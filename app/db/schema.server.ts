@@ -19,7 +19,8 @@ import {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `splitbox_${name}`);
+export const createTable = pgTableCreator((name) => `remix_splitbox_{name}`);
+
 
 export const SO_posts = createTable(
   "post",
