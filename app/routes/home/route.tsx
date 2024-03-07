@@ -1,7 +1,6 @@
+// eslint-disable-next-line react/no-children-prop
 import type { MetaFunction } from "@remix-run/node";
-import { Outlet } from "@remix-run/react";
-import { DashLayout } from "~/components/custom/side-bar";
-
+import { useNavigation } from "@remix-run/react";
 export const meta: MetaFunction = () => {
   return [
     { title: "New Remix App" },
@@ -9,11 +8,13 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
-  return (
-    <DashLayout selected="/home">
-      <Outlet />
-    </DashLayout>
 
+export default function Index() {
+  const nav = useNavigation();
+
+  return (
+    <div className="flex">
+      <h1>Simple Form Example</h1>
+    </div>
   );
 }
