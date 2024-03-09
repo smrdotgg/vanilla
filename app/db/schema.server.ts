@@ -19,8 +19,7 @@ import {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `remix_splitbox_${name}`);
-
+export const createTable = pgTableCreator((name) => `rs_${name}`);
 
 export const SO_posts = createTable(
   "post",
@@ -36,17 +35,35 @@ export const SO_posts = createTable(
   }),
 );
 
-export const SO_campaigns = createTable(
-  "campaign",
-  {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
-    isDraft: boolean("isDraft").notNull().default(false),
-    sequence: text("sequence"),
-  }
-);
+export const SO_campaigns = createTable("campaign", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 256 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  isDraft: boolean("isDraft").notNull().default(false),
+  sequence: text("sequence"),
+});
+
+
+export const SO_sequence_steps = createTable("sequence_step", {
+  id: serial("id").primaryKey(),
+  title: text("title"),
+  content: text("content"),
+  index: integer("index").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  campaignId: integer("campaign_id").references(() => SO_campaigns.id).notNull(),
+});
+
+export const SO_sequence_breaks = createTable("sequence_break", {
+  id: serial("id").primaryKey(),
+  lengthInHours: integer("length_in_hours").notNull(),
+  index: integer("index").notNull(),
+  campaignId: integer("campaign_id").references(() => SO_campaigns.id),
+});
+
+export type SequenceStep = typeof SO_sequence_steps.$inferSelect;
+export type SequenceBreak = typeof SO_sequence_breaks.$inferSelect;
 
 
 export const SO_contacts = createTable("contact", {
@@ -59,7 +76,6 @@ export const SO_contacts = createTable("contact", {
 
 export type SelectContact = typeof SO_contacts.$inferSelect;
 export type InsertContact = typeof SO_contacts.$inferInsert;
-
 
 export const SO_binding_campaigns_contacts = createTable(
   "campaigns_contacts",
@@ -75,4 +91,3 @@ export const SO_binding_campaigns_contacts = createTable(
     pk: primaryKey({ columns: [table.contactId, table.campaignId] }),
   }),
 );
-

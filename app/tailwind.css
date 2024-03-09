@@ -60,3 +60,6 @@
     @apply bg-background text-foreground;
   }
 }
+.ck-editor__editable_inline {
+    @apply min-h-96 flex-grow min-w-0 max-h-full
+}

@@ -5,7 +5,7 @@ import { FaHome } from "react-icons/fa";
 import { HiClipboardDocument } from "react-icons/hi2";
 import { IoPersonSharp, IoSettingsSharp } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
-import { ModeToggle } from "../ui/toggle";
+import { ModeToggle } from "../ui/mode-toggle";
 import { ReactNode, useState } from "react";
 import { Theme, useTheme } from "remix-themes";
 
@@ -42,7 +42,11 @@ export function DashLayout({
   children: React.ReactNode;
   selected?: dashRoute;
 }) {
-  const [loading, setLoading] = useState("");
+  // const [loading, setLoading] = useState("");
+  // eslint-disable-next-line prefer-const
+  let loading = "";
+  const setLoading = (x:string) => {};
+
   const [theme] = useTheme();
   return (
     <div className="max-w-screen min-w-screen flex max-h-screen min-h-screen ">
@@ -61,7 +65,7 @@ export function DashLayout({
           alt="loading spinner"
         />
       )}
-      <div className="flex flex-col   p-2  text-white bg-primary dark:bg-blue-950 justify-between">
+      <div className={`flex flex-col   p-2  text-white bg-primary dark:bg-secondary justify-between `}>
         <div className="flex flex-col gap-1">
           <img
             className="mx-auto"
@@ -85,8 +89,8 @@ export function DashLayout({
                   isActive
                     ? "bg-blue-100 text-blue-900"
                     : isPending
-                      ? "bg-white dark:bg-gray-300 dark:text-gray-500 text-black border border-black cursor-wait"
-                      : "text-white dark:border dark:border-blue-200 dark:bg-blue-900 bg-black "
+                      ? "bg-white dark:bg-gray-300 dark:text-gray-500 text-black border border-blue-300 cursor-wait"
+                      : "text-white dark:border   bg-blue-900 "
                 }`;
                 }}
                 to={e.route}

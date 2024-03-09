@@ -1,4 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
+import { Provider } from "jotai";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Links,
@@ -58,8 +59,10 @@ export function App() {
 export default function AppWithProviders() {
   const data = useLoaderData<typeof loader>();
   return (
+  <Provider>
     <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
       <App />
     </ThemeProvider>
+  </Provider>
   );
 }
