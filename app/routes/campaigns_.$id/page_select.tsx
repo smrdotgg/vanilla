@@ -49,26 +49,26 @@ export function PageSelect({
         done={sequence}
         icon={TbCircleNumber2}
       />
-      <FaChevronRight />
-      <PageButton
-        href="03_schedule"
-        label={"Schedule"}
-        done={schedule}
-        icon={TbCircleNumber3}
-      />
+      {/* <FaChevronRight /> */}
+      {/* <PageButton */}
+      {/*   href="03_schedule" */}
+      {/*   label={"Schedule"} */}
+      {/*   done={schedule} */}
+      {/*   icon={TbCircleNumber3} */}
+      {/* /> */}
       <FaChevronRight />
       <PageButton
         href="04_settings"
         label={"Settings"}
         done={settings}
-        icon={TbCircleNumber4}
+        icon={TbCircleNumber3}
       />
       <FaChevronRight />
       <PageButton
         href="05_launch"
         label={"Launch"}
         done={launch}
-        icon={TbCircleNumber5}
+        icon={TbCircleNumber4}
       />
     </div>
   );

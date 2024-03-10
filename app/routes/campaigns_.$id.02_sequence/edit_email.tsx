@@ -2,7 +2,7 @@ import { ClientOnly } from "remix-utils/client-only";
 import { z } from "zod";
 import { NewEditor } from "./editor.client";
 import { NameView } from "../campaigns_.$id/route";
-import { useFetcher, useFetchers, useParams } from "@remix-run/react";
+import { useFetcher, useFetchers } from "@remix-run/react";
 import { INTENTS, deleteEmailSchema } from "./types";
 import { Button } from "~/components/ui/button";
 import { TrashIcon } from "lucide-react";

@@ -12,11 +12,14 @@ import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { db } from "~/db/index.server";
-import {useAtomValue,atom} from "jotai";
+import { useAtomValue, atom } from "jotai";
 import {
   SO_binding_campaigns_contacts,
+  SO_campaign_sender_email_link,
   SO_campaigns,
   SO_contacts,
+  SO_sender_emails,
+  SO_sequence_steps,
 } from "~/db/schema.server";
 import { createEnumSchema } from "~/lib/zod_enum_schema";
 import { PageSelect } from "./page_select";
@@ -29,10 +32,7 @@ export type CampaignStatus = {
   launch: boolean;
 };
 
-
-export const sequenceCTAAtom = atom<ReactNode | undefined>(undefined)
-
-
+export const sequenceCTAAtom = atom<ReactNode | undefined>(undefined);
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const campaignContacts = await db
@@ -51,12 +51,22 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     params: qParams,
   };
 
+  const sequence = await db
+    .select()
+    .from(SO_sequence_steps)
+    .where(eq(SO_sequence_steps.campaignId, Number(params.id)));
+
+  const senders = await db
+    .select()
+    .from(SO_campaign_sender_email_link)
+    .where(eq(SO_campaign_sender_email_link.campaignId, Number(params.id)));
+
   return {
     campaign: campaign[0],
     contacts: Boolean(campaignContacts.length),
-    sequence: false,
+    sequence: Boolean(sequence.length),
     schedule: false,
-    settings: false,
+    settings: Boolean(senders.length),
     launch: false,
     result,
   };
@@ -102,17 +112,13 @@ export default function Page() {
             campaignId={data.campaign.id}
             data={data.result.params}
           />
-          <div className="w-60 flex justify-end">
-            {cta}
-          </div>
+          <div className="w-60 flex justify-end">{cta}</div>
         </div>
         <Outlet />
-
       </div>
     </>
   );
 }
-
 
 export const NameView = ({
   name,
@@ -120,7 +126,7 @@ export const NameView = ({
   onSubmit,
 }: {
   name: FormDataEntryValue | null;
-  notSetView?: string,
+  notSetView?: string;
   onSubmit: (val: string) => void;
 }) => {
   const [editMode, setEditMode] = useState(false);

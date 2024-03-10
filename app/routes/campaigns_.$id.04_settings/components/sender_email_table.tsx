@@ -2,7 +2,7 @@ import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { timeAgo } from "~/lib/time_ago";
 
-export function ContactsDisplay({
+export function SenderEmailTable({
   contacts,
   selectedContactsMap,
   setSelectedContactsMap,
@@ -10,16 +10,13 @@ export function ContactsDisplay({
 }: {
   contacts?: {
     id: number;
-    name: string;
-    email: string;
-    createdAt: Date;
-    companyName: string | null;
+    emailAddr: string;
   }[];
   selectedContactsMap: Set<number>;
   setSelectedContactsMap: (newVal: Set<number>) => void;
   formDisabled?: boolean;
 }) {
-  if (contacts == undefined) return <>Loading</>;
+  if (contacts == undefined) return <></>;
   return (
     <div className=" flex-grow flex overflow-hidden  ">
       <div className="flex flex-col  w-full">
@@ -27,8 +24,8 @@ export function ContactsDisplay({
         <div className="flex gap-6">
           <Checkbox
             disabled={formDisabled}
-            className=" my-auto h-5 w-5"
-            onCheckedChange={(newVal) => {
+            className="my-auto h-5 w-5"
+            onCheckedChange={() => {
               if (selectedContactsMap.size == contacts.length) {
                 const newVal = new Set<number>();
                 setSelectedContactsMap(newVal);
@@ -46,13 +43,13 @@ export function ContactsDisplay({
           <h1>Select All ({contacts.length})</h1>
         </div>
         <p>
-          {selectedContactsMap.size} Contact
+          {selectedContactsMap.size} Sender Account
           {selectedContactsMap.size == 1 ? "" : "s"} Selected
         </p>
       </div>
       <div className="flex-grow overflow-y-auto">
         {contacts.map((c, i) => (
-          <ContactDisplay
+          <SenderEmailDisplay
             key={i}
             contact={c}
             formDisabled={formDisabled}
@@ -66,7 +63,7 @@ export function ContactsDisplay({
   );
 }
 
-function ContactDisplay({
+function SenderEmailDisplay({
   contact,
   selectedContactsMap,
   setSelectedContactsMap,
@@ -74,10 +71,7 @@ function ContactDisplay({
 }: {
   contact: {
     id: number;
-    name: string;
-    email: string;
-    createdAt: Date;
-    companyName: string | null;
+    emailAddr: string;
   };
   selectedContactsMap: Set<number>;
   setSelectedContactsMap: (newVal: Set<number>) => void;
@@ -91,7 +85,7 @@ function ContactDisplay({
         <div className="flex gap-2">
           <Checkbox
             disabled={formDisabled}
-            onCheckedChange={(newState) => {
+            onCheckedChange={() => {
               const newVal = new Set(selectedContactsMap);
               if (selected) newVal.delete(contact.id);
               else newVal.add(contact.id);
@@ -103,14 +97,14 @@ function ContactDisplay({
 
           <div className="flex flex-col gap-1 py-2">
             <div className="flex gap-1">
-              <p className="font-bold">{contact.name}</p>
-              <p>{contact.companyName == null ? "" : `-`}</p>
-              <p>
-                {contact.companyName == null ? "" : `${contact.companyName}`}
-              </p>
+              <p className="font-bold">{contact.emailAddr}</p>
+              {/* <p>{contact.companyName == null ? "" : `-`}</p> */}
+              {/* <p> */}
+              {/*   {contact.companyName == null ? "" : `${contact.companyName}`} */}
+              {/* </p> */}
             </div>
-            <p className="text-black dark:text-white">{contact.email}</p>
-            <p className="text-secondary-foreground">Added {timeAgo(contact.createdAt)}</p>
+            <p className="text-black dark:text-white">{contact.emailAddr}</p>
+            {/* <p className="text-secondary-foreground">Added {timeAgo(contact.createdAt)}</p> */}
           </div>
         </div>
         <Button variant={"outline"}>Manage</Button>
@@ -119,4 +113,7 @@ function ContactDisplay({
     </div>
   );
 }
+
+
+
 

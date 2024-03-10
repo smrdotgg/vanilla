@@ -105,8 +105,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const fd = await request.formData();
   const intent = fd.get("intent");
 
-  console.log("ACTION CALLED");
-
   let form: any = {};
   if (intent === INTENTS.updateEmailContent) {
     await newUpdateEmailContent(

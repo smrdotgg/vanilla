@@ -35,6 +35,11 @@ export const SO_posts = createTable(
   }),
 );
 
+export const SO_sender_emails = createTable("sender_email", {
+  id: serial("id").primaryKey(),
+  emailAddr: text("email_address").notNull(),
+});
+
 export const SO_campaigns = createTable("campaign", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }),
@@ -44,6 +49,20 @@ export const SO_campaigns = createTable("campaign", {
   sequence: text("sequence"),
 });
 
+export const SO_campaign_sender_email_link = createTable(
+  "campaign_sender_email_link",
+  {
+    campaignId: integer("campaign_id")
+      .references(() => SO_campaigns.id)
+      .notNull(),
+    senderEmailId: integer("sender_email_id")
+      .references(() => SO_sender_emails.id)
+      .notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.campaignId, table.senderEmailId] }),
+  }),
+);
 
 export const SO_sequence_steps = createTable("sequence_step", {
   id: serial("id").primaryKey(),
@@ -52,7 +71,9 @@ export const SO_sequence_steps = createTable("sequence_step", {
   index: integer("index").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  campaignId: integer("campaign_id").references(() => SO_campaigns.id).notNull(),
+  campaignId: integer("campaign_id")
+    .references(() => SO_campaigns.id)
+    .notNull(),
 });
 
 export const SO_sequence_breaks = createTable("sequence_break", {
@@ -62,10 +83,6 @@ export const SO_sequence_breaks = createTable("sequence_break", {
   campaignId: integer("campaign_id").references(() => SO_campaigns.id),
 });
 
-export type SequenceStep = typeof SO_sequence_steps.$inferSelect;
-export type SequenceBreak = typeof SO_sequence_breaks.$inferSelect;
-
-
 export const SO_contacts = createTable("contact", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
@@ -73,9 +90,6 @@ export const SO_contacts = createTable("contact", {
   companyName: varchar("company_name", { length: 256 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
-export type SelectContact = typeof SO_contacts.$inferSelect;
-export type InsertContact = typeof SO_contacts.$inferInsert;
 
 export const SO_binding_campaigns_contacts = createTable(
   "campaigns_contacts",
@@ -91,3 +105,9 @@ export const SO_binding_campaigns_contacts = createTable(
     pk: primaryKey({ columns: [table.contactId, table.campaignId] }),
   }),
 );
+
+/* ---  Type Exports --- */
+export type SequenceStep = typeof SO_sequence_steps.$inferSelect;
+export type SequenceBreak = typeof SO_sequence_breaks.$inferSelect;
+export type SelectContact = typeof SO_contacts.$inferSelect;
+export type InsertContact = typeof SO_contacts.$inferInsert;
