@@ -101,8 +101,6 @@ const main = async () => {
 };
 
 console.log("cron job about to start waiting for an hour...");
-// schedule("* * * * *", main);
-
-main();
+schedule("*/60 * * * *", main);
 console.log("Added console logs throughout the script for better tracking");
 
