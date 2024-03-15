@@ -11,7 +11,10 @@ import {
 import { sequenceStepsToSend } from "./helpers";
 import { sendWithCustomData } from "./send_email";
 import { eq, inArray } from "drizzle-orm";
+let t = false;
 const main = async () => {
+	if (t) return;
+	t=  true;
   console.log(`${new Date().toISOString()}: cron job triggered`);
   console.log("Starting sequenceStepsToSend function");
   const { stepsToSend } = await sequenceStepsToSend();
@@ -69,7 +72,7 @@ const main = async () => {
       const d = targetContacts.map(
         async (t) => {
           console.log(`Sending email to: ${t.email}`);
-          return await sendWithCustomData({
+	  const args = {
             SMTPPort: senderEmail.smtpPort,
             SMTPHost: senderEmail.smtpHost,
             body: step.content ?? "",
@@ -79,7 +82,9 @@ const main = async () => {
             password: senderEmail.password,
             username: senderEmail.userName,
             targetAddress: t.email,
-          });
+          };
+	  console.log(`args = ${JSON.stringify(args, null, 2)}`);
+          return await sendWithCustomData(args);
         },
       );
       await Promise.all(d);
@@ -101,6 +106,6 @@ const main = async () => {
 };
 
 console.log("cron job about to start waiting for an hour...");
-schedule("*/60 * * * *", main);
+schedule("* * * * * *", main);
 console.log("Added console logs throughout the script for better tracking");
 
