@@ -71,23 +71,26 @@ export default function ContactsPage() {
   }, [fetcher, params.id, selectedId, setCta]);
 
   return (
-  <>
-    <ContactsDisplay
-      formDisabled={!loaded}
-      selectedContactsMap={selectedId}
-      setSelectedContactsMap={setSelectedId}
-      contacts={data!.contacts.map((d) => ({
-        id: d.id,
-        name: d.name,
-        email: d.email,
-        createdAt: new Date(d.createdAt),
-        companyName: d.companyName,
-      }))}
-    />
-    </>
+    <div className="flex flex-col gap-2 overflow-auto">
+      <hr />
+      <h1 className="mx-6 my-2 text-3xl font-bold">
+        Select the contacts you want to target for this campaign.
+      </h1>
+      <ContactsDisplay
+        formDisabled={!loaded}
+        selectedContactsMap={selectedId}
+        setSelectedContactsMap={setSelectedId}
+        contacts={data!.contacts.map((d) => ({
+          id: d.id,
+          name: d.name,
+          email: d.email,
+          createdAt: new Date(d.createdAt),
+          companyName: d.companyName,
+        }))}
+      />
+    </div>
   );
 }
-
 
 export const action = async (args: ActionFunctionArgs) => {
   const body = await readableStreamToString(args.request.body!);

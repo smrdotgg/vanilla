@@ -19,7 +19,7 @@ export function BreakManagePortal({
   open: boolean;
   setOpen: (val: boolean) => void;
   onSubmit: (val: string) => void;
-  initialValue?: number,
+  initialValue?: number;
 }) {
   const [val, setVal] = useState<number | undefined>(initialValue);
   return (
@@ -30,31 +30,42 @@ export function BreakManagePortal({
             <DialogTitle>How much time should this break last</DialogTitle>
             <DialogDescription>
               <div className="flex">
-              
                 <div className=" ">
                   <ToggleGroup
                     type="single"
                     value={String(val)}
                     onValueChange={(e) => setVal(Number(e))}
-                    className="flex flex-col *:gap-1  *:flex *:justify-start *:mr-auto *:w-full w-28"
+                    className="flex w-28 flex-col  *:mr-auto *:flex *:w-full *:justify-start *:gap-1"
                   >
                     <ToggleGroupItem
-                      value={String(1*24)}
+                      value={String(1 * 24)}
                       aria-label="Toggle bold"
                       className=""
                     >
                       <p>1 Day</p>
                     </ToggleGroupItem>
-                    <ToggleGroupItem value={String(3*24)} aria-label="Toggle italic">
+                    <ToggleGroupItem
+                      value={String(3 * 24)}
+                      aria-label="Toggle italic"
+                    >
                       <p>3 Days</p>
                     </ToggleGroupItem>
-                    <ToggleGroupItem value={String(7*24)} aria-label="Toggle italic">
+                    <ToggleGroupItem
+                      value={String(7 * 24)}
+                      aria-label="Toggle italic"
+                    >
                       <p>1 Week</p>
                     </ToggleGroupItem>
-                    <ToggleGroupItem value={String(14*24)} aria-label="Toggle italic">
+                    <ToggleGroupItem
+                      value={String(14 * 24)}
+                      aria-label="Toggle italic"
+                    >
                       <p>2 Weeks</p>
                     </ToggleGroupItem>
-                    <ToggleGroupItem value={String(30*24)} aria-label="Toggle italic">
+                    <ToggleGroupItem
+                      value={String(30 * 24)}
+                      aria-label="Toggle italic"
+                    >
                       <p>1 Month</p>
                     </ToggleGroupItem>
                   </ToggleGroup>

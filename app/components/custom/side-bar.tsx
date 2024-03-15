@@ -1,15 +1,21 @@
-import { NavLink } from "@remix-run/react";
+import { Link, NavLink } from "@remix-run/react";
 import { GrInProgress } from "react-icons/gr";
 import { FaHome } from "react-icons/fa";
 
 import { HiClipboardDocument } from "react-icons/hi2";
+import { IoIosPeople } from "react-icons/io";
 import { IoPersonSharp, IoSettingsSharp } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
 import { ModeToggle } from "../ui/mode-toggle";
 import { ReactNode, useState } from "react";
 import { Theme, useTheme } from "remix-themes";
 
-type dashRoute = "/home" | "/settings" | "/contacts" | "/campaigns";
+type dashRoute =
+  | "/home"
+  | "/settings"
+  | "/contacts"
+  | "/campaigns"
+  | "/sender_accounts";
 
 const elements: { route: dashRoute; name: string; icon: IconType }[] = [
   {
@@ -32,6 +38,11 @@ const elements: { route: dashRoute; name: string; icon: IconType }[] = [
     name: "Campaign",
     icon: HiClipboardDocument,
   },
+  {
+    route: "/sender_accounts",
+    name: "Sender Accounts",
+    icon: IoIosPeople,
+  },
 ];
 
 export function DashLayout({
@@ -45,7 +56,7 @@ export function DashLayout({
   // const [loading, setLoading] = useState("");
   // eslint-disable-next-line prefer-const
   let loading = "";
-  const setLoading = (x:string) => {};
+  const setLoading = (x: string) => {};
 
   const [theme] = useTheme();
   return (
@@ -55,25 +66,29 @@ export function DashLayout({
       ) : theme === Theme.DARK ? (
         <img
           src="/loading-dark.svg"
-          className="absolute left-1/2 top-10 -translate-x-1/2 h-10"
+          className="absolute left-1/2 top-10 h-10 -translate-x-1/2"
           alt="loading spinner"
         />
       ) : (
         <img
           src="/loading.svg"
-          className="absolute left-1/2 top-10 -translate-x-1/2 h-10"
+          className="absolute left-1/2 top-10 h-10 -translate-x-1/2"
           alt="loading spinner"
         />
       )}
-      <div className={`flex flex-col   p-2  text-white bg-primary dark:bg-secondary justify-between `}>
+      <div
+        className={`flex flex-col w-52 min-w-52  justify-between  bg-primary p-2 text-white dark:bg-secondary `}
+      >
         <div className="flex flex-col gap-1">
-          <img
-            className="mx-auto"
-            alt="Splitbox Logo"
-            src={"/download.svg"}
-            width={8 * 3}
-            height={8 * 3}
-          />
+          <Link to="/">
+            <img
+              className="mr-auto"
+              alt="Splitbox Logo"
+              src={"/download.svg"}
+              width={8 * 3}
+              height={8 * 3}
+            />
+          </Link>
 
           <div className="pt-10"></div>
           <>
@@ -84,13 +99,13 @@ export function DashLayout({
                   if (isPending && loading != e.route) setLoading(e.route);
                   if (isActive && loading == e.route) setLoading("");
                   return `
-                  rounded py-2   h-8 w-8 flex 
+                  flex min-h-8 rounded 
                 ${
                   isActive
-                    ? "bg-blue-100 text-blue-900"
+                    ? "bg-blue-200 text-blue-900"
                     : isPending
-                      ? "bg-white dark:bg-gray-300 dark:text-gray-500 text-black border border-blue-300 cursor-wait"
-                      : "text-white dark:border   bg-blue-900 "
+                      ? "cursor-wait bg-white text-black dark:bg-gray-50 dark:text-gray-400"
+                      : "bg-blue-900    text-white "
                 }`;
                 }}
                 to={e.route}
@@ -98,7 +113,11 @@ export function DashLayout({
                 {loading == e.route ? (
                   <GrInProgress className="m-auto " size={8 * 2} />
                 ) : (
-                  <e.icon className="m-auto " size={8 * 2} />
+                  <div className="flex  h-full w-full px-3 *:my-auto">
+                    <e.icon className="h-8  min-w-4" size={8 * 2} />
+                    <div className="pl-2"></div>
+                    <p>{e.name}</p>
+                  </div>
                 )}
               </NavLink>
             ))}

@@ -6,8 +6,8 @@ import { CiSquarePlus } from "react-icons/ci";
 import { db } from "~/db/index.server";
 import { SO_sequence_breaks, SO_sequence_steps } from "~/db/schema.server";
 import { eq } from "drizzle-orm";
-import { useFetchers, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import { Link, useFetchers, useLoaderData, useParams } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { EditEmailPage } from "./edit_email";
 import { BreakTile } from "./components/break_tile";
 import { StepTile } from "./components/step_tile";
@@ -33,6 +33,9 @@ import {
   updateEmailTitle,
 } from "./db_calls.server";
 import { AddItem } from "./components/add_item";
+import { JSX } from "react/jsx-runtime";
+import { useSetAtom } from "jotai";
+import { sequenceCTAAtom } from "../campaigns_.$id/route";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const campaignId = Number(params.id);
@@ -58,43 +61,66 @@ export default function ContactsPage() {
   const data = useLoaderData<typeof loader>();
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
+  const params = useParams();
+  const setCta = useSetAtom(sequenceCTAAtom);
+  useEffect(() => {
+    setCta(
+      <Button asChild>
+        <Link to={`/campaigns/${params.id}/04_settings`}>Next</Link>
+      </Button>,
+    );
+    return () => setCta(undefined);
+  }, []);
   return (
-    <div className=" flex-grow flex max-h-full overflow-y-auto ">
-      <div className="flex w-full h-full">
-        <div className="pl-1"></div>
-        <div className=" w-96 bg-secondary border border-l-black flex flex-col *:w-full">
-          <div className="flex justify-between *:my-auto">
-            <p className="p-2 text-xl">Emails</p>
-            <AddItem />
-          </div>
-          {data.order.map((orderElement, i) => (
-            <div key={i}>
-              {orderElement.type === "break" ? (
-                <BreakTile data={data.breaks[orderElement.id]} />
-              ) : (
-                <StepTile
-                  selected={selected == orderElement.id}
-                  onClick={() => setSelected(orderElement.id)}
-                  data={{
-                    ...data.steps[orderElement.id],
-                    createdAt: new Date(data.steps[orderElement.id].createdAt),
-                    updatedAt: new Date(data.steps[orderElement.id].updatedAt),
-                  }}
-                />
-              )}
+    <div className="flex h-full flex-col ">
+      <hr />
+      <h1 className="mx-6 my-2 text-3xl font-bold">
+        Setup the your emails. You can add breaks between them.
+      </h1>
+      <div className=" flex   flex-grow overflow-y-auto ">
+        <div className="flex w-full  flex-grow">
+          <div className="pl-1"></div>
+          <div className=" flex w-96 flex-col border border-l-black bg-secondary *:w-full">
+            <div className="flex justify-between *:my-auto">
+              <p className="p-2 text-xl">Emails &amp; Breaks</p>
+              <AddItem />
             </div>
-          ))}
-        </div>
-        <div className="pl-1"></div>
-        <div className="flex-grow flex flex-col overflow-y-auto  h-full bg-secondary">
-          {selected !== undefined && data.steps[selected!] !== undefined ? (
-            <EditEmailPage
-              id={selected!}
-              content={data.steps[selected].content}
-              title={data.steps[selected].title}
-            />
-          ) : (<></>)
-          }
+            <div className="flex flex-col gap-2 overflow-y-auto">
+              {data.order.map((orderElement, i) => (
+                <div key={i}>
+                  {orderElement.type === "break" ? (
+                    <BreakTile data={data.breaks[orderElement.id]} />
+                  ) : (
+                    <StepTile
+                      selected={selected == orderElement.id}
+                      onClick={() => setSelected(orderElement.id)}
+                      data={{
+                        ...data.steps[orderElement.id],
+                        createdAt: new Date(
+                          data.steps[orderElement.id].createdAt,
+                        ),
+                        updatedAt: new Date(
+                          data.steps[orderElement.id].updatedAt,
+                        ),
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="pl-1"></div>
+          <div className="flex h-full flex-grow flex-col  overflow-y-auto bg-secondary">
+            {selected !== undefined && data.steps[selected!] !== undefined ? (
+              <EditEmailPage
+                id={selected!}
+                content={data.steps[selected].content}
+                title={data.steps[selected].title}
+              />
+            ) : (
+              <></>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -121,9 +147,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     await deleteBreak(await zx.parseForm(fd, deleteBreakSchema));
   } else if (intent === INTENTS.addEmail) {
     await addEmail(await zx.parseForm(fd, addEmailSchema));
-  }  else if (intent === INTENTS.deleteEmail) {
+  } else if (intent === INTENTS.deleteEmail) {
     await deleteEmail(await zx.parseForm(fd, deleteEmailSchema));
-  }else {
+  } else {
     console.log("default");
   }
 

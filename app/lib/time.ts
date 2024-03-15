@@ -7,8 +7,9 @@ export function hoursToEnglishString(hours: number): string {
     { unit: "Minute", value: Math.floor(minutes % 60) },
   ];
   const nonZeroParts = timeParts
-    .filter(part => part.value > 0)
-    .map(part => `${part.value} ${part.value > 1 ? part.unit + "s" : part.unit}`);
+    .filter((part) => part.value > 0)
+    .map(
+      (part) => `${part.value} ${part.value > 1 ? part.unit + "s" : part.unit}`,
+    );
   return nonZeroParts.join(" and ");
 }
-

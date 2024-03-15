@@ -10,7 +10,7 @@ export function SenderEmailTable({
 }: {
   contacts?: {
     id: number;
-    emailAddr: string;
+    fromEmail: string;
   }[];
   selectedContactsMap: Set<number>;
   setSelectedContactsMap: (newVal: Set<number>) => void;
@@ -18,46 +18,47 @@ export function SenderEmailTable({
 }) {
   if (contacts == undefined) return <></>;
   return (
-    <div className=" flex-grow flex overflow-hidden  ">
-      <div className="flex flex-col  w-full">
-      <div className="flex h-12 min-h-12 w-full justify-between bg-secondary px-6 *:my-auto  ">
-        <div className="flex gap-6">
-          <Checkbox
-            disabled={formDisabled}
-            className="my-auto h-5 w-5"
-            onCheckedChange={() => {
-              if (selectedContactsMap.size == contacts.length) {
-                const newVal = new Set<number>();
-                setSelectedContactsMap(newVal);
-              } else {
-                const newVal = new Set<number>();
-                contacts.map((c) => newVal.add(c.id));
-                setSelectedContactsMap(newVal);
+    <div className=" flex flex-grow  overflow-y-auto ">
+      <div className="flex w-full max-h-full flex-col overflow-y-auto">
+        <div className="flex h-12 min-h-12 w-full justify-between bg-secondary px-6 *:my-auto  ">
+          <div className="flex gap-6">
+            <Checkbox
+              disabled={formDisabled}
+              className="my-auto h-5 w-5"
+              onCheckedChange={() => {
+                if (selectedContactsMap.size == contacts.length) {
+                  const newVal = new Set<number>();
+                  setSelectedContactsMap(newVal);
+                } else {
+                  const newVal = new Set<number>();
+                  contacts.map((c) => newVal.add(c.id));
+                  setSelectedContactsMap(newVal);
+                }
+              }}
+              checked={
+                selectedContactsMap.size > 0 &&
+                selectedContactsMap.size == contacts.length
               }
-            }}
-            checked={
-              selectedContactsMap.size > 0 &&
-              selectedContactsMap.size == contacts.length
-            }
-          />
-          <h1>Select All ({contacts.length})</h1>
+            />
+            <h1>Select All ({contacts.length})</h1>
+          </div>
+          <p>
+            {selectedContactsMap.size} Sender Account
+            {selectedContactsMap.size == 1 ? "" : "s"} Selected
+          </p>
         </div>
-        <p>
-          {selectedContactsMap.size} Sender Account
-          {selectedContactsMap.size == 1 ? "" : "s"} Selected
-        </p>
-      </div>
-      <div className="flex-grow overflow-y-auto">
-        {contacts.map((c, i) => (
-          <SenderEmailDisplay
-            key={i}
-            contact={c}
-            formDisabled={formDisabled}
-            setSelectedContactsMap={setSelectedContactsMap}
-            selectedContactsMap={selectedContactsMap}
-          />
-        ))}
-      </div>
+
+        <div className="flex-grow flex flex-col overflow-y-auto">
+          {contacts.map((c, i) => (
+            <SenderEmailDisplay
+              key={i}
+              contact={c}
+              formDisabled={formDisabled}
+              setSelectedContactsMap={setSelectedContactsMap}
+              selectedContactsMap={selectedContactsMap}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -71,7 +72,7 @@ function SenderEmailDisplay({
 }: {
   contact: {
     id: number;
-    emailAddr: string;
+    fromEmail: string;
   };
   selectedContactsMap: Set<number>;
   setSelectedContactsMap: (newVal: Set<number>) => void;
@@ -97,23 +98,19 @@ function SenderEmailDisplay({
 
           <div className="flex flex-col gap-1 py-2">
             <div className="flex gap-1">
-              <p className="font-bold">{contact.emailAddr}</p>
+              <p className="font-bold">{contact.fromEmail}</p>
               {/* <p>{contact.companyName == null ? "" : `-`}</p> */}
               {/* <p> */}
               {/*   {contact.companyName == null ? "" : `${contact.companyName}`} */}
               {/* </p> */}
             </div>
-            <p className="text-black dark:text-white">{contact.emailAddr}</p>
+            <p className="text-black dark:text-white">{contact.fromEmail}</p>
             {/* <p className="text-secondary-foreground">Added {timeAgo(contact.createdAt)}</p> */}
           </div>
         </div>
         <Button variant={"outline"}>Manage</Button>
       </div>
-      <div className="h-[.5px] w-full dark:bg-gray-700 bg-gray-100"></div>
+      <div className="h-[.5px] w-full bg-gray-100 dark:bg-gray-700"></div>
     </div>
   );
 }
-
-
-
-

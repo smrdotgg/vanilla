@@ -44,13 +44,13 @@ export const EditEmailPage = ({
 
   return (
     <div>
-      <div className="flex  pb-2 p-2 *:my-auto justify-between">
+      <div className="flex  justify-between p-2 pb-2 *:my-auto">
         <NameView
           notSetView="Email Title"
           name={title}
           onSubmit={setContentWithTwoSecondWait}
         />
-        <div >
+        <div>
           {fetchers.filter(
             (f) => f.formData?.get("intent") === INTENTS.updateEmailContent,
           ).length > 0 ? (
@@ -81,8 +81,8 @@ function DeleteIconButton({ onDelete }: { onDelete: () => void }) {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline" className="py-2 px-3 ">
-            <TrashIcon className="w-4 h-4 dark:text-white text-red" />
+          <Button variant="outline" className="px-3 py-2 ">
+            <TrashIcon className="text-red h-4 w-4 dark:text-white" />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
@@ -92,7 +92,7 @@ function DeleteIconButton({ onDelete }: { onDelete: () => void }) {
               Are you sure you want to delete this email?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="sm:justify-end gap-1">
+          <DialogFooter className="gap-1 sm:justify-end">
             <DialogClose asChild>
               <Button variant="secondary">Cancel</Button>
             </DialogClose>

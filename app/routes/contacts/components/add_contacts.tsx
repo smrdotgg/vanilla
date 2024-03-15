@@ -70,44 +70,39 @@ export function DialogCloseButton({
                 <SampleShow data={data} headers={headers} mapping={mapping} />
               </div>
               <DialogFooter className="sm:justify-between">
+                <FileAcceptSmall setData={updateParsedData} />
+                <div className="flex gap-2 ">
+                  <DialogClose asChild>
+                    <Button
+                      type="button"
+                      onClick={() => setData(null)}
+                      variant={"secondary"}
+                    >
+                      Cancel
+                    </Button>
+                  </DialogClose>
 
-                  <FileAcceptSmall setData={updateParsedData} />
-                  <div className="flex gap-2 ">
-                    <DialogClose asChild>
-                      <Button
-                        type="button"
-                        onClick={() => setData(null)}
-                        variant={"secondary"}
-                      >
-                        Cancel
-                      </Button>
-                    </DialogClose>
-
-                    <DialogClose asChild>
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          const x = data.data
-                            .map((row: any, _) => {
-                              const x = {
-                                name: String(row[mapping.name]),
-                                email: String(row[mapping.email]),
-                                company: String(row[mapping.companyName]),
-                              };
-                              return x;
-                            })
-                            .filter((i) => i.name.length);
-                          console.log("SENDING");
-                          console.log(JSON.stringify(x));
-                          // setData(null);
-                          onSubmit(x);
-                        }}
-                      >
-                        Submit
-                      </Button>
-                    </DialogClose>
-                  </div>
-                
+                  <DialogClose asChild>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        const x = data.data
+                          .map((row: any, _) => {
+                            const x = {
+                              name: String(row[mapping.name]),
+                              email: String(row[mapping.email]),
+                              company: String(row[mapping.companyName]),
+                            };
+                            return x;
+                          })
+                          .filter((i) => i.name.length);
+                        onSubmit(x);
+                      }}
+                    >
+                      Submit
+                    </Button>
+                  </DialogClose>
+                </div>
               </DialogFooter>
             </div>
           ) : (

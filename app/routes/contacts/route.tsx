@@ -1,14 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // eslint-disable-next-line react/no-children-prop,
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { MdDelete } from "react-icons/md";
-import { useForm, createFormFactory } from "@tanstack/react-form";
-import {
-  useActionData,
-  useFetcher,
-  useLoaderData,
-  useNavigation,
-} from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CiFilter } from "react-icons/ci";
 import { Button } from "~/components/ui/button";
 import { db } from "~/db/index.server";
@@ -35,9 +28,9 @@ export default function Index() {
   useEffect(() => setLoaded(true), []);
 
   return (
-    <div className="flex gap-10 flex-col h-screen  flex-grow overflow-y-hidden ">
-      <div className="h-24 p-4 w-full">
-        <div className="flex justify-between w-full *:my-auto">
+    <div className="flex h-screen flex-grow flex-col  gap-10 overflow-y-hidden ">
+      <div className="h-24 w-full p-4">
+        <div className="flex w-full justify-between *:my-auto">
           <div className="flex flex-col">
             <h1 className="text-xl font-bold">Contacts</h1>
             <p className="text-gray-500 dark:text-gray-300">
@@ -58,7 +51,6 @@ export default function Index() {
               );
             }}
           />
-          {/*<Button onClick={() => null}>Import contacts from CSV</Button>*/}
         </div>
         <div className="pt-4"></div>
         <div className="flex justify-between">

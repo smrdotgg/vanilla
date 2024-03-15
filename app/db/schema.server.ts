@@ -11,6 +11,7 @@ import {
   timestamp,
   varchar,
   boolean,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -20,6 +21,8 @@ import {
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 export const createTable = pgTableCreator((name) => `rs_${name}`);
+
+
 
 export const SO_posts = createTable(
   "post",
@@ -35,19 +38,68 @@ export const SO_posts = createTable(
   }),
 );
 
-export const SO_sender_emails = createTable("sender_email", {
-  id: serial("id").primaryKey(),
-  emailAddr: text("email_address").notNull(),
-});
-
 export const SO_campaigns = createTable("campaign", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  isDraft: boolean("isDraft").notNull().default(false),
+  deadline: timestamp("deadline"),
   sequence: text("sequence"),
 });
+
+export const SO_google_tokens = createTable("google_tokens", {
+  id: serial("id").primaryKey(),
+  googleId: text("google_id").notNull().unique(),
+  accessToken: text("access_token").notNull(),
+  expiresIn: timestamp("expires_in").notNull(),
+  refreshToken: text("refresh_token").notNull(),
+  scope: text("scope").notNull(),
+  tokenType: text("token_type").notNull(),
+  id_token: text("id_token"),
+});
+
+export const SO_sender_emails = createTable("sender_email", {
+  id: serial("id").primaryKey(),
+
+  fromName: text("from_name").notNull(),
+  fromEmail: text("from_email").notNull(),
+
+  userName: text("user_name").notNull(),
+  password: text("password").notNull(),
+
+  smtpHost: text("smtp_host").notNull(),
+  smtpPort: integer("smtp_port").notNull(),
+
+  imapHost: text("imap_host").notNull(),
+  imapPort: integer("imap_port").notNull(),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const SO_google_user_info = createTable("google_user_info", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  googleId: text("google_id").notNull().unique(),
+  verifiedEmail: boolean("verified_email").notNull(),
+  name: text("name").notNull(),
+  given_name: text("given_name"),
+  family_name: text("family_name"),
+  picture: text("picture").notNull(),
+  locale: text("locale"),
+});
+
+export const SO_google_campaign_bridge = createTable(
+  "campaign_google_email_link",
+  {
+    campaignId: integer("campaign_id")
+      .references(() => SO_campaigns.id)
+      .notNull(),
+    googleUserId: integer("google_user_id")
+      .references(() => SO_google_user_info.id)
+      .notNull(),
+  },
+);
 
 export const SO_campaign_sender_email_link = createTable(
   "campaign_sender_email_link",
@@ -56,13 +108,15 @@ export const SO_campaign_sender_email_link = createTable(
       .references(() => SO_campaigns.id)
       .notNull(),
     senderEmailId: integer("sender_email_id")
-      .references(() => SO_sender_emails.id)
+      .references(() => SO_sender_emails.id, {onDelete: "cascade"})
       .notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.campaignId, table.senderEmailId] }),
   }),
 );
+
+export const SO_sequence_step_state = pgEnum("sequence_step_state", ["sent", "waiting"]);
 
 export const SO_sequence_steps = createTable("sequence_step", {
   id: serial("id").primaryKey(),
@@ -74,6 +128,7 @@ export const SO_sequence_steps = createTable("sequence_step", {
   campaignId: integer("campaign_id")
     .references(() => SO_campaigns.id)
     .notNull(),
+  state: SO_sequence_step_state("state").default("waiting").notNull(),
 });
 
 export const SO_sequence_breaks = createTable("sequence_break", {
@@ -96,10 +151,16 @@ export const SO_binding_campaigns_contacts = createTable(
   {
     campaignId: integer("campaign")
       .notNull()
-      .references(() => SO_campaigns.id),
+      .references(() => SO_campaigns.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     contactId: integer("contact")
       .notNull()
-      .references(() => SO_contacts.id),
+      .references(() => SO_contacts.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.contactId, table.campaignId] }),

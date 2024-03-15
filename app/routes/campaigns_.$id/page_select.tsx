@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from "@remix-run/react";
 import {
+    TbCircleNumber0,
   TbCircleNumber1,
   TbCircleNumber2,
   TbCircleNumber3,
@@ -21,6 +22,7 @@ import { FaChevronRight } from "react-icons/fa";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
 export function PageSelect({
+  basics,
   launch,
   contacts,
   schedule,
@@ -31,11 +33,17 @@ export function PageSelect({
   const nav = useNavigation();
   const isPending = nav.state != "idle";
 
-
   return (
     <div
-      className={`flex gap-2 justify-evenly  px-6 *:my-auto ${isPending ? "bg-blue-100 bg-opacity-35" : ""}`}
+      className={`flex justify-evenly gap-2  px-6 *:my-auto ${isPending ? "bg-blue-100 bg-opacity-35" : ""}`}
     >
+      <PageButton
+        href="00_basics"
+        label={"Basics"}
+        done={basics}
+        icon={TbCircleNumber0}
+      />
+      <FaChevronRight />
       <PageButton
         href="01_contacts"
         label={"Contacts"}
@@ -75,7 +83,7 @@ export function PageSelect({
 }
 
 function PageButton(props: {
-  href: string ;
+  href: string;
   label: string;
   done: boolean;
   icon: IconType;
@@ -83,7 +91,7 @@ function PageButton(props: {
   const location = useLocation();
   const selected = location.pathname.includes(props.href);
   return (
-    <Link to={props.href ?? "#"}>
+    <Link prefetch="intent" to={props.href ?? "#"}>
       <div
         className={`flex w-40 ${props.href != undefined ? "cursor-pointer" : "cursor-wait"} justify-center gap-2 rounded py-2 *:my-auto ${selected === true ? "bg-secondary" : ""}`}
       >

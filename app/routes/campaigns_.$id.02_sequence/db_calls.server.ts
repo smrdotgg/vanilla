@@ -24,19 +24,21 @@ export async function updateEmailTitle({
 
 export async function deleteEmail({
   emailId,
-} : z.infer<typeof deleteEmailSchema>){
-  await db.delete(SO_sequence_steps).where(eq(SO_sequence_steps.id, Number(emailId)));
+}: z.infer<typeof deleteEmailSchema>) {
+  await db
+    .delete(SO_sequence_steps)
+    .where(eq(SO_sequence_steps.id, Number(emailId)));
 }
 
 export async function deleteBreak({
   breakId,
 }: z.infer<typeof deleteBreakSchema>) {
-  await db.delete(SO_sequence_breaks).where(eq(SO_sequence_breaks.id, Number(breakId)));
+  await db
+    .delete(SO_sequence_breaks)
+    .where(eq(SO_sequence_breaks.id, Number(breakId)));
 }
 
-export async function addEmail({
-  campaignId,
-}: z.infer<typeof addEmailSchema>) {
+export async function addEmail({ campaignId }: z.infer<typeof addEmailSchema>) {
   await db.transaction(async (db) => {
     const sequenceCount = (
       await db

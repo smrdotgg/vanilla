@@ -5,4 +5,3 @@ export function toFormData<T extends Record<string, any>>(obj: T): FormData {
     return formData;
   }, new FormData());
 }
-

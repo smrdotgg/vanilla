@@ -30,12 +30,9 @@ export function StepTile({
     content = contentUpdates.at(-1)!.formData!.get("content")!.toString();
 
   return (
-    <button
-      onClick={onClick}
-      className={`  h-20   cursor-pointer  p-1 w-full`}
-    >
+    <button onClick={onClick} className={`  h-20   w-full  cursor-pointer p-1`}>
       <div
-        className={` flex flex-col px-2 *:mr-auto *:my-auto h-full p-1 ${selected ? "text-white bg-blue-600 border-white" : "bg-blue-100 dark:bg-blue-950 border-blue-900 "} rounded  border   `}
+        className={` flex h-full flex-col p-1 px-2 *:my-auto *:mr-auto ${selected ? "border-white bg-blue-600 text-white" : "border-blue-900 bg-blue-100 dark:bg-blue-950 "} rounded  border   `}
       >
         <p className="text-xl font-bold">{title ?? "Title Not Set"}</p>
         <ClientOnly fallback={<h1>....</h1>}>

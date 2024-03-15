@@ -4,9 +4,17 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useFetcher, useParams } from "@remix-run/react";
 import { INTENTS } from "./types";
 
-export const NewEditor = ({id,contentString} : {id:number,contentString: string|null}) => {
-  const [prevContent, setPrevContent] = useState(contentString??"");
-  const [content, setContent] = useState(contentString??"");
+export const NewEditor = ({
+  id,
+  contentString,
+}: {
+  id: number;
+  contentString: string | null;
+}) => {
+  const [prevContent, setPrevContent] = useState(contentString ?? "");
+  const [content, setContent] = useState(contentString ?? "");
+  // const [content, setContent] = useState("<p class=\"text-red-500\">hello there</p>");
+  const [mono, setMono] = useState(false);
   const fetcher = useFetcher();
   const params = useParams();
 
@@ -30,18 +38,20 @@ export const NewEditor = ({id,contentString} : {id:number,contentString: string|
 
     // Cleanup function to cancel the timeout if the content changes again before the delay is over
     return () => clearTimeout(handler);
-  }, [content, fetcher, params.id,id, prevContent]); // Effect depends on content state
+  }, [content, fetcher, params.id, id, prevContent]); // Effect depends on content state
 
   return (
-    <>
-      <div className="p-2 text-black">
+    <div>
+      <div className="p-2 text-black ">
         {/* THE height of this thing is set in the CSS, with a hardcoded CSS class name */}
         <CKEditor
           editor={ClassicEditor}
           data={content}
-          onChange={(_, editor) => setContent(editor.getData())}
+          onChange={(_, editor) => {
+            setContent(editor.getData());
+          }}
         />
       </div>
-    </>
+    </div>
   );
 };

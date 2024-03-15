@@ -14,8 +14,6 @@ import {
 } from "~/components/ui/table";
 import { CsvToModelMapping } from "./mapping";
 
-
-
 export function SampleShow({
   data,
   headers,
@@ -63,4 +61,3 @@ export function SampleShow({
     </>
   );
 }
-

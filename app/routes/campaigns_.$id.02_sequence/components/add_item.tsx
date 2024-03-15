@@ -27,7 +27,10 @@ export function AddItem() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <CiSquarePlus  size={36} className="dark:text-white text-black m-auto" />
+          <CiSquarePlus
+            size={36}
+            className="m-auto text-black dark:text-white"
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem

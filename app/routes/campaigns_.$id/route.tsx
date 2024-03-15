@@ -3,6 +3,7 @@ import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   readableStreamToString,
+  redirect,
 } from "@remix-run/node";
 import { Outlet, useFetcher, useLoaderData, useParams } from "@remix-run/react";
 import { eq } from "drizzle-orm";
@@ -18,6 +19,7 @@ import {
   SO_campaign_sender_email_link,
   SO_campaigns,
   SO_contacts,
+  SO_google_campaign_bridge,
   SO_sender_emails,
   SO_sequence_steps,
 } from "~/db/schema.server";
@@ -25,6 +27,7 @@ import { createEnumSchema } from "~/lib/zod_enum_schema";
 import { PageSelect } from "./page_select";
 
 export type CampaignStatus = {
+  basics: boolean;
   contacts: boolean;
   sequence: boolean;
   schedule: boolean;
@@ -35,6 +38,13 @@ export type CampaignStatus = {
 export const sequenceCTAAtom = atom<ReactNode | undefined>(undefined);
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  if (
+    request.url.endsWith(`campaigns/${params.id}/`) ||
+    request.url.endsWith(`campaigns/${params.id}`)
+  ) {
+    return redirect(`/campaigns/${params.id}/01_contacts`);
+  }
+
   const campaignContacts = await db
     .select()
     .from(SO_binding_campaigns_contacts)
@@ -62,12 +72,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     .where(eq(SO_campaign_sender_email_link.campaignId, Number(params.id)));
 
   return {
+    basics: Boolean(campaign[0].name),
     campaign: campaign[0],
     contacts: Boolean(campaignContacts.length),
     sequence: Boolean(sequence.length),
     schedule: false,
     settings: Boolean(senders.length),
-    launch: false,
+    launch: campaign[0].deadline != null,
     result,
   };
 };
@@ -84,7 +95,7 @@ export default function Page() {
   return (
     <>
       <div className="flex h-screen max-h-screen flex-col ">
-        <div className="flex justify-between *:my-auto py-2 px-6 h-auto">
+        <div className="flex h-auto justify-between px-6 py-2 *:my-auto">
           <div className="flex flex-col justify-start align-baseline">
             <NameView
               onSubmit={(val) => {
@@ -104,6 +115,7 @@ export default function Page() {
             <p className="text-gray-500">Manage your campaign contacts.</p>
           </div>
           <PageSelect
+            basics={data.basics}
             contacts={data.contacts}
             sequence={data.sequence}
             schedule={data.schedule}
@@ -112,7 +124,7 @@ export default function Page() {
             campaignId={data.campaign.id}
             data={data.result.params}
           />
-          <div className="w-60 flex justify-end">{cta}</div>
+          <div className="flex w-60 justify-end">{cta}</div>
         </div>
         <Outlet />
       </div>
@@ -138,7 +150,7 @@ export const NameView = ({
     return (
       <div className="w-60">
         <Input
-          className="p-0 h-9 font-bold text-3xl"
+          className="h-9 p-0 text-3xl font-bold"
           onFocus={(e) => e.target.select()}
           value={val}
           onChange={(e) => setVal(e.target.value)}
@@ -162,13 +174,13 @@ export const NameView = ({
   if (name == null || val == null || val!.toString().length == 0) {
     return (
       <Button
-        className=" flex text-left font-bold p-0"
+        className=" flex p-0 text-left font-bold"
         variant={"link"}
         onClick={() => {
           setEditMode(true);
         }}
       >
-        <p className="text-secondary-foreground text-2xl  text-left">
+        <p className="text-left text-2xl  text-secondary-foreground">
           {itemName} not Set
         </p>
         <div className="flex-grow"></div>
@@ -180,7 +192,7 @@ export const NameView = ({
   return (
     <button
       onClick={() => setEditMode(true)}
-      className="pb-1 w-60 flex pl-[0.05rem]  h-9 font-bold text-3xl"
+      className="flex h-9 w-60 pb-1  pl-[0.05rem] text-3xl font-bold"
     >
       <p>{name.toString()}</p>
     </button>
@@ -205,7 +217,9 @@ export const action = async (args: ActionFunctionArgs) => {
   const intent = intentSchema.parse(body.intent);
   if (intent == "set_name") {
     const data = setNameSchema.parse(body);
-    await db.update(SO_campaigns).set({ name: data.newName });
+    await db
+      .update(SO_campaigns)
+      .set({ updatedAt: new Date(), name: data.newName });
   }
   return null;
 };

@@ -19,16 +19,22 @@ import {
 } from "remix-themes";
 import clsx from "clsx";
 import { DashLayout } from "./components/custom/side-bar";
+import { Toaster } from "./components/ui/sonner";
+import { TRPCReactProvider } from "./server/trpc/react";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
   return {
     theme: getTheme(),
+    ENV: {
+      STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
+      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    },
   };
 }
 
@@ -50,6 +56,7 @@ export function App() {
           <Outlet />
         </DashLayout>
         <ScrollRestoration />
+        <Toaster />
         <Scripts />
         <LiveReload />
       </body>
@@ -60,9 +67,12 @@ export default function AppWithProviders() {
   const data = useLoaderData<typeof loader>();
   return (
   <Provider>
+<TRPCReactProvider>
     <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
       <App />
     </ThemeProvider>
+    </TRPCReactProvider>
   </Provider>
+
   );
 }

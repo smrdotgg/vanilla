@@ -12,18 +12,32 @@ export const INTENTS = {
   deleteEmail: "DELETE_EMAIL" as const,
 };
 
-export const updateEmailContentSchema = z.object({content: z.string(), id: z.string()});
+export const updateEmailContentSchema = z.object({
+  content: z.string(),
+  id: z.string(),
+});
 
-export const updateEmailTitleSchema = z.object({title: z.string(), id: z.string()});
+export const updateEmailTitleSchema = z.object({
+  title: z.string(),
+  id: z.string(),
+});
 
+export const addBreakSchema = z
+  .object({ id: z.string(), lengthInHours: z.string() })
+  .passthrough();
 
-export const addBreakSchema = z.object({ id: z.string(), lengthInHours: z.string()}).passthrough();
+export const addEmailSchema = z
+  .object({ campaignId: z.string() })
+  .passthrough();
 
-export const addEmailSchema = z.object({ campaignId: z.string(), }).passthrough();
+export const updateBreakSchema = z
+  .object({ breakId: z.string(), lengthInHours: z.string() })
+  .passthrough();
 
-export const updateBreakSchema = z.object({ breakId: z.string() , lengthInHours: z.string()}).passthrough();
+export const deleteBreakSchema = z
+  .object({ breakId: z.string() })
+  .passthrough();
 
-export const deleteBreakSchema = z.object({ breakId: z.string() }).passthrough();
-
-export const deleteEmailSchema = z.object({ emailId: z.string() }).passthrough();
-
+export const deleteEmailSchema = z
+  .object({ emailId: z.string() })
+  .passthrough();

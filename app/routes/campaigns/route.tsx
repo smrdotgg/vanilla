@@ -1,37 +1,42 @@
 import { redirect } from "@remix-run/node";
-import { Form, useFetcher } from "@remix-run/react";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import { db } from "~/db/index.server";
-import { SO_campaigns } from "~/db/schema.server";
+import {
+  SO_binding_campaigns_contacts,
+  SO_campaigns,
+} from "~/db/schema.server";
+import { eq, sql } from "drizzle-orm";
+import { Page } from "./page";
 
 export const loader = async () => {
-  return null;
+  const d = await db
+    .select({
+      id: SO_campaigns.id,
+      name: SO_campaigns.name,
+      createdAt: SO_campaigns.createdAt,
+      updatedAt: SO_campaigns.updatedAt,
+  deadline: SO_campaigns.deadline,
+      contactCount:
+        sql<number>`COUNT(${SO_binding_campaigns_contacts.contactId})`.mapWith(
+          Number,
+        ),
+    })
+    .from(SO_campaigns)
+    .leftJoin(
+      SO_binding_campaigns_contacts,
+      eq(SO_binding_campaigns_contacts.campaignId, SO_campaigns.id),
+    )
+    .groupBy(SO_campaigns.id)
+    .then((list) => list.map((camp) => ({
+      ...camp,
+      isDraft: camp.deadline === null,
+    })));
+    
+
+  return d;
 };
 
-export default function Page() {
-  const fetcher = useFetcher();
-  return (
-    <>
-      <div className="flex h-screen max-h-screen flex-col  py-6">
-        <div className="flex justify-between *:my-auto px-6">
-          <div className="flex flex-col">
-            <h1 className="text-xl font-bold">Campaigns</h1>
-            <p className="text-gray-500">
-              Create a new campaign or track existing sequences.
-            </p>
-          </div>
-          <Form method="post" >
-          <Button type="submit"  >Create Campaign</Button>
-          </Form>
-        </div>
-        <div className="pt-2"></div>
-        <Input className="w-96 ml-6" placeholder="Search" />
-        <div className="pt-6"></div>
-      </div>
-    </>
-  );
-}
+
+export { Page as default };
 
 export const action = async () => {
   const newCampaigns = await db.insert(SO_campaigns).values({}).returning();

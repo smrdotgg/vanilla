@@ -28,17 +28,15 @@ export function BreakTile({ data }: { data: SequenceBreak }) {
   return (
     <>
       <Popover open={click} onOpenChange={setClick}>
-        <PopoverTrigger
-          className={`flex cursor-pointer p-1 w-full`}
-        >
+        <PopoverTrigger className={`flex w-full cursor-pointer p-1`}>
           <div
-            className={`${click ? "dark:bg-green-700 border-green-600 bg-green-300 " : " bg-green-200 dark:bg-green-900"}  p-1 w-full  rounded border-white  `}
+            className={`${click ? "border-green-600 bg-green-300 dark:bg-green-700 " : " bg-green-200 dark:bg-green-900"}  w-full rounded  border-white p-1  `}
           >
-          {hoursToEnglishString(data.lengthInHours)} Break
+            {hoursToEnglishString(data.lengthInHours)} Break
           </div>
         </PopoverTrigger>
         <PopoverContent className="w-32">
-          <div className="flex flex-col *:rounded gap-2">
+          <div className="flex flex-col gap-2 *:rounded">
             <Button
               className=" bg-secondary text-secondary-foreground"
               onClick={() => setShowPortal(true)}
@@ -62,7 +60,7 @@ export function BreakTile({ data }: { data: SequenceBreak }) {
             breakId: String(data.id),
             intent: INTENTS.deleteBreak,
           };
-          fetcher.submit(toFormData(d), {method:"post"});
+          fetcher.submit(toFormData(d), { method: "post" });
         }}
       />
 

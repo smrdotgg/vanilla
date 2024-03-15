@@ -65,7 +65,7 @@ function SelectRow({
 }) {
   return (
     <div className="flex gap-2 *:my-auto">
-      <div className="flex w-1/4 justify-end align-bottom *:ml-auto flex-col">
+      <div className="flex w-1/4 flex-col justify-end align-bottom *:ml-auto">
         <p>{label}</p>
         {isOptional ? <p className="text-gray-400">(Optional)</p> : <></>}
       </div>
@@ -82,7 +82,7 @@ function SelectRow({
         </SelectContent>
       </Select>
 
-      {(isOptional && value.length != 0) ? (
+      {isOptional && value.length != 0 ? (
         <Button className="px-3" variant={"ghost"} onClick={() => onSelect("")}>
           X
         </Button>
@@ -93,4 +93,3 @@ function SelectRow({
     </div>
   );
 }
-
