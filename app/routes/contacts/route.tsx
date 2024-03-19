@@ -100,16 +100,12 @@ const deleteSchema = z.object({
   data: z.number().array(),
 });
 
-const createSchema = z.object({
-  intent: intentSchema,
-  data: z
-    .object({
-      name: z.string(),
-      email: z.string().email(),
-      company: z.string().nullish(),
-    })
-    .array(),
-});
+const createSchemaRaw = z
+  .object({
+    name: z.string(),
+    email: z.string().email(),
+    company: z.string().nullish(),
+  });
 
 export const action = async (args: ActionFunctionArgs) => {
   const requestBody = JSON.parse(
@@ -117,7 +113,14 @@ export const action = async (args: ActionFunctionArgs) => {
   );
   const intent = intentSchema.parse(requestBody.intent);
   if (intent === "create") {
-    const contactData = createSchema.parse(requestBody).data;
+    const contactData: z.infer<typeof createSchemaRaw>[] = [];
+     (requestBody.data as any[]).forEach((datum:any, index) => {
+      try{
+        contactData.push(createSchemaRaw.parse(datum));
+      } catch(e){
+        console.error(e);
+      }
+    });
     await db.insert(SO_contacts).values(contactData);
   } else if (intent == "delete") {
     const contactData = deleteSchema.parse(requestBody);
