@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { DeleteDialog } from "./components/delete_modal";
 
 export const loader = async (args: LoaderFunctionArgs) => {
-  return await db.select().from(SO_contacts);
+  return await db.select().from(SO_contacts).limit(10);
 };
 
 export default function Index() {
@@ -121,11 +121,14 @@ export const action = async (args: ActionFunctionArgs) => {
         console.error(e);
       }
     });
+    console.log("contact data length");
+    console.log(contactData.length);
     await db.insert(SO_contacts).values(contactData);
   } else if (intent == "delete") {
     const contactData = deleteSchema.parse(requestBody);
     const idArray = contactData.data.map(Number);
-    await db.delete(SO_contacts).where(inArray(SO_contacts.id, idArray));
+    // await db.delete(SO_contacts).where(inArray(SO_contacts.id, idArray));
+    await db.delete(SO_contacts);//.where(inArray(SO_contacts.id, idArray));
   }
   return null;
 };
