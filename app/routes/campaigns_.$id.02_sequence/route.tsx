@@ -77,7 +77,7 @@ export default function ContactsPage() {
       <h1 className="mx-6 my-2 text-3xl font-bold">
         Setup the your emails. You can add breaks between them.
       </h1>
-      <div className=" flex   flex-grow overflow-y-auto ">
+      <div className=" flex  flex-grow overflow-y-auto ">
         <div className="flex w-full  flex-grow">
           <div className="pl-1"></div>
           <div className=" flex w-96 flex-col border border-l-black bg-secondary *:w-full">

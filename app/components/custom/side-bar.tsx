@@ -60,7 +60,7 @@ export function DashLayout({
 
   const [theme] = useTheme();
   return (
-    <div className="max-w-screen min-w-screen flex max-h-screen min-h-screen ">
+    <div className=" max-w-screen min-w-screen flex max-h-screen min-h-screen ">
       {loading === "" ? (
         <></>
       ) : theme === Theme.DARK ? (
@@ -126,7 +126,7 @@ export function DashLayout({
         <ModeToggle />
       </div>
 
-      <div className="flex-grow">{children}</div>
+      <div className="overflow-x-hidden  flex-grow">{children}</div>
     </div>
   );
 }

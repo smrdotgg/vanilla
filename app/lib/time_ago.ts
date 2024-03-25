@@ -1,4 +1,6 @@
 export function timeAgo(dateInput: Date | string): string {
+  if (!dateInput) return "";
+
   const now = new Date();
   const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
 

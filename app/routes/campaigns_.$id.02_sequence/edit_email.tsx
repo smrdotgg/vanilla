@@ -1,7 +1,7 @@
 import { ClientOnly } from "remix-utils/client-only";
 import { z } from "zod";
 import { NewEditor } from "./editor.client";
-import { NameView } from "../campaigns_.$id/route";
+import { NameView } from "./components/title_edit";
 import { useFetcher, useFetchers } from "@remix-run/react";
 import { INTENTS, deleteEmailSchema } from "./types";
 import { Button } from "~/components/ui/button";
@@ -44,11 +44,10 @@ export const EditEmailPage = ({
 
   return (
     <div>
-      <div className="flex  justify-between p-2 pb-2 *:my-auto">
+      <div className="flex justify-between p-2 pb-2 *:my-auto">
         <NameView
-          notSetView="Email Title"
-          name={title}
-          onSubmit={setContentWithTwoSecondWait}
+          id={id}
+          value={title ?? undefined}
         />
         <div>
           {fetchers.filter(

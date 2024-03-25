@@ -5,7 +5,7 @@ import {
   readableStreamToString,
   redirect,
 } from "@remix-run/node";
-import { Outlet, useFetcher, useLoaderData, useParams } from "@remix-run/react";
+import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { eq } from "drizzle-orm";
 import { ReactNode, useState } from "react";
 import { flushSync } from "react-dom";
@@ -18,9 +18,6 @@ import {
   SO_binding_campaigns_contacts,
   SO_campaign_sender_email_link,
   SO_campaigns,
-  SO_contacts,
-  SO_google_campaign_bridge,
-  SO_sender_emails,
   SO_sequence_steps,
 } from "~/db/schema.server";
 import { createEnumSchema } from "~/lib/zod_enum_schema";
@@ -49,6 +46,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     .select()
     .from(SO_binding_campaigns_contacts)
     .where(eq(SO_binding_campaigns_contacts.campaignId, Number(params.id)));
+
   const campaign = await db
     .select()
     .from(SO_campaigns)
@@ -82,6 +80,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     result,
   };
 };
+
 
 export default function Page() {
   const data = useLoaderData<typeof loader>();
@@ -132,6 +131,7 @@ export default function Page() {
   );
 }
 
+
 export const NameView = ({
   name,
   notSetView: itemName,
@@ -154,9 +154,7 @@ export const NameView = ({
           onFocus={(e) => e.target.select()}
           value={val}
           onChange={(e) => setVal(e.target.value)}
-          onBlur={() => {
-            setEditMode(false);
-          }}
+          onBlur={() => setEditMode(false)}
           onSubmit={submit}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.code === "Enter") {
@@ -207,10 +205,6 @@ const setNameSchema = z.object({
   id: z.number(),
 });
 
-// const deleteSchema = z.object({
-//   intent: intentSchema,
-//   data: z.number().array(),
-// });
 
 export const action = async (args: ActionFunctionArgs) => {
   const body = JSON.parse(await readableStreamToString(args.request.body!));

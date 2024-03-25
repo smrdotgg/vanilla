@@ -1,12 +1,19 @@
+import { useRef, useCallback, useEffect, MutableRefObject } from "react";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { timeAgo } from "~/lib/time_ago";
 
 export function ContactsDisplay({
   contacts,
-  selectedContactsMap,
-  setSelectedContactsMap,
+  rowIsSelected,
+  manageRowClick,
+  unselectedIds,
+  selectedContactCount,
+  contactCount,
+  allSelectedAdmin,
+  setAllSelectedAdmin,
   formDisabled,
+  loadMore,
 }: {
   contacts?: {
     id: number;
@@ -15,10 +22,18 @@ export function ContactsDisplay({
     createdAt: Date;
     companyName: string | null;
   }[];
-  selectedContactsMap: Set<number>;
-  setSelectedContactsMap: (newVal: Set<number>) => void;
+  contactCount: number;
+  unselectedIds: Set<number>;
+  rowIsSelected: (rowId: number) => boolean;
+  manageRowClick: (rowId: number) => void;
+  selectedContactCount: number;
+  allSelectedAdmin: boolean;
+  setAllSelectedAdmin: (newVal: boolean) => void;
   formDisabled?: boolean;
+  loadMore: () => void;
 }) {
+  const scrollableDivRef = useRef<HTMLDivElement | null>(null);
+  const bottomThreshold = 100;
   if (contacts == undefined) return <>Loading</>;
   return (
     <div className=" flex flex-grow overflow-hidden  ">
@@ -27,50 +42,46 @@ export function ContactsDisplay({
           <div className="flex gap-6">
             <Checkbox
               disabled={formDisabled}
-              className=" my-auto h-5 w-5"
+              className="my-auto h-5 w-5"
               onCheckedChange={(newVal) => {
-                if (selectedContactsMap.size == contacts.length) {
-                  const newVal = new Set<number>();
-                  setSelectedContactsMap(newVal);
-                } else {
-                  const newVal = new Set<number>();
-                  contacts.map((c) => newVal.add(c.id));
-                  setSelectedContactsMap(newVal);
-                }
+                setAllSelectedAdmin(!allSelectedAdmin);
               }}
-              checked={
-                selectedContactsMap.size > 0 &&
-                selectedContactsMap.size == contacts.length
-              }
+              checked={allSelectedAdmin && unselectedIds.size === 0}
             />
-            <h1>Select All ({contacts.length})</h1>
+            <h1>Select All ({contactCount})</h1>
           </div>
           <p>
-            {selectedContactsMap.size} Contact
-            {selectedContactsMap.size == 1 ? "" : "s"} Selected
+            {selectedContactCount} Contact
+            {selectedContactCount == 1 ? "" : "s"} Selected
           </p>
         </div>
-        <div className="flex-grow overflow-y-auto">
+        <div className="flex-grow overflow-y-auto" ref={scrollableDivRef}>
           {contacts.map((c, i) => (
             <ContactDisplay
+              rowIsSelected={rowIsSelected}
               key={i}
               contact={c}
               formDisabled={formDisabled}
-              setSelectedContactsMap={setSelectedContactsMap}
-              selectedContactsMap={selectedContactsMap}
+              manageRowClick={manageRowClick}
             />
           ))}
+          { contactCount > contacts.length &&
+          <div className="flex p-4 *:m-auto">
+            <Button onClick={loadMore}>Load More</Button>
+          </div>
+          }
         </div>
       </div>
     </div>
   );
 }
 
+
 function ContactDisplay({
   contact,
-  selectedContactsMap,
-  setSelectedContactsMap,
   formDisabled,
+  manageRowClick,
+  rowIsSelected,
 }: {
   contact: {
     id: number;
@@ -79,25 +90,18 @@ function ContactDisplay({
     createdAt: Date;
     companyName: string | null;
   };
-  selectedContactsMap: Set<number>;
-  setSelectedContactsMap: (newVal: Set<number>) => void;
   formDisabled?: boolean;
+  manageRowClick: (rowId: number) => void;
+  rowIsSelected: (rowId: number) => boolean;
 }) {
-  const selected = selectedContactsMap.has(contact.id);
-
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col " >
       <div className="mr-5 flex  justify-between px-2 *:my-auto">
         <div className="flex gap-2">
           <Checkbox
             disabled={formDisabled}
-            onCheckedChange={(newState) => {
-              const newVal = new Set(selectedContactsMap);
-              if (selected) newVal.delete(contact.id);
-              else newVal.add(contact.id);
-              setSelectedContactsMap(newVal);
-            }}
-            checked={selected}
+            onCheckedChange={(_) => manageRowClick(contact.id)}
+            checked={rowIsSelected(contact.id)}
             className="mx-4 my-auto h-5 w-5"
           />
 

@@ -78,8 +78,14 @@ export default function ContactsPage() {
       </h1>
       <ContactsDisplay
         formDisabled={!loaded}
-        selectedContactsMap={selectedId}
-        setSelectedContactsMap={setSelectedId}
+        selectedContactCount={selectedId.size}
+        setAllSelectedAdmin={(v) => null}
+        loadMore={() => null}
+        contactCount={data!.contacts.length}
+        rowIsSelected={(n) => selectedId.has(n)}
+        unselectedIds={new Set<number>()}
+        manageRowClick={(n) => null}
+        allSelectedAdmin={false}
         contacts={data!.contacts.map((d) => ({
           id: d.id,
           name: d.name,

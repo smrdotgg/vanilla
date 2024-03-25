@@ -11,16 +11,14 @@ import {
 import { sequenceStepsToSend } from "./helpers";
 import { sendWithCustomData } from "./send_email";
 import { eq, inArray } from "drizzle-orm";
-let t = false;
+
 const main = async () => {
-	if (t) return;
-	t=  true;
   console.log(`${new Date().toISOString()}: cron job triggered`);
   console.log("Starting sequenceStepsToSend function");
   const { stepsToSend } = await sequenceStepsToSend();
   console.log(`Steps to send: ${JSON.stringify(stepsToSend)}`);
   const campaignIds = stepsToSend.map((step) => step.campaignId);
-  
+
   console.log(`Campaign IDs: ${campaignIds}`);
   console.log("getting DB");
   console.log("Starting database query");
@@ -68,25 +66,25 @@ const main = async () => {
   await Promise.all(
     stepsToSend.map(async (step) => {
       const senderEmail = senderEmails[0];
-      console.log(`Processing step: ${JSON.stringify(step)} with sender email: ${JSON.stringify(senderEmail)}`);
-      const d = targetContacts.map(
-        async (t) => {
-          console.log(`Sending email to: ${t.email}`);
-	  const args = {
-            SMTPPort: senderEmail.smtpPort,
-            SMTPHost: senderEmail.smtpHost,
-            body: step.content ?? "",
-            subject: step.title ?? "",
-            fromEmail: senderEmail.fromEmail,
-            // fromName: senderEmail.fromName,
-            password: senderEmail.password,
-            username: senderEmail.userName,
-            targetAddress: t.email,
-          };
-	  console.log(`args = ${JSON.stringify(args, null, 2)}`);
-          return await sendWithCustomData(args);
-        },
+      console.log(
+        `Processing step: ${JSON.stringify(step)} with sender email: ${JSON.stringify(senderEmail)}`,
       );
+      const d = targetContacts.map(async (t) => {
+        console.log(`Sending email to: ${t.email}`);
+        const args = {
+          SMTPPort: senderEmail.smtpPort,
+          SMTPHost: senderEmail.smtpHost,
+          body: step.content ?? "",
+          subject: step.title ?? "",
+          fromEmail: senderEmail.fromEmail,
+          // fromName: senderEmail.fromName,
+          password: senderEmail.password,
+          username: senderEmail.userName,
+          targetAddress: t.email,
+       };
+        console.log(`args = ${JSON.stringify(args, null, 2)}`);
+        return await sendWithCustomData(args);
+      });
       await Promise.all(d);
       console.log(`Finished sending emails for step: ${step.id}`);
     }),
@@ -106,6 +104,5 @@ const main = async () => {
 };
 
 console.log("cron job about to start waiting for an hour...");
-schedule("* * * * * *", main);
+schedule(" * * * * *", main);
 console.log("Added console logs throughout the script for better tracking");
-

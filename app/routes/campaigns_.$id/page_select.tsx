@@ -1,9 +1,7 @@
 import {
   Link,
-  useLoaderData,
   useLocation,
   useNavigation,
-  useSearchParams,
 } from "@remix-run/react";
 import {
     TbCircleNumber0,
@@ -11,7 +9,6 @@ import {
   TbCircleNumber2,
   TbCircleNumber3,
   TbCircleNumber4,
-  TbCircleNumber5,
 } from "react-icons/tb";
 
 import { TiTick } from "react-icons/ti";
@@ -19,16 +16,13 @@ import { TiTick } from "react-icons/ti";
 import { IconType } from "react-icons/lib";
 import { CampaignStatus } from "./route";
 import { FaChevronRight } from "react-icons/fa";
-import { LoaderFunctionArgs } from "@remix-run/node";
 
 export function PageSelect({
   basics,
   launch,
   contacts,
-  schedule,
   sequence,
   settings,
-  data,
 }: CampaignStatus & { campaignId: number; data: { [k: string]: string } }) {
   const nav = useNavigation();
   const isPending = nav.state != "idle";
@@ -93,7 +87,7 @@ function PageButton(props: {
   return (
     <Link prefetch="intent" to={props.href ?? "#"}>
       <div
-        className={`flex w-40 ${props.href != undefined ? "cursor-pointer" : "cursor-wait"} justify-center gap-2 rounded py-2 *:my-auto ${selected === true ? "bg-secondary" : ""}`}
+        className={`flex w-10 2xl:w-40 ${props.href != undefined ? "cursor-pointer" : "cursor-wait"} justify-center gap-2 rounded py-2 *:my-auto ${selected === true ? "bg-secondary" : ""}`}
       >
         <div
           className={`h-6 w-6 rounded-[.75rem] ${props.done ? "bg-green-500" : "bg-gray-500"}`}
@@ -105,7 +99,7 @@ function PageButton(props: {
           )}
         </div>
         <p
-          className={`font-bold ${props.done ? "text-green-500" : "text-gray-500"}`}
+          className={`hidden 2xl:inline font-bold ${props.done ? "text-green-500" : "text-gray-500"}`}
         >
           {props.label}
         </p>
