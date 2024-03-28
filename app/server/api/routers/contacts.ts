@@ -52,7 +52,7 @@ export const contactsRouter = createTRPCRouter({
         } else {
           await ctx.db.delete(SO_contacts);
         }
-      } else {
+      } else if (input.mode === "none") {
         if (input.exceptions.length > 0) {
           await ctx.db
             .delete(SO_contacts)

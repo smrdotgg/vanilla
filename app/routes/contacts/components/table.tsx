@@ -65,17 +65,16 @@ export function ContactsDisplay({
               manageRowClick={manageRowClick}
             />
           ))}
-          { contactCount > contacts.length &&
-          <div className="flex p-4 *:m-auto">
-            <Button onClick={loadMore}>Load More</Button>
-          </div>
-          }
+          {contactCount > contacts.length && (
+            <div className="flex p-4 *:m-auto">
+              <Button onClick={loadMore}>Load More</Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
-
 
 function ContactDisplay({
   contact,
@@ -95,7 +94,7 @@ function ContactDisplay({
   rowIsSelected: (rowId: number) => boolean;
 }) {
   return (
-    <div className="flex flex-col " >
+    <div className="flex flex-col ">
       <div className="mr-5 flex  justify-between px-2 *:my-auto">
         <div className="flex gap-2">
           <Checkbox

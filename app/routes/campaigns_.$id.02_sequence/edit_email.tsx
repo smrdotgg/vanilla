@@ -45,10 +45,7 @@ export const EditEmailPage = ({
   return (
     <div>
       <div className="flex justify-between p-2 pb-2 *:my-auto">
-        <NameView
-          id={id}
-          value={title ?? undefined}
-        />
+        <NameView id={id} value={title ?? undefined} />
         <div>
           {fetchers.filter(
             (f) => f.formData?.get("intent") === INTENTS.updateEmailContent,

@@ -1,7 +1,6 @@
 import { type Config } from "drizzle-kit";
 
 
-
 export default {
   schema: "./app/db/schema.server.ts",
   driver: "pg",
@@ -10,5 +9,6 @@ export default {
   },
   tablesFilter: ["rs_*"],
 } satisfies Config;
+
 
 

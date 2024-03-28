@@ -9,6 +9,7 @@ import { IconType } from "react-icons/lib";
 import { ModeToggle } from "../ui/mode-toggle";
 import { ReactNode, useState } from "react";
 import { Theme, useTheme } from "remix-themes";
+import downloadsvg from "./download.svg";
 
 type dashRoute =
   | "/home"
@@ -77,14 +78,14 @@ export function DashLayout({
         />
       )}
       <div
-        className={`flex flex-col w-52 min-w-52  justify-between  bg-primary p-2 text-white dark:bg-secondary `}
+        className={`flex w-52 min-w-52 flex-col  justify-between  bg-primary p-2 text-white dark:bg-secondary `}
       >
         <div className="flex flex-col gap-1">
           <Link to="/">
             <img
               className="mr-auto"
               alt="Splitbox Logo"
-              src={"/download.svg"}
+              src={downloadsvg}
               width={8 * 3}
               height={8 * 3}
             />
@@ -126,7 +127,7 @@ export function DashLayout({
         <ModeToggle />
       </div>
 
-      <div className="overflow-x-hidden  flex-grow">{children}</div>
+      <div className="flex-grow  overflow-x-hidden">{children}</div>
     </div>
   );
 }

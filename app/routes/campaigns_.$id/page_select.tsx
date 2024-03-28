@@ -1,10 +1,6 @@
+import { Link, useLocation, useNavigation } from "@remix-run/react";
 import {
-  Link,
-  useLocation,
-  useNavigation,
-} from "@remix-run/react";
-import {
-    TbCircleNumber0,
+  TbCircleNumber0,
   TbCircleNumber1,
   TbCircleNumber2,
   TbCircleNumber3,
@@ -99,7 +95,7 @@ function PageButton(props: {
           )}
         </div>
         <p
-          className={`hidden 2xl:inline font-bold ${props.done ? "text-green-500" : "text-gray-500"}`}
+          className={`hidden font-bold 2xl:inline ${props.done ? "text-green-500" : "text-gray-500"}`}
         >
           {props.label}
         </p>

@@ -50,7 +50,8 @@ export function ContactsPage() {
     <div className="">
       <hr />
       <h1 className="mx-6 my-2 text-3xl font-bold">
-        Select the sender accounts you want to send your emails from for this campaign.
+        Select the sender accounts you want to send your emails from for this
+        campaign.
       </h1>
       <SenderEmailTable
         selectedContactsMap={selected}

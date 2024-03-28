@@ -81,7 +81,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   };
 };
 
-
 export default function Page() {
   const data = useLoaderData<typeof loader>();
   const nameFetcher = useFetcher();
@@ -130,7 +129,6 @@ export default function Page() {
     </>
   );
 }
-
 
 export const NameView = ({
   name,
@@ -204,7 +202,6 @@ const setNameSchema = z.object({
   newName: z.string(),
   id: z.number(),
 });
-
 
 export const action = async (args: ActionFunctionArgs) => {
   const body = JSON.parse(await readableStreamToString(args.request.body!));

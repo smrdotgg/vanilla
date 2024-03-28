@@ -1,34 +1,30 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
-import { Provider } from "jotai";
-import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { Toaster } from "./components/ui/sonner";
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteError,
 } from "@remix-run/react";
-import stylesheet from "~/tailwind.css";
+import "./tailwind.css";
 import { themeSessionResolver } from "./sessions.server";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import {
   PreventFlashOnWrongTheme,
+  Theme,
   ThemeProvider,
   useTheme,
 } from "remix-themes";
-import clsx from "clsx";
 import { DashLayout } from "./components/custom/side-bar";
-import { Toaster } from "./components/ui/sonner";
+import { Provider } from "jotai";
 import { TRPCReactProvider } from "./server/trpc/react";
-
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: stylesheet },
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-];
+import clsx from "clsx";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
+  const x = getTheme();
   return {
     theme: getTheme(),
     ENV: {
@@ -38,41 +34,56 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   };
 }
 
-export function App() {
+export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>();
+  return (
+    <Providers theme={data?.theme ?? Theme.DARK}>
+      <LayoutCore>{children}</LayoutCore>
+    </Providers>
+  );
+}
+
+function LayoutCore({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>();
   const [theme] = useTheme();
-
   return (
     <html lang="en" className={`${clsx(theme)} font-sans`}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
         <Meta />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme ?? "dark")} />
         <Links />
       </head>
       <body>
-        <DashLayout selected="/home">
-          <Outlet />
-        </DashLayout>
+        <DashLayout selected="/home">{children}</DashLayout>
         <ScrollRestoration />
         <Toaster />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
 }
-export default function AppWithProviders() {
-  const data = useLoaderData<typeof loader>();
-  return (
-  <Provider>
-<TRPCReactProvider>
-    <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
-      <App />
-    </ThemeProvider>
-    </TRPCReactProvider>
-  </Provider>
 
+function Providers({
+  children,
+  theme,
+}: {
+  theme: Theme | null;
+  children: React.ReactNode;
+}) {
+  return (
+    <Provider>
+      <TRPCReactProvider>
+        <ThemeProvider specifiedTheme={theme} themeAction="/action/set-theme">
+          {children}
+        </ThemeProvider>
+      </TRPCReactProvider>
+    </Provider>
   );
+}
+
+export default function App() {
+  return <Outlet />;
 }

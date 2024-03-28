@@ -1,13 +1,13 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { z } from "zod";
-import { SO_campaigns, SO_posts } from "~/db/schema.server";
-
 import {
-  createTRPCRouter,
-  // protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
-// import { posts } from "~/server/db/schema";
+  SO_binding_campaigns_contacts,
+  SO_campaigns,
+  SO_contacts,
+  SO_posts,
+} from "~/db/schema.server";
+
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const campaignRouter = createTRPCRouter({
   setDeadline: publicProcedure
@@ -15,10 +15,91 @@ export const campaignRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(SO_campaigns)
-        .set({deadline: input.deadline})
+        .set({ deadline: input.deadline })
         .where(eq(SO_campaigns.id, input.campaignId));
     }),
+  getContacts: publicProcedure
+    .input(z.object({ campaignId: z.number(), cursor: z.number().default(1) }))
+    .query(async ({ input, ctx }) => {
+      const batchSize = 25;
 
+      const dbCall = await ctx.db.select({ count: count() }).from(SO_contacts);
+      const ids = (await ctx.db.select().from(SO_contacts)).map((c) => c.id);
+
+      const contactCount = dbCall[0].count;
+      const pageCount = Math.ceil(contactCount / batchSize);
+
+      const selectedContacts = await ctx.db
+        .select()
+        .from(SO_contacts)
+        .leftJoin(
+          SO_binding_campaigns_contacts,
+          eq(SO_binding_campaigns_contacts.contactId, SO_contacts.id),
+        )
+        .where(eq(SO_binding_campaigns_contacts.campaignId, input.campaignId));
+      const selectedContactIds: number[] = [];
+      for (const el of selectedContacts) {
+        if (el.campaigns_contacts?.contactId != null)
+          selectedContactIds.push(el.campaigns_contacts?.contactId);
+      }
+
+      return {
+        data: await ctx.db
+          .select()
+          .from(SO_contacts)
+          .limit(batchSize)
+          .offset((input.cursor - 1) * batchSize),
+        cursor: input.cursor,
+        campaignId: input.campaignId,
+        batchSize,
+        pageCount,
+        contactCount,
+        ids,
+        selectedContactIds,
+      };
+    }),
+  updateContactPairings: publicProcedure
+    .input(
+      z.object({
+        mode: z.enum(["excludeSpecified", "useOnlySpecified"]),
+        campaignId: z.number(),
+        exceptions: z.number().array(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.transaction(async (db) => {
+        await db
+          .delete(SO_binding_campaigns_contacts)
+          .where(
+            eq(SO_binding_campaigns_contacts.campaignId, input.campaignId),
+          );
+        if (input.mode === "useOnlySpecified") {
+          if (input.exceptions.length)
+            await db.insert(SO_binding_campaigns_contacts).values(
+              input.exceptions.map((contactId) => ({
+                campaignId: input.campaignId,
+                contactId: contactId,
+              })),
+            );
+        } else if (input.mode === "excludeSpecified") {
+          const allContactIds = await db
+            .select({ id: SO_contacts.id })
+            .from(SO_contacts);
+          const targetContactIds: number[] = [];
+          for (const contId of allContactIds) {
+            if (!input.exceptions.includes(contId.id)) {
+              targetContactIds.push(contId.id);
+            }
+          }
+          await db.insert(SO_binding_campaigns_contacts).values(
+            targetContactIds.map((contactId) => ({
+              campaignId: input.campaignId,
+              contactId: contactId,
+            })),
+          );
+        }
+      });
+    }),
   create: publicProcedure
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {

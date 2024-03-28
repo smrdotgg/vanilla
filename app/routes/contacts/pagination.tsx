@@ -60,14 +60,17 @@ const PreviousPages = ({
       <PaginationItem>
         <PaginationLink to={pageToUrl(1)}>1</PaginationLink>
       </PaginationItem>
-      {currentPage - 1 > maxConsecutiveBatchDisplay ? <>
+      {currentPage - 1 > maxConsecutiveBatchDisplay ? (
+        <>
           <PaginationItem>
             <PaginationLink to="#">
               <PaginationEllipsis />
             </PaginationLink>
           </PaginationItem>
-        
-      </> : <></>}
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

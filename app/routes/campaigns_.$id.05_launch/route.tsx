@@ -1,14 +1,9 @@
 import { PaperPlaneIcon } from "@radix-ui/react-icons";
 import { FaRegMessage } from "react-icons/fa6";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import {
-  Link,
-  useLoaderData,
-  useNavigate,
-  useParams,
-} from "@remix-run/react";
+import { Link, useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { eq } from "drizzle-orm";
-import {  useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -92,9 +87,10 @@ export default function ContactsPage() {
               asChild
               className="flex h-12 w-full gap-4 p-1 text-2xl font-semibold"
             >
-            <Link prefetch="intent" to="/campaigns">
-              <FaRegMessage height={8 * 3} width={8 * 3} /> <p>Save as Draft</p>
-            </Link>
+              <Link prefetch="intent" to="/campaigns">
+                <FaRegMessage height={8 * 3} width={8 * 3} />{" "}
+                <p>Save as Draft</p>
+              </Link>
             </Button>
 
             {/* <Form method="post"> */}

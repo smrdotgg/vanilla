@@ -22,8 +22,6 @@ import {
  */
 export const createTable = pgTableCreator((name) => `rs_${name}`);
 
-
-
 export const SO_posts = createTable(
   "post",
   {
@@ -108,7 +106,7 @@ export const SO_campaign_sender_email_link = createTable(
       .references(() => SO_campaigns.id)
       .notNull(),
     senderEmailId: integer("sender_email_id")
-      .references(() => SO_sender_emails.id, {onDelete: "cascade"})
+      .references(() => SO_sender_emails.id, { onDelete: "cascade" })
       .notNull(),
   },
   (table) => ({
@@ -116,7 +114,10 @@ export const SO_campaign_sender_email_link = createTable(
   }),
 );
 
-export const SO_sequence_step_state = pgEnum("sequence_step_state", ["sent", "waiting"]);
+export const SO_sequence_step_state = pgEnum("sequence_step_state", [
+  "sent",
+  "waiting",
+]);
 
 export const SO_sequence_steps = createTable("sequence_step", {
   id: serial("id").primaryKey(),

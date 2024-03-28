@@ -13,7 +13,7 @@ export const loader = async () => {
   return api.contacts.getContacts.query({ cursor: 1 });
 };
 
-export {Page as default}
+export { Page as default };
 
 const intentSchema = createEnumSchema(["create", "delete"]);
 const deleteSchema = z.object({

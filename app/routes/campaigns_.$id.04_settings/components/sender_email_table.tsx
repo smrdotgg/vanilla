@@ -19,7 +19,7 @@ export function SenderEmailTable({
   if (contacts == undefined) return <></>;
   return (
     <div className=" flex flex-grow  overflow-y-auto ">
-      <div className="flex w-full max-h-full flex-col overflow-y-auto">
+      <div className="flex max-h-full w-full flex-col overflow-y-auto">
         <div className="flex h-12 min-h-12 w-full justify-between bg-secondary px-6 *:my-auto  ">
           <div className="flex gap-6">
             <Checkbox
@@ -48,7 +48,7 @@ export function SenderEmailTable({
           </p>
         </div>
 
-        <div className="flex-grow flex flex-col overflow-y-auto">
+        <div className="flex flex-grow flex-col overflow-y-auto">
           {contacts.map((c, i) => (
             <SenderEmailDisplay
               key={i}

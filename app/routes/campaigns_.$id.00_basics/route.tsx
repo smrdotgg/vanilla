@@ -1,4 +1,8 @@
-import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  redirect,
+} from "@remix-run/node";
 import { Page } from "./page";
 import { db } from "~/db/index.server";
 import { SO_campaigns } from "~/db/schema.server";
@@ -7,7 +11,8 @@ import { eq } from "drizzle-orm";
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = args.params.id;
   const data = await db
-    .select().from(SO_campaigns)
+    .select()
+    .from(SO_campaigns)
     .where(eq(SO_campaigns.id, Number(id)));
   return data[0].name;
 };

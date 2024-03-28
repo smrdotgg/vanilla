@@ -54,7 +54,7 @@ export function DialogCloseButton({
       <DialogTrigger asChild>
         <Button>Import contacts from CSV</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-screen overflow-y-auto">
+      <DialogContent className="max-h-screen overflow-y-auto sm:max-w-md">
         <DialogHeader className="  flex-grow">
           <DialogTitle>Upload your contacts in CSV format.</DialogTitle>
         </DialogHeader>

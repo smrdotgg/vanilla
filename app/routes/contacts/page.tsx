@@ -28,8 +28,8 @@ export const Page = () => {
 
   const actionSubmitFetcher = useFetcher<typeof action>();
   const [loaded, setLoaded] = useState(false);
-  const [selectedId, setSelectedId] = useState(new Set<number>());
   const [allSelectedAdmin, setAllSelectedAdmin] = useState(false);
+  const [selectedId, setSelectedId] = useState(new Set<number>());
   const [unselectedIds, setUnselectedIds] = useState(new Set<number>());
 
   const rowIsSelected = (rowId: number) => {
