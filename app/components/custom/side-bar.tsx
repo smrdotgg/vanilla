@@ -5,7 +5,7 @@ import { FaHome } from "react-icons/fa";
 import { HiClipboardDocument } from "react-icons/hi2";
 import { IoIosPeople } from "react-icons/io";
 import { IoPersonSharp, IoSettingsSharp } from "react-icons/io5";
-import { IconType } from "react-icons/lib";
+import type { IconType } from "react-icons/lib";
 import { ModeToggle } from "../ui/mode-toggle";
 import { ReactNode, useState } from "react";
 import { Theme, useTheme } from "remix-themes";
@@ -36,7 +36,7 @@ const elements: { route: dashRoute; name: string; icon: IconType }[] = [
   },
   {
     route: "/campaigns",
-    name: "Campaign",
+    name: "Campaigns",
     icon: HiClipboardDocument,
   },
   {

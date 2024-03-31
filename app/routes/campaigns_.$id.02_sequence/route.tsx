@@ -66,7 +66,7 @@ export default function ContactsPage() {
   useEffect(() => {
     setCta(
       <Button asChild>
-        <Link to={`/campaigns/${params.id}/04_settings`}>Next</Link>
+        <Link to={`/campaigns/${params.id}/03_sender_accounts`}>Next</Link>
       </Button>,
     );
     return () => setCta(undefined);

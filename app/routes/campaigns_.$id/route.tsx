@@ -15,6 +15,7 @@ import { Input } from "~/components/ui/input";
 import { db } from "~/db/index.server";
 import { useAtomValue, atom } from "jotai";
 import {
+  SO_analytic_settings,
   SO_binding_campaigns_contacts,
   SO_campaign_sender_email_link,
   SO_campaigns,
@@ -28,6 +29,7 @@ export type CampaignStatus = {
   contacts: boolean;
   sequence: boolean;
   schedule: boolean;
+  senders: boolean;
   settings: boolean;
   launch: boolean;
 };
@@ -69,13 +71,19 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     .from(SO_campaign_sender_email_link)
     .where(eq(SO_campaign_sender_email_link.campaignId, Number(params.id)));
 
+  const analytics = await db
+    .select()
+    .from(SO_analytic_settings)
+    .where(eq(SO_analytic_settings.campaignId, Number(params.id)));
+
   return {
     basics: Boolean(campaign[0].name),
     campaign: campaign[0],
     contacts: Boolean(campaignContacts.length),
     sequence: Boolean(sequence.length),
     schedule: false,
-    settings: Boolean(senders.length),
+    senders: Boolean(senders.length),
+    settings: Boolean(analytics.length),
     launch: campaign[0].deadline != null,
     result,
   };
@@ -83,42 +91,20 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export default function Page() {
   const data = useLoaderData<typeof loader>();
-  const nameFetcher = useFetcher();
   const cta = useAtomValue(sequenceCTAAtom);
-  const name =
-    nameFetcher.json == null
-      ? data.campaign.name
-      : JSON.parse(JSON.stringify(nameFetcher.json)).newName;
 
   return (
     <>
       <div className="flex h-screen max-h-screen flex-col ">
         <div className="flex h-auto justify-between px-6 py-2 *:my-auto">
-          <div className="flex flex-col justify-start align-baseline">
-            <NameView
-              onSubmit={(val) => {
-                const fd = new FormData();
-                fd.append("name", val);
-                nameFetcher.submit(
-                  {
-                    intent: "set_name",
-                    newName: val,
-                    id: Number(data.campaign.id),
-                  },
-                  { encType: "application/json", method: "post" },
-                );
-              }}
-              name={name}
-            />
-            <p className="text-gray-500">Manage your campaign contacts.</p>
-          </div>
           <PageSelect
             basics={data.basics}
             contacts={data.contacts}
             sequence={data.sequence}
             schedule={data.schedule}
-            settings={data.settings}
+            senders={data.senders}
             launch={data.launch}
+            settings={data.settings}
             campaignId={data.campaign.id}
             data={data.result.params}
           />

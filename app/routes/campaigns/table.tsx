@@ -2,6 +2,7 @@ import { Link } from "@remix-run/react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { timeAgo } from "~/lib/time_ago";
+import { FaChartBar, FaSlidersH } from "react-icons/fa";
 
 export function CampaignTable({ data }: { data: CampaignTableCellData[] }) {
   return (
@@ -23,8 +24,7 @@ export type CampaignTableCellData = {
 
 function CampaignRow({ campaign }: { campaign: CampaignTableCellData }) {
   return (
-    <Link prefetch="intent" to={`/campaigns/${campaign.id}`}>
-      <div className="flex flex-col px-6 hover:bg-secondary">
+      <div className="flex flex-col px-6">
         <div className=" flex  justify-between *:my-auto">
           <div className="flex gap-2">
             <div className="flex flex-col gap-1 py-2">
@@ -57,10 +57,32 @@ function CampaignRow({ campaign }: { campaign: CampaignTableCellData }) {
               </p>
             </div>
           </div>
-          <Button variant={"outline"}>Manage</Button>
+          <div className="flex gap-2">
+            <Button
+              asChild
+              variant={"outline"}
+              className="border hover:border-primary flex gap-2"
+            >
+            <Link prefetch="intent" to={`/campaigns/${campaign.id}/stats`}>   
+              <FaChartBar /> Status
+            </Link>
+            </Button>
+            <Link prefetch="intent" to={`/campaigns/${campaign.id}`}>
+            <Button
+              className="flex gap-2 hover:border-primary"
+              // onClick={(e) => {
+              //   e.stopPropagation();
+              //   e.preventDefault();
+              // }}
+              variant={"outline"}
+            >
+              <FaSlidersH />
+              Manage
+            </Button>
+            </Link>
+          </div>
         </div>
         <div className="h-[.5px] w-full bg-gray-100 dark:bg-gray-800"></div>
       </div>
-    </Link>
   );
 }

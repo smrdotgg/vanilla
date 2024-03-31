@@ -5,6 +5,7 @@ import {
   TbCircleNumber2,
   TbCircleNumber3,
   TbCircleNumber4,
+  TbCircleNumber5,
 } from "react-icons/tb";
 
 import { TiTick } from "react-icons/ti";
@@ -18,6 +19,7 @@ export function PageSelect({
   launch,
   contacts,
   sequence,
+  senders,
   settings,
 }: CampaignStatus & { campaignId: number; data: { [k: string]: string } }) {
   const nav = useNavigation();
@@ -56,17 +58,24 @@ export function PageSelect({
       {/* /> */}
       <FaChevronRight />
       <PageButton
+        href="03_sender_accounts"
+        label={"Senders"}
+        done={senders}
+        icon={TbCircleNumber3}
+      />
+      <FaChevronRight />
+      <PageButton
         href="04_settings"
         label={"Settings"}
         done={settings}
-        icon={TbCircleNumber3}
+        icon={TbCircleNumber4}
       />
       <FaChevronRight />
       <PageButton
         href="05_launch"
         label={"Launch"}
         done={launch}
-        icon={TbCircleNumber4}
+        icon={TbCircleNumber5}
       />
     </div>
   );
@@ -95,7 +104,7 @@ function PageButton(props: {
           )}
         </div>
         <p
-          className={`hidden font-bold 2xl:inline ${props.done ? "text-green-500" : "text-gray-500"}`}
+          className={`hidden text-center font-bold 2xl:inline ${props.done ? "text-green-500" : "text-gray-500"}`}
         >
           {props.label}
         </p>

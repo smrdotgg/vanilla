@@ -3,6 +3,7 @@ import { senderAccountsRouter } from "./routers/sender_accounts";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { campaignRouter } from "./routers/campaign";
 import { contactsRouter } from "./routers/contacts";
+import {analyticsRouter} from "./routers/analytics";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
   senderAccounts: senderAccountsRouter,
   campaign: campaignRouter,
   contacts: contactsRouter,
+  analytics: analyticsRouter,
   // campaignRouter
 });
 
