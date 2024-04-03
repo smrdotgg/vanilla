@@ -6,3 +6,6 @@ node_modules
 .env
 
 bun.lockb
+
+cron/test.ts
+.vercel/
