@@ -15,5 +15,9 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
       sequenceId: Number(sequenceStepId),
       link: originalTarget,
     });
-  return redirect(originalTarget);
+  if (originalTarget.startsWith("http")){
+    return redirect(originalTarget);
+  } else {
+    return redirect(`https://${originalTarget}`);
+  }
 }
