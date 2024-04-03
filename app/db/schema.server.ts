@@ -199,14 +199,20 @@ export const SO_binding_campaigns_contacts = createTable(
   }),
 );
 
-export const SO_email_open_event = createTable(
-  "email_open_event",
-  {
+export const SO_email_open_event = createTable("email_open_event", {
   id: serial("id").primaryKey(),
-    targetEmail: text("target_email").notNull(),
-    sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  });
+  targetEmail: text("target_email").notNull(),
+  sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const SO_email_link_click = createTable("email_link_click", {
+  id: serial("id").primaryKey(),
+  targetEmail: text("target_email").notNull(),
+  sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),
+  link: text("link").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 /* ---  Type Exports --- */
 export type SequenceStep = typeof SO_sequence_steps.$inferSelect;

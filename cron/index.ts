@@ -1,5 +1,5 @@
 import { schedule } from "node-cron";
-import {addCtrTracking} from "./tracking";
+import {addTracking} from "./tracking";
 import { db } from "~/db/index.server";
 import {
   SO_binding_campaigns_contacts,
@@ -82,7 +82,7 @@ const main = async () => {
         const args = {
           SMTPPort: senderEmail.smtpPort,
           SMTPHost: senderEmail.smtpHost,
-          body: addCtrTracking({targetEmail: t.email,sequenceStepId: step.id.toString(), content: step.content ?? ""}),
+          body: addTracking({targetEmail: t.email,sequenceStepId: step.id.toString(), content: step.content ?? ""}),
           subject: step.title ?? "",
           fromEmail: senderEmail.fromEmail,
           // fromName: senderEmail.fromName,
