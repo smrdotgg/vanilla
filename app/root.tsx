@@ -6,7 +6,6 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useRouteError,
 } from "@remix-run/react";
 import "./tailwind.css";
 import { themeSessionResolver } from "./sessions.server";
@@ -19,6 +18,7 @@ import {
 } from "remix-themes";
 import { DashLayout } from "./components/custom/side-bar";
 import { Provider } from "jotai";
+
 import { TRPCReactProvider } from "./server/trpc/react";
 import clsx from "clsx";
 

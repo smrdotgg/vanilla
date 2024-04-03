@@ -1,4 +1,5 @@
 import { schedule } from "node-cron";
+import {addCtrTracking} from "./tracking";
 import { db } from "~/db/index.server";
 import {
   SO_binding_campaigns_contacts,
@@ -81,7 +82,7 @@ const main = async () => {
         const args = {
           SMTPPort: senderEmail.smtpPort,
           SMTPHost: senderEmail.smtpHost,
-          body: step.content ?? "",
+          body: addCtrTracking({targetEmail: t.email,sequenceStepId: step.id.toString(), content: step.content ?? ""}),
           subject: step.title ?? "",
           fromEmail: senderEmail.fromEmail,
           // fromName: senderEmail.fromName,
@@ -110,7 +111,8 @@ const main = async () => {
   console.log("Sequence steps state updated");
 };
 
+await main();
 
-console.log("cron job about to start waiting for an hour...");
-schedule("* * * * *", main);
-console.log("Added console logs throughout the script for better tracking");
+// console.log("cron job about to start waiting for an hour...");
+// schedule("* * * * *", main);
+// console.log("Added console logs throughout the script for better tracking");

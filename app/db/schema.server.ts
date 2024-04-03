@@ -199,6 +199,15 @@ export const SO_binding_campaigns_contacts = createTable(
   }),
 );
 
+export const SO_email_open_event = createTable(
+  "email_open_event",
+  {
+  id: serial("id").primaryKey(),
+    targetEmail: text("target_email").notNull(),
+    sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  });
+
 /* ---  Type Exports --- */
 export type SequenceStep = typeof SO_sequence_steps.$inferSelect;
 export type SequenceBreak = typeof SO_sequence_breaks.$inferSelect;
