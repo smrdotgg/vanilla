@@ -80,7 +80,7 @@ export default function ContactsPage() {
       <div className=" flex  flex-grow overflow-y-auto ">
         <div className="flex w-full  flex-grow">
           <div className="pl-1"></div>
-          <div className=" flex w-96 flex-col border border-l-black bg-secondary *:w-full">
+          <div className=" flex max-w-80 min-w-80 flex-col border border-l-black bg-secondary *:w-full">
             <div className="flex justify-between *:my-auto">
               <p className="p-2 text-xl">Emails &amp; Breaks</p>
               <AddItem />
@@ -115,6 +115,7 @@ export default function ContactsPage() {
               <EditEmailPage
                 id={selected!}
                 content={data.steps[selected].content}
+                isPlainText={data.steps[selected].format == "plain"}
                 title={data.steps[selected].title}
               />
             ) : (

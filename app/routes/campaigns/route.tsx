@@ -7,6 +7,7 @@ import {
 import { eq, sql } from "drizzle-orm";
 import { Page } from "./page";
 
+
 export const loader = async () => {
   const d = await db
     .select({

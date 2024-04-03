@@ -32,7 +32,7 @@ export const NameView = ({
           buttonRef.current?.focus();
         }}
       >
-        <div className="w-60">
+        <div className="w-full min-w-60">
           <Input
             name="title"
             required
@@ -52,12 +52,18 @@ export const NameView = ({
                 buttonRef?.current?.focus();
               }
               if (event.key === "Enter") {
+                event.preventDefault();
                 if (inputRef.current?.value != value) {
                   flushSync(() => {
                     fetcher.submit(event.currentTarget.form);
+                    setEditMode(false);
                   });
-                  setEditMode(false);
                   buttonRef.current?.focus();
+                } else {
+                  flushSync(() => {
+                    setEditMode(false);
+                  });
+                  buttonRef?.current?.focus();
                 }
               }
             }}
@@ -80,9 +86,9 @@ export const NameView = ({
         });
         inputRef.current?.focus();
       }}
-      className={`flex h-9 w-60 pb-1  pl-[0.05rem] text-3xl font-bold ${value ? "" : "text-secondary"}`}
+      className={`flex h-9 min-w-60 pb-1  pl-[0.05rem] text-3xl font-bold ${value ? "" : "text-gray-500"}`}
     >
-      <p>{value || "Set Value"}</p>
+      <p>{value || "Title not set"}</p>
     </button>
   );
 };

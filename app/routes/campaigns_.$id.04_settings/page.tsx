@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useNavigate, useParams } from "@remix-run/react";
+import { Link, useLoaderData, useNavigate, useParams, useRevalidator } from "@remix-run/react";
 import type { IconType } from "react-icons/lib";
 import { Switch } from "~/components/ui/switch";
 import type { loader } from "./route";
@@ -24,11 +24,15 @@ export function Page() {
   const [bounceRate, setBounceRate] = useState(data?.bounceRate ?? false);
   const params = useParams();
   const setCta = useSetAtom(sequenceCTAAtom);
-  const updateAnalytics = api.analytics.setAnalytics.useMutation();
+  const revalidator = useRevalidator();
+  const updateAnalytics = api.analytics.setAnalytics.useMutation({
+    onSuccess: () => {
+      if (revalidator.state === "idle") revalidator.revalidate();
+    },
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("use effect ran");
     setCta(
       <Button
         onClick={async (event) => {
@@ -52,7 +56,17 @@ export function Page() {
       </Button>,
     );
     return () => setCta(undefined);
-  }, [bounceRate, clickThroughRate, navigate, openRate, optOutRate, params.id, replyRate, setCta, updateAnalytics]);
+  }, [
+    bounceRate,
+    clickThroughRate,
+    navigate,
+    openRate,
+    optOutRate,
+    params.id,
+    replyRate,
+    setCta,
+    updateAnalytics,
+  ]);
 
   return (
     <div className="flex *:mx-auto">

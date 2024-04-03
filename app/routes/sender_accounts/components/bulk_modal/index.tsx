@@ -57,7 +57,7 @@ export function BulkButton({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Import contacts from CSV</Button>
+        <Button>Import sender accounts from CSV</Button>
       </DialogTrigger>
       <DialogContent className="flex h-screen w-screen min-w-full flex-col">
         <DialogHeader className=" h-10">

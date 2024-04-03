@@ -98,8 +98,6 @@ export async function newUpdateEmailContent({
   id,
   content,
 }: z.infer<typeof updateEmailContentSchema>) {
-  console.log("got reqeust from ");
-  console.log({ id, content });
   await db
     .update(SO_sequence_steps)
     .set({ content })

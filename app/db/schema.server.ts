@@ -119,6 +119,14 @@ export const SO_sequence_step_state = pgEnum("sequence_step_state", [
   "waiting",
 ]);
 
+export const SequenceStepTextFormatTypes = ["html", "plain"] as const;
+
+export const SO_sequence_step_text_format = pgEnum(
+  "sequence_step_text_format",
+  SequenceStepTextFormatTypes,
+);
+// export const OrderMethod = strEnum(orderMethodEnum.enumValues);
+
 export const SO_sequence_steps = createTable("sequence_step", {
   id: serial("id").primaryKey(),
   title: text("title"),
@@ -130,6 +138,7 @@ export const SO_sequence_steps = createTable("sequence_step", {
     .references(() => SO_campaigns.id)
     .notNull(),
   state: SO_sequence_step_state("state").default("waiting").notNull(),
+  format: SO_sequence_step_text_format("format").default("html").notNull(),
 });
 
 export const SO_sequence_breaks = createTable("sequence_break", {
@@ -139,17 +148,17 @@ export const SO_sequence_breaks = createTable("sequence_break", {
   campaignId: integer("campaign_id").references(() => SO_campaigns.id),
 });
 
-
 export const SO_analytic_settings = createTable("analytic_settings", {
   id: serial("id").primaryKey(),
-  campaignId: integer("campaign_id").references(() => SO_campaigns.id).unique(),
+  campaignId: integer("campaign_id")
+    .references(() => SO_campaigns.id)
+    .unique(),
   openRate: boolean("open_rate").default(false),
   replyRate: boolean("reply_rate").default(false),
   optOutRate: boolean("opt_out_rate").default(false),
   bounceRate: boolean("bounce_rate").default(false),
   clickthroughRate: boolean("click_through_rate").default(false),
 });
-
 
 // export const SO_analytic_data = createTable("analytic_data", {
 //   id: serial("id").primaryKey(),
@@ -160,7 +169,6 @@ export const SO_analytic_settings = createTable("analytic_settings", {
 //   bounceRate: boolean("bounce_rate").default(false),
 //   clickthroughRate: boolean("click_through_rate").default(false),
 // });
-
 
 export const SO_contacts = createTable("contact", {
   id: serial("id").primaryKey(),

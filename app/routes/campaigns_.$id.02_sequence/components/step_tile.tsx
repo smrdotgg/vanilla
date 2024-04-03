@@ -36,15 +36,27 @@ export function StepTile({
       <div
         className={` flex h-full flex-col p-1 px-2 *:my-auto *:mr-auto ${selected ? "border-white bg-blue-600 text-white" : "border-blue-900 bg-blue-100 dark:bg-blue-950 "} rounded  border   `}
       >
-        <p className="text-xl font-bold ">{title ?? "Title Not Set"}</p>
-        <ClientOnly fallback={<h1>....</h1>}>
-          {() => <p>{extractVisibleTextFromHTML(content ?? "")}</p>}
+        <p className="text-xl font-bold ">
+          {Number(title?.length) > 0 ? title : "Title Not Set"}
+        </p>
+        <ClientOnly fallback={<p>....</p>}>
+          {() => {
+            const CUTOFF = 20;
+            return (
+              <p>
+                {extractVisibleTextFromHTML(content ?? "").slice(0, CUTOFF) +
+                  (extractVisibleTextFromHTML(content ?? "").length > CUTOFF
+                    ? "..."
+                    : "")}
+              </p>
+            );
+          }}
         </ClientOnly>
       </div>
     </button>
   );
 }
-function extractVisibleTextFromHTML(htmlString: string): string {
+export function extractVisibleTextFromHTML(htmlString: string): string {
   // Use DOMParser to parse the HTML string
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlString, "text/html");

@@ -22,10 +22,12 @@ export const EditEmailPage = ({
   title,
   content,
   id,
+  isPlainText,
 }: {
   id: number;
   title: string | null;
   content: string | null;
+  isPlainText: boolean,
 }) => {
   const fetcher = useFetcher();
   const fetchers = useFetchers();
@@ -66,7 +68,7 @@ export const EditEmailPage = ({
       </div>
 
       <ClientOnly fallback={<h1>loading</h1>}>
-        {() => <NewEditor id={id} key={id} contentString={content} />}
+        {() => <NewEditor isPlainText={isPlainText} id={id} key={id} contentString={content} />}
       </ClientOnly>
     </div>
   );

@@ -1,4 +1,12 @@
-import { Link, useFetcher, useLoaderData, useParams } from "@remix-run/react";
+import {
+  Link,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+  useParams,
+  useRevalidator,
+  useSearchParams,
+} from "@remix-run/react";
 import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ContactsDisplay } from "../contacts/components/table";
@@ -8,40 +16,74 @@ import { loader } from "./route";
 import { api } from "~/server/trpc/react";
 
 export default function Page() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const { data, cursor, selectedContactIds, contactCount, campaignId } =
     useLoaderData<typeof loader>();
   const [loaded, setLoaded] = useState(false);
   const params = useParams();
-  const fetcher = useFetcher();
-  const setCta = useSetAtom(sequenceCTAAtom);
-
   const [allSelectedAdmin, setAllSelectedMode] = useState(false);
   const [selectedId, setSelectedId] = useState(new Set(selectedContactIds));
   const [unselectedIds, setUnselectedIds] = useState(new Set<number>());
+  const setCta = useSetAtom(sequenceCTAAtom);
+  const navigate = useNavigate();
+  const revalidator = useRevalidator();
+  const updateContactSelection =
+    api.campaign.updateContactPairings.useMutation({onSuccess: () => { if(revalidator.state === "idle") revalidator.revalidate();}});
 
-  const myQuery = api.campaign.getContacts.useInfiniteQuery(
-    { campaignId },
-    {
-      getNextPageParam: (lastPage) => lastPage.cursor + 1,
-      initialCursor: cursor,
-    },
-  );
-
-  const rowIsSelected = (rowId: number) => {
-    if (allSelectedAdmin) {
-      return !unselectedIds.has(rowId);
+  const nextCursor = () => {
+    if (location.search.length === 0) {
+      return 2;
     } else {
-      return selectedId.has(rowId);
+      const params = new URLSearchParams(location.search.slice(1));
+      const cursor = Number(params.get("cursor"));
+      return cursor + 1;
     }
   };
 
-  const selectedContactCount: number = (() => {
-    if (allSelectedAdmin) {
-      return contactCount - unselectedIds.size;
-    } else {
-      return selectedId.size;
+  useEffect(() => {
+    setLoaded(true);
+    setCta(
+      <Button
+        onClick={() => {
+          updateContactSelection.mutate({
+            mode: allSelectedAdmin ? "excludeSpecified" : "useOnlySpecified",
+            exceptions: allSelectedAdmin ? [...unselectedIds] : [...selectedId],
+            campaignId: campaignId,
+          });
+          setSelectedId(new Set<number>());
+          setAllSelectedMode(false);
+          setUnselectedIds(new Set<number>());
+        }}
+      >
+        <Link to={`/campaigns/${params.id}/02_sequence`}>Next</Link>
+      </Button>,
+    );
+    return () => setCta(undefined);
+  }, [params.id, selectedId, setCta]);
+
+  useEffect(() => {
+    if (selectedId.size === contactCount && contactCount > 0) {
+      setAllSelectedMode(true);
     }
-  })();
+  }, [selectedId, contactCount]);
+
+  useEffect(() => {
+    if (
+      allSelectedAdmin &&
+      unselectedIds.size === contactCount &&
+      contactCount > 0
+    ) {
+      setAllSelectedMode(false);
+    }
+  }, [unselectedIds, contactCount]);
+
+  useEffect(() => {
+    if (loaded) {
+      setSelectedId(new Set<number>());
+      setUnselectedIds(new Set<number>());
+    }
+  }, [allSelectedAdmin]);
 
   const manageRowClick = (rowId: number) => {
     const selected = rowIsSelected(rowId);
@@ -67,51 +109,20 @@ export default function Page() {
       }
     }
   };
-
-  useEffect(() => {
-    if (selectedId.size === contactCount && contactCount > 0) {
-      setAllSelectedMode(true);
+  const rowIsSelected = (rowId: number) => {
+    if (allSelectedAdmin) {
+      return !unselectedIds.has(rowId);
+    } else {
+      return selectedId.has(rowId);
     }
-  }, [selectedId, contactCount]);
-
-  useEffect(() => {
-    if (
-      allSelectedAdmin &&
-      unselectedIds.size === contactCount &&
-      contactCount > 0
-    ) {
-      setAllSelectedMode(false);
+  };
+  const selectedContactCount: number = (() => {
+    if (allSelectedAdmin) {
+      return contactCount - unselectedIds.size;
+    } else {
+      return selectedId.size;
     }
-  }, [unselectedIds, contactCount]);
-
-  useEffect(() => {
-    setSelectedId(new Set<number>());
-    setUnselectedIds(new Set<number>());
-  }, [allSelectedAdmin]);
-
-  const updateContactSelection =
-    api.campaign.updateContactPairings.useMutation();
-
-  useEffect(() => {
-    setLoaded(true);
-    setCta(
-      <Button
-        onClick={() => {
-          updateContactSelection.mutate({
-            mode: allSelectedAdmin ? "excludeSpecified" : "useOnlySpecified",
-            exceptions: allSelectedAdmin ? [...unselectedIds] : [...selectedId],
-            campaignId: campaignId,
-          });
-          setSelectedId(new Set<number>());
-          setAllSelectedMode(false);
-          setUnselectedIds(new Set<number>());
-        }}
-      >
-        <Link to={`/campaigns/${params.id}/02_sequence`}>Next</Link>
-      </Button>,
-    );
-    return () => setCta(undefined);
-  }, [fetcher, params.id, selectedId, setCta]);
+  })();
 
   return (
     <div className="flex flex-col gap-2 overflow-auto">
@@ -123,22 +134,25 @@ export default function Page() {
         formDisabled={!loaded}
         selectedContactCount={selectedContactCount}
         setAllSelectedAdmin={setAllSelectedMode}
-        loadMore={() => null} // TODO
+        loadMore={() => {
+          const params = new URLSearchParams();
+          params.set("cursor", String(nextCursor()));
+          setSearchParams(params, {
+            preventScrollReset: true,
+          });
+        }}
         contactCount={contactCount}
         rowIsSelected={rowIsSelected}
         unselectedIds={unselectedIds}
         manageRowClick={manageRowClick}
-        allSelectedAdmin={false}
-        contacts={
-          myQuery.data?.pages.map((p) => p.data).flat() ??
-          data!.map((d) => ({
-            id: d.id,
-            name: d.name,
-            email: d.email,
-            createdAt: new Date(d.createdAt),
-            companyName: d.companyName,
-          }))
-        }
+        allSelectedAdmin={allSelectedAdmin}
+        contacts={data!.map((d) => ({
+          id: d.id,
+          name: d.name,
+          email: d.email,
+          createdAt: new Date(d.createdAt),
+          companyName: d.companyName,
+        }))}
       />
     </div>
   );

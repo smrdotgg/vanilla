@@ -41,7 +41,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     request.url.endsWith(`campaigns/${params.id}/`) ||
     request.url.endsWith(`campaigns/${params.id}`)
   ) {
-    return redirect(`/campaigns/${params.id}/01_contacts`);
+    return redirect(`/campaigns/${params.id}/00_basics`);
   }
 
   const campaignContacts = await db

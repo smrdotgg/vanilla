@@ -10,9 +10,14 @@ import { contactListSchema } from "./types";
 import Page from "./page";
 import { api } from "~/server/trpc/server.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+const getPage = (searchParams: URLSearchParams) =>
+  Number(searchParams.get("cursor") || "1");
+
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+  const page = getPage(new URL(request.url).searchParams);
   return api.campaign.getContacts.query({
-    cursor: 1,
+    cursor: page,
+    getAll: true,
     campaignId: Number(params.id),
   });
 };

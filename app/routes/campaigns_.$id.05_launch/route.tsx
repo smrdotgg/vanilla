@@ -21,7 +21,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   return campaign[0].deadline == null;
 };
 
-export default function ContactsPage() {
+export default function Page() {
   const navigate = useNavigate();
   const loaderData = useLoaderData<typeof loader>();
   const setDeadline = api.campaign.setDeadline.useMutation({

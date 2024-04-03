@@ -3,55 +3,86 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useFetcher, useParams } from "@remix-run/react";
 import { INTENTS } from "./types";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Textarea } from "~/components/ui/textarea";
+import { extractVisibleTextFromHTML } from "./components/step_tile";
+import { api } from "~/server/trpc/react";
+import { decodeHtml, encodeHtml } from "~/lib/html_encoding";
 
 export const NewEditor = ({
   id,
   contentString,
+  isPlainText,
 }: {
   id: number;
   contentString: string | null;
+  isPlainText: boolean;
 }) => {
-  const [prevContent, setPrevContent] = useState(contentString ?? "");
-  const [content, setContent] = useState(contentString ?? "");
-  // const [content, setContent] = useState("<p class=\"text-red-500\">hello there</p>");
-  const [mono, setMono] = useState(false);
-  const fetcher = useFetcher();
+  const [prevContent, setPrevContent] = useState(
+    isPlainText ? decodeHtml(contentString?.replace(/<br\s*\/?>/gi, "\n") ?? "") : (contentString ?? ""),
+  );
+  const [content, setContent] = useState(
+    isPlainText ? decodeHtml(contentString?.replace(/<br\s*\/?>/gi, "\n") ?? "") : (contentString ?? ""),
+  );
   const params = useParams();
+  const [plainTextMode, setPlainTextMode] = useState(isPlainText);
+  const updateContentMutation = api.sequence.updateContent.useMutation();
 
-  // Debounce effect for content state
   useEffect(() => {
+    if (plainTextMode) {
+      setContent((content) => extractVisibleTextFromHTML(content));
+    }
+  }, [plainTextMode]);
+
+  useEffect(() => {
+    const parsedContent = plainTextMode ? encodeHtml(content).replace(/\n/g, "<br>") : content;
     const handler = setTimeout(() => {
-      // Asynchronous operation
       const performAsyncOperation = async () => {
-        const fd = new FormData();
-        fd.append("intent", INTENTS.updateEmailContent);
-        fd.append("content", content);
-        fd.append("id", String(id));
-        fetcher.submit(fd, { method: "post" });
-        // Your async operation here. For example, sending content to an API.
+        updateContentMutation.mutate({
+          id,
+          content: parsedContent,
+          type: plainTextMode ? "plain" : "html",
+        });
       };
       if (prevContent !== content) {
         setPrevContent(content);
         performAsyncOperation();
       }
-    }, 1000); // Adjust the delay (ms) as needed
-
-    // Cleanup function to cancel the timeout if the content changes again before the delay is over
+    }, 1000);
     return () => clearTimeout(handler);
-  }, [content, fetcher, params.id, id, prevContent]); // Effect depends on content state
+  }, [content, plainTextMode, params.id, id, prevContent]); // Effect depends on content state
 
   return (
     <div>
-      <div className="p-2 text-black ">
-        {/* THE height of this thing is set in the CSS, with a hardcoded CSS class name */}
-        <CKEditor
-          editor={ClassicEditor}
-          data={content}
-          onChange={(_, editor) => {
-            setContent(editor.getData());
-          }}
-        />
+      <div className="p-2 ">
+        <div className="flex gap-2 *:my-auto">
+          <Checkbox
+            onCheckedChange={() => setPlainTextMode(!plainTextMode)}
+            checked={plainTextMode}
+          />
+          <p>Plain Text Mode</p>
+        </div>
+        {plainTextMode && (
+          <Textarea
+            className="h-96 rounded-none bg-white text-black"
+            placeholder="Your Email..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+        )}
+        {!plainTextMode && (
+          <div className="text-black">
+            <CKEditor
+              editor={ClassicEditor}
+              data={content}
+              onChange={(_, editor) => {
+                setContent(editor.getData());
+              }}
+            />
+          </div>
+        )}
       </div>
+      {/* Floating checkbox */}
     </div>
   );
 };

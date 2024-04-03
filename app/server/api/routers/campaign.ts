@@ -19,7 +19,7 @@ export const campaignRouter = createTRPCRouter({
         .where(eq(SO_campaigns.id, input.campaignId));
     }),
   getContacts: publicProcedure
-    .input(z.object({ campaignId: z.number(), cursor: z.number().default(1) }))
+    .input(z.object({ getAll: z.boolean().default(false), campaignId: z.number(), cursor: z.number().default(1) }))
     .query(async ({ input, ctx }) => {
       const batchSize = 25;
 
@@ -47,8 +47,8 @@ export const campaignRouter = createTRPCRouter({
         data: await ctx.db
           .select()
           .from(SO_contacts)
-          .limit(batchSize)
-          .offset((input.cursor - 1) * batchSize),
+          .limit(batchSize*input.cursor),
+          // .offset((input.cursor - 1) * batchSize),
         cursor: input.cursor,
         campaignId: input.campaignId,
         batchSize,
