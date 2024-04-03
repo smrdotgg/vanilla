@@ -3,7 +3,6 @@ import { db } from "~/db/index.server";
 import { SO_email_link_click, SO_email_open_event } from "~/db/schema.server";
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
-  try{
    const url = new URL(request.url);
     const email = url.searchParams.get("email");
     const sequenceStepId = url.searchParams.get("sequenceStepId");
@@ -16,8 +15,5 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
       sequenceId: Number(sequenceStepId),
       link: originalTarget,
     });
-  } catch(e){
-    console.log(e);
-  }
-  return redirect('originalTarget');
+  return redirect(originalTarget);
 }
