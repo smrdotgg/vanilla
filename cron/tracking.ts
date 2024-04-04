@@ -13,13 +13,13 @@ export const addTracking = ({
   customerTrackingLink: string | null;
 }) => {
   content = openRateTracking({ content, sequenceStepId, targetEmail });
-  content = ctrTracking({ content, sequenceStepId, targetEmail });
   content = unsubTracking({
     content,
     customerTrackingLink,
     sequenceStepId,
     targetEmail,
   });
+  content = ctrTracking({ content, sequenceStepId, targetEmail, customerTrackingLink });
 
   return content;
 };
@@ -92,22 +92,24 @@ const openRateTracking = ({
 };
 
 function ctrTracking({
+  sequenceStepId,
   content,
   targetEmail,
-  sequenceStepId,
+  customerTrackingLink,
 }: {
   sequenceStepId: string;
   targetEmail: string;
   content: string;
+  customerTrackingLink: string | null;
 }): string {
   const dom = new JSDOM(content);
   const aElements = dom.window.document.querySelectorAll("a");
 
   aElements.forEach((a) => {
-    const newLink = dom.window.document.createElement("a");
-    newLink.href = `${url}analytics/ctr?email=${targetEmail}&originalTarget=${a.href}&sequenceStepId=${sequenceStepId}`;
-    newLink.textContent = a.textContent;
-    a.replaceWith(newLink);
+      const newLink = dom.window.document.createElement("a");
+      newLink.href = `${url}analytics/ctr?email=${targetEmail}&originalTarget=${encodeURIComponent(a.href)}&sequenceStepId=${sequenceStepId}`;
+      newLink.textContent = a.textContent;
+      a.replaceWith(newLink);
   });
 
   return dom.window.document.body.innerHTML;

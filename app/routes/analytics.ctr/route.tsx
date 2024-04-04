@@ -6,9 +6,9 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
    const url = new URL(request.url);
     const email = url.searchParams.get("email");
     const sequenceStepId = url.searchParams.get("sequenceStepId");
-    const originalTarget = url.searchParams.get("originalTarget");
+    const originalTarget = decodeURIComponent(url.searchParams.get("originalTarget") ?? "");
     if (!email) throw Error("Email is required");
-    if (!originalTarget) throw Error("Original Target is required");
+    if (!(originalTarget.length)) throw Error("Original Target is required");
     if (!sequenceStepId) throw Error("Sequence Step ID is required");
     await db.insert(SO_email_link_click).values({
       targetEmail: email,
