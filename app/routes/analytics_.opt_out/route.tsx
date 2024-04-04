@@ -19,7 +19,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   await db.insert(SO_email_opt_out_event).values({
     targetEmail: email,
-    sequenceId: Number(sequenceStepId),
+    sequenceStepId: Number(sequenceStepId),
   });
   const seqStep = await db
     .select()

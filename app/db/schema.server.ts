@@ -117,6 +117,7 @@ export const SO_campaign_sender_email_link = createTable(
 export const SO_sequence_step_state = pgEnum("sequence_step_state", [
   "sent",
   "waiting",
+  "bounced",
 ]);
 
 export const SequenceStepTextFormatTypes = ["html", "plain"] as const;
@@ -200,17 +201,25 @@ export const SO_binding_campaigns_contacts = createTable(
   }),
 );
 
+// export const SO_email_bounce_event = 
+export const SO_email_bounce_event = createTable("email_bounce_event", {
+  id: serial("id").primaryKey(),
+  targetEmail: text("target_email").notNull(),
+  sequenceStepId: integer("sequence_step_id").references(() => SO_sequence_steps.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const SO_email_open_event = createTable("email_open_event", {
   id: serial("id").primaryKey(),
   targetEmail: text("target_email").notNull(),
-  sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),
+  sequenceStepId: integer("sequence_id").references(() => SO_sequence_steps.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const SO_email_opt_out_event = createTable("email_opt_out", {
   id: serial("id").primaryKey(),
   targetEmail: text("target_email").notNull(),
-  sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),
+  sequenceStepId: integer("sequence_id").references(() => SO_sequence_steps.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

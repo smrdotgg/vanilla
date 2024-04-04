@@ -6,6 +6,7 @@ import {
   SO_campaign_sender_email_link,
   SO_campaigns,
   SO_contacts,
+  SO_email_bounce_event,
   SO_sender_emails,
   SO_sequence_steps,
 } from "~/db/schema.server";
@@ -13,18 +14,23 @@ import { sequenceStepsToSend } from "./helpers";
 import { sendWithCustomData } from "./send_email";
 import { eq, inArray } from "drizzle-orm";
 
+const shouldLog = 0;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const log =(message?: any, ...optionalParams: any[]) => shouldLog ? console.log(message, optionalParams) : null;
+
+
 const main = async () => {
   for (let counter = 0; counter < 40; counter++) process.stdout.write("=");
-  console.log("");
-  console.log(`${new Date().toISOString()}: cron job triggered`);
-  console.log("Starting sequenceStepsToSend function");
+  log("");
+  log(`${new Date().toISOString()}: cron job triggered`);
+  log("Starting sequenceStepsToSend function");
   const { stepsToSend } = await sequenceStepsToSend();
-  console.log(`Steps to send: ${JSON.stringify(stepsToSend)}`);
+  log(`Steps to send: ${JSON.stringify(stepsToSend)}`);
   const campaignIds = stepsToSend.map((step) => step.campaignId);
 
-  console.log(`Campaign IDs: ${campaignIds}`);
-  console.log("getting DB");
-  console.log("Starting database query");
+  log(`Campaign IDs: ${campaignIds}`);
+  log("getting DB");
+  log("Starting database query");
 
   const x = await db
     .select()
@@ -46,9 +52,9 @@ const main = async () => {
       SO_contacts,
       eq(SO_contacts.id, SO_binding_campaigns_contacts.contactId),
     );
-  console.log("Database query completed");
+  log("Database query completed");
 
-  console.log("Processing sender emails and target contacts");
+  log("Processing sender emails and target contacts");
   const senderEmails = [
     ...new Set(
       x
@@ -56,7 +62,7 @@ const main = async () => {
         .filter((item): item is NonNullable<typeof item> => item !== null),
     ),
   ];
-  console.log(`Sender Emails: ${JSON.stringify(senderEmails)}`);
+  log(`Sender Emails: ${JSON.stringify(senderEmails)}`);
   const targetContacts = [
     ...new Set(
       x
@@ -64,21 +70,21 @@ const main = async () => {
         .filter((item): item is NonNullable<typeof item> => item !== null),
     ),
   ];
-  console.log(`Target Contacts: ${JSON.stringify(targetContacts)}`);
+  log(`Target Contacts: ${JSON.stringify(targetContacts)}`);
 
-  console.log("Starting to send emails");
-  await Promise.all(
+  log("Starting to send emails");
+  const masterAwait = (await Promise.all(
     stepsToSend.map(async (step) => {
       function getRandomValue<T>(list: T[]): T {
         return list[Math.floor(Math.random() * list.length)];
       }
       const senderEmail = getRandomValue(senderEmails);
 
-      console.log(
+      log(
         `Processing step: ${JSON.stringify(step)} with sender email: ${JSON.stringify(senderEmail)}`,
       );
       const d = targetContacts.map(async (t) => {
-        console.log(`Sending email to: ${t.email}`);
+        log(`Sending email to: ${t.email}`);
         const args = {
           SMTPPort: senderEmail.smtpPort,
           SMTPHost: senderEmail.smtpHost,
@@ -95,14 +101,17 @@ const main = async () => {
           username: senderEmail.userName,
           targetAddress: t.email,
         };
-        console.log(`args = ${JSON.stringify(args, null, 2)}`);
-        return await sendWithCustomData(args);
+        log(`args = ${JSON.stringify(args, null, 2)}`);
+        const response = await sendWithCustomData(args);
+        if (response.rejected.length){
+            await db.insert(SO_email_bounce_event).values({sequenceStepId: step.id, targetEmail: t.email });
+        }
+        return {...response, stepId: step.id};
       });
-      await Promise.all(d);
-      console.log(`Finished sending emails for step: ${step.id}`);
+      return await Promise.all(d);
     }),
-  );
-  console.log("Emails sent, updating the sequence steps state");
+  )).flat();
+  log("Emails sent, updating the sequence steps state");
 
   await db
     .update(SO_sequence_steps)
@@ -113,7 +122,7 @@ const main = async () => {
         stepsToSend.map((s) => s.id),
       ),
     );
-  console.log("Sequence steps state updated");
+  log("Sequence steps state updated");
 };
 
 await main();
