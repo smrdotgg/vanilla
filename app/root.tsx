@@ -9,7 +9,7 @@ import {
 } from "@remix-run/react";
 import "./tailwind.css";
 import { themeSessionResolver } from "./sessions.server";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import {
   PreventFlashOnWrongTheme,
   Theme,
@@ -23,6 +23,9 @@ import { TRPCReactProvider } from "./server/trpc/react";
 import clsx from "clsx";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  if (url.pathname == "/")  return redirect("home");
+
   const { getTheme } = await themeSessionResolver(request);
   const x = getTheme();
   return {
@@ -57,7 +60,7 @@ function LayoutCore({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <DashLayout selected="/home">{children}</DashLayout>
+        {children}
         <ScrollRestoration />
         <Toaster />
         <Scripts />

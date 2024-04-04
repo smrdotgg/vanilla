@@ -9,9 +9,9 @@ import {
 } from "@remix-run/react";
 import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { ContactsDisplay } from "../contacts/components/table";
+import { ContactsDisplay } from "../_dashboard.contacts/components/table";
 import { Button } from "~/components/ui/button";
-import { sequenceCTAAtom } from "../campaigns_.$id/route";
+import { sequenceCTAAtom } from "../_dashboard.campaigns_.$id/route";
 import { loader } from "./route";
 import { api } from "~/server/trpc/react";
 

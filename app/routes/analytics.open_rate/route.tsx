@@ -7,7 +7,6 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
   const imageBuffer = await fetch('https://placehold.co/600x400/111/ddd').then(res => res.arrayBuffer());
   const response = new Response(imageBuffer, { headers: { 'Content-Type': 'image/png' } });
   try{
-console.log("CTR TRIGGERED");
    const url = new URL(request.url);
   const email = url.searchParams.get("email");
   const sequenceStepId = url.searchParams.get("sequenceStepId");

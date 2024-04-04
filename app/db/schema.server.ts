@@ -156,6 +156,7 @@ export const SO_analytic_settings = createTable("analytic_settings", {
   openRate: boolean("open_rate").default(false),
   replyRate: boolean("reply_rate").default(false),
   optOutRate: boolean("opt_out_rate").default(false),
+  optOutUrl: text("opt_out_url"),
   bounceRate: boolean("bounce_rate").default(false),
   clickthroughRate: boolean("click_through_rate").default(false),
 });
@@ -200,6 +201,13 @@ export const SO_binding_campaigns_contacts = createTable(
 );
 
 export const SO_email_open_event = createTable("email_open_event", {
+  id: serial("id").primaryKey(),
+  targetEmail: text("target_email").notNull(),
+  sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const SO_email_opt_out_event = createTable("email_opt_out", {
   id: serial("id").primaryKey(),
   targetEmail: text("target_email").notNull(),
   sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),

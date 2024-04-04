@@ -9,7 +9,7 @@ import { loader } from "./route";
 import { SenderEmailTable } from "./components/sender_email_table";
 import { ReactNode, useEffect, useState } from "react";
 import { useSetAtom } from "jotai";
-import { sequenceCTAAtom } from "../campaigns_.$id/route";
+import { sequenceCTAAtom } from "../_dashboard.campaigns_.$id/route";
 import { Button } from "~/components/ui/button";
 import { z } from "zod";
 import { senderEmailListSchema } from "./types";

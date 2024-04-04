@@ -1,6 +1,7 @@
 import { db } from "~/db/index.server";
-import { lte, eq } from "drizzle-orm";
+import { lte, eq, inArray } from "drizzle-orm";
 import {
+  SO_analytic_settings,
   SO_campaigns,
   SO_sequence_breaks,
   SO_sequence_steps,
@@ -119,11 +120,26 @@ export const sequenceStepsToSend = async () => {
     );
   });
 
+  const campaignIds = stepsToSend
+    .map((s) => s?.campaignId)
+    .filter((item): item is NonNullable<typeof item> => item !== undefined);
+  const analyticSettings = campaignIds.length
+    ? await db
+        .select()
+        .from(SO_analytic_settings)
+        .where(inArray(SO_analytic_settings.campaignId, campaignIds))
+    : [];
+
   // TS trick to make sure the list items aren't null in TS land
   return {
     campaignIdToChildren,
-    stepsToSend: stepsToSend.filter(
-      (item): item is NonNullable<typeof item> => item !== null,
-    ),
+    stepsToSend: stepsToSend
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+      .map((i) => ({
+        ...i,
+        analyticSettings: analyticSettings.find(
+          (as) => as.campaignId === i.campaignId,
+        ),
+      })),
   };
 };

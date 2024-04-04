@@ -4,9 +4,10 @@ import {
   SO_sender_emails,
   SO_campaign_sender_email_link,
 } from "~/db/schema.server";
-import { rowSchema } from "~/routes/sender_accounts/components/bulk_modal";
+import { rowSchema } from "~/routes/_dashboard.sender_accounts/components/bulk_modal";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+
 
 export const senderAccountsRouter = createTRPCRouter({
   setSelected: publicProcedure

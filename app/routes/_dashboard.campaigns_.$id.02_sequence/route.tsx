@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 
+
 import { Button } from "~/components/ui/button";
 import { CiSquarePlus } from "react-icons/ci";
 import { db } from "~/db/index.server";
@@ -35,7 +36,7 @@ import {
 import { AddItem } from "./components/add_item";
 import { JSX } from "react/jsx-runtime";
 import { useSetAtom } from "jotai";
-import { sequenceCTAAtom } from "../campaigns_.$id/route";
+import { sequenceCTAAtom } from "../_dashboard.campaigns_.$id/route";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const campaignId = Number(params.id);
