@@ -12,6 +12,7 @@ import {
   varchar,
   boolean,
   pgEnum,
+  unique,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -214,7 +215,9 @@ export const SO_email_open_event = createTable("email_open_event", {
   targetEmail: text("target_email").notNull(),
   sequenceStepId: integer("sequence_id").references(() => SO_sequence_steps.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (t) => ({
+  unq: unique().on(t.sequenceStepId, t.targetEmail),
+}));
 
 export const SO_email_opt_out_event = createTable("email_opt_out", {
   id: serial("id").primaryKey(),

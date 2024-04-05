@@ -1,4 +1,6 @@
 import { FaShield, FaShieldHalved, FaInfo, FaExclamation } from "react-icons/fa6";
+import { FaRegEye } from "react-icons/fa";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { TextItem } from "./components/text_item";
 import { MyBreadCrumb } from "./components/bc";
 import { useLoaderData } from "@remix-run/react";
@@ -19,30 +21,24 @@ export function Page() {
       <div className="flex gap-2">
 
         <TextItem
-          icon={<FaShieldHalved />}
+          icon={<RiVerifiedBadgeFill />}
           onClick={() => {}}
           subText={"No issues detected"}
           bottomLeftComponent={<p>bonkers</p>}
-          mainText={"Good"}
-          label={"Reputation"}
-          bottomComponentConfig={{
-            sign: "warning",
-            mainText: "+2%",
-            direction: "increasing",
-          }}
+          mainText={`${data.deliverability * 100}%`}
+          label={"Deliverabilty Rate"}
+          // bottomComponentConfig={{
+          //   sign: "warning",
+          //   mainText: "+2%",
+          //   direction: "increasing",
+          // }}
         />
 
         <TextItem
-          icon={<FaShieldHalved />}
-          subText={"No issues detected"}
+          icon={<FaRegEye />}
           bottomLeftComponent={<p>bonkers</p>}
-          mainText={"Good"}
-          label={"Reputation"}
-          bottomComponentConfig={{
-            sign: "warning",
-            mainText: "+2%",
-            direction: "increasing",
-          }}
+          mainText={`${data.openRate * 100}%`}
+          label={"Open Rate"}
         />
       </div>
     </div>

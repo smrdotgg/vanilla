@@ -16,8 +16,8 @@ import { eq, inArray } from "drizzle-orm";
 
 const shouldLog = 0;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const log =(message?: any, ...optionalParams: any[]) => shouldLog ? console.log(message, optionalParams) : null;
-
+const log = (message?: any, ...optionalParams: any[]) =>
+  shouldLog ? console.log(message, optionalParams) : null;
 
 const main = async () => {
   for (let counter = 0; counter < 40; counter++) process.stdout.write("=");
@@ -73,44 +73,54 @@ const main = async () => {
   log(`Target Contacts: ${JSON.stringify(targetContacts)}`);
 
   log("Starting to send emails");
-  const masterAwait = (await Promise.all(
-    stepsToSend.map(async (step) => {
-      function getRandomValue<T>(list: T[]): T {
-        return list[Math.floor(Math.random() * list.length)];
-      }
-      const senderEmail = getRandomValue(senderEmails);
-
-      log(
-        `Processing step: ${JSON.stringify(step)} with sender email: ${JSON.stringify(senderEmail)}`,
-      );
-      const d = targetContacts.map(async (t) => {
-        log(`Sending email to: ${t.email}`);
-        const args = {
-          SMTPPort: senderEmail.smtpPort,
-          SMTPHost: senderEmail.smtpHost,
-          body: addTracking({
-            targetEmail: t.email,
-            sequenceStepId: step.id.toString(),
-            content: step.content ?? "",
-            customerTrackingLink: step.analyticSettings?.optOutUrl ?? null,
-          }),
-          subject: step.title ?? "",
-          fromEmail: senderEmail.fromEmail,
-          // fromName: senderEmail.fromName,
-          password: senderEmail.password,
-          username: senderEmail.userName,
-          targetAddress: t.email,
-        };
-        log(`args = ${JSON.stringify(args, null, 2)}`);
-        const response = await sendWithCustomData(args);
-        if (response.rejected.length){
-            await db.insert(SO_email_bounce_event).values({sequenceStepId: step.id, targetEmail: t.email });
+  const masterAwait = (
+    await Promise.all(
+      stepsToSend.map(async (step) => {
+        function getRandomValue<T>(list: T[]): T {
+          return list[Math.floor(Math.random() * list.length)];
         }
-        return {...response, stepId: step.id};
-      });
-      return await Promise.all(d);
-    }),
-  )).flat();
+        const senderEmail = getRandomValue(senderEmails);
+
+        log(
+          `Processing step: ${JSON.stringify(step)} with sender email: ${JSON.stringify(senderEmail)}`,
+        );
+        const d = targetContacts.map(async (t) => {
+          log(`Sending email to: ${t.email}`);
+          step.analyticSettings;
+          const args = {
+            SMTPPort: senderEmail.smtpPort,
+            SMTPHost: senderEmail.smtpHost,
+            body: addTracking({
+              targetEmail: t.email,
+              sequenceStepId: step.id.toString(),
+              content: step.content ?? "",
+              customerTrackingLink: step.analyticSettings?.optOutUrl ?? null,
+              settings: {
+                openRate: Boolean(step.analyticSettings?.openRate) ,
+                optOutRate: Boolean(step.analyticSettings?.optOutRate) ,
+                clickthroughRate: Boolean(step.analyticSettings?.clickthroughRate) ,
+              },
+            }),
+            subject: step.title ?? "",
+            fromEmail: senderEmail.fromEmail,
+            // fromName: senderEmail.fromName,
+            password: senderEmail.password,
+            username: senderEmail.userName,
+            targetAddress: t.email,
+          };
+          log(`args = ${JSON.stringify(args, null, 2)}`);
+          const response = await sendWithCustomData(args);
+          if (response.rejected.length) {
+            await db
+              .insert(SO_email_bounce_event)
+              .values({ sequenceStepId: step.id, targetEmail: t.email });
+          }
+          return { ...response, stepId: step.id };
+        });
+        return await Promise.all(d);
+      }),
+    )
+  ).flat();
   log("Emails sent, updating the sequence steps state");
 
   await db
@@ -125,8 +135,8 @@ const main = async () => {
   log("Sequence steps state updated");
 };
 
-await main();
+// await main();
 
-// console.log("cron job about to start waiting for an hour...");
-// schedule("* * * * *", main);
-// console.log("Added console logs throughout the script for better tracking");
+console.log("cron job about to start waiting for an hour...");
+schedule('*/10 * * * *',main);
+console.log("Added console logs throughout the script for better tracking");

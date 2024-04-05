@@ -89,7 +89,7 @@ export const sequenceStepsToSend = async () => {
           `Child at index ${index} has a state: ${currentChild.state}`,
         );
 
-        if ( currentChild.state === "waiting") {
+        if (currentChild.state === "waiting") {
           console.log(
             `Child at index ${index} is waiting, adding to stepsToSend`,
           );

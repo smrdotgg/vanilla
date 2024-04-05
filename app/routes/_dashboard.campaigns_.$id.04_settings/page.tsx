@@ -85,6 +85,13 @@ export function Page() {
         <p className="text-2xl">Analytics Settings</p>
         <div className="pt-6"></div>
         <AnalyticToggle
+          onSwitch={undefined}
+          value={true}
+          subtext="Track how many emails bounced and were not delivered."
+          text="Bounce Rate"
+          icon={TbArrowBounce}
+        />
+        <AnalyticToggle
           onSwitch={() => setOpenRate(!openRate)}
           value={openRate}
           subtext="Track how many recipients open your email."
@@ -98,25 +105,11 @@ export function Page() {
           text="Click-Through Rate"
           icon={HiOutlineCursorArrowRays}
         />
-        <AnalyticToggle
-          onSwitch={() => setReplyRate(!replyRate)}
-          value={replyRate}
-          subtext="Track how many of your emails get replies"
-          text="Reply Rate"
-          icon={FaReply}
-        />
         <UnsubToggle
           optOutRate={optOutRate}
           setOptOutRate={setOptOutRate}
           optOutLink={unsubLink}
           setOptOutLink={setUnsubLink}
-        />
-        <AnalyticToggle
-          onSwitch={() => setBounceRate(!bounceRate)}
-          value={bounceRate}
-          subtext="Track how many emails bounced and were not delivered."
-          text="Bounce Rate"
-          icon={TbArrowBounce}
         />
       </div>
     </div>
@@ -128,7 +121,7 @@ export function AnalyticToggle(props: {
   text: string;
   subtext: string;
   value: boolean;
-  onSwitch: () => void;
+  onSwitch: undefined |(() => void);
 }) {
   const { icon, text, subtext, value, onSwitch } = props;
   const isUnsub =
@@ -150,6 +143,7 @@ export function AnalyticToggle(props: {
         </div>
         <div>
           <Switch
+            disabled={onSwitch === undefined}
             aria-label={text + " Toggle Switch"}
             checked={value}
             onCheckedChange={onSwitch}

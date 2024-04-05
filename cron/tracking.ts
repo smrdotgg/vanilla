@@ -1,24 +1,35 @@
 import { JSDOM } from "jsdom";
 const url = "https://vanilla-seven.vercel.app/";
 
-export const addTracking = ({
+type analyticsSettings = {
+    optOutRate: boolean | null;
+    openRate: boolean | null;
+    clickthroughRate: boolean | null;
+} 
+
+export const addTracking = <T extends analyticsSettings>({
   sequenceStepId,
   content,
   targetEmail,
   customerTrackingLink,
+  settings,
 }: {
   sequenceStepId: string;
   targetEmail: string;
   content: string;
   customerTrackingLink: string | null;
+  settings: T,
 }) => {
+  if (settings.openRate)
   content = openRateTracking({ content, sequenceStepId, targetEmail });
+if (settings.optOutRate)
   content = unsubTracking({
     content,
     customerTrackingLink,
     sequenceStepId,
     targetEmail,
   });
+  if (settings.clickthroughRate)
   content = ctrTracking({ content, sequenceStepId, targetEmail, customerTrackingLink });
 
   return content;

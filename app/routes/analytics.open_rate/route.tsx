@@ -14,7 +14,7 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
   if (!sequenceStepId) throw Error("Sequence Step ID is required");
   await db.insert(SO_email_open_event).values({
     targetEmail: email,
-    sequenceId: Number(sequenceStepId),
+    sequenceStepId: Number(sequenceStepId),
   });
   } catch(e){
     console.log(e);
