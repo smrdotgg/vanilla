@@ -96,9 +96,11 @@ const main = async () => {
               content: step.content ?? "",
               customerTrackingLink: step.analyticSettings?.optOutUrl ?? null,
               settings: {
-                openRate: Boolean(step.analyticSettings?.openRate) ,
-                optOutRate: Boolean(step.analyticSettings?.optOutRate) ,
-                clickthroughRate: Boolean(step.analyticSettings?.clickthroughRate) ,
+                openRate: Boolean(step.analyticSettings?.openRate),
+                optOutRate: Boolean(step.analyticSettings?.optOutRate),
+                clickthroughRate: Boolean(
+                  step.analyticSettings?.clickthroughRate,
+                ),
               },
             }),
             subject: step.title ?? "",
@@ -109,13 +111,18 @@ const main = async () => {
             targetAddress: t.email,
           };
           log(`args = ${JSON.stringify(args, null, 2)}`);
-          const response = await sendWithCustomData(args);
-          if (response.rejected.length) {
+          try {
+            const response = await sendWithCustomData(args);
+            if (response.rejected.length) {
+              throw Error();
+            }
+            return { ...response, stepId: step.id };
+          } catch (e) {
             await db
               .insert(SO_email_bounce_event)
               .values({ sequenceStepId: step.id, targetEmail: t.email });
+            return null;
           }
-          return { ...response, stepId: step.id };
         });
         return await Promise.all(d);
       }),
@@ -129,7 +136,7 @@ const main = async () => {
     .where(
       inArray(
         SO_sequence_steps.id,
-        stepsToSend.map((s) => s.id),
+        masterAwait.filter((s) => s?.stepId).map(s => s!.stepId),
       ),
     );
   log("Sequence steps state updated");
@@ -138,5 +145,5 @@ const main = async () => {
 // await main();
 
 console.log("cron job about to start waiting for an hour...");
-schedule('*/10 * * * *',main);
+schedule("*/10 * * * *", main);
 console.log("Added console logs throughout the script for better tracking");
