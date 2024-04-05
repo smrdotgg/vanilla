@@ -3,8 +3,8 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { sendEmail } from "./send.server";
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Splitbox" },
+    { name: "description", content: "Ensuring Every Email Hits Its Mark." },
   ];
 };
 
