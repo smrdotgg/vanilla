@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/db/index.server";
-import { SO_sequence_breaks, SO_sequence_steps } from "~/db/schema.server";
+import { TB_sequence_breaks, TB_sequence_steps } from "~/db/schema.server";
 import {
   addBreakSchema,
   addEmailSchema,
@@ -17,42 +17,42 @@ export async function updateEmailTitle({
   title,
 }: z.infer<typeof updateEmailTitleSchema>) {
   await db
-    .update(SO_sequence_steps)
+    .update(TB_sequence_steps)
     .set({ title })
-    .where(eq(SO_sequence_steps.id, Number(id)));
+    .where(eq(TB_sequence_steps.id, Number(id)));
 }
 
 export async function deleteEmail({
   emailId,
 }: z.infer<typeof deleteEmailSchema>) {
   await db
-    .delete(SO_sequence_steps)
-    .where(eq(SO_sequence_steps.id, Number(emailId)));
+    .delete(TB_sequence_steps)
+    .where(eq(TB_sequence_steps.id, Number(emailId)));
 }
 
 export async function deleteBreak({
   breakId,
 }: z.infer<typeof deleteBreakSchema>) {
   await db
-    .delete(SO_sequence_breaks)
-    .where(eq(SO_sequence_breaks.id, Number(breakId)));
+    .delete(TB_sequence_breaks)
+    .where(eq(TB_sequence_breaks.id, Number(breakId)));
 }
 
 export async function addEmail({ campaignId }: z.infer<typeof addEmailSchema>) {
   await db.transaction(async (db) => {
     const sequenceCount = (
       await db
-        .select({ id: SO_sequence_steps.id })
-        .from(SO_sequence_steps)
-        .where(eq(SO_sequence_steps.campaignId, Number(campaignId)))
+        .select({ id: TB_sequence_steps.id })
+        .from(TB_sequence_steps)
+        .where(eq(TB_sequence_steps.campaignId, Number(campaignId)))
     ).length;
     const breakCount = (
       await db
-        .select({ id: SO_sequence_breaks.id })
-        .from(SO_sequence_breaks)
-        .where(eq(SO_sequence_breaks.campaignId, Number(campaignId)))
+        .select({ id: TB_sequence_breaks.id })
+        .from(TB_sequence_breaks)
+        .where(eq(TB_sequence_breaks.campaignId, Number(campaignId)))
     ).length;
-    await db.insert(SO_sequence_steps).values({
+    await db.insert(TB_sequence_steps).values({
       index: sequenceCount + breakCount,
       campaignId: Number(campaignId),
     });
@@ -66,17 +66,17 @@ export async function addBreak({
   await db.transaction(async (db) => {
     const sequenceCount = (
       await db
-        .select({ id: SO_sequence_steps.id })
-        .from(SO_sequence_steps)
-        .where(eq(SO_sequence_steps.campaignId, Number(id)))
+        .select({ id: TB_sequence_steps.id })
+        .from(TB_sequence_steps)
+        .where(eq(TB_sequence_steps.campaignId, Number(id)))
     ).length;
     const breakCount = (
       await db
-        .select({ id: SO_sequence_breaks.id })
-        .from(SO_sequence_breaks)
-        .where(eq(SO_sequence_breaks.campaignId, Number(id)))
+        .select({ id: TB_sequence_breaks.id })
+        .from(TB_sequence_breaks)
+        .where(eq(TB_sequence_breaks.campaignId, Number(id)))
     ).length;
-    await db.insert(SO_sequence_breaks).values({
+    await db.insert(TB_sequence_breaks).values({
       campaignId: Number(id),
       lengthInHours: Number(lengthInHours),
       index: sequenceCount + breakCount,
@@ -89,9 +89,9 @@ export async function updateBreak({
   lengthInHours,
 }: z.infer<typeof updateBreakSchema>) {
   await db
-    .update(SO_sequence_breaks)
+    .update(TB_sequence_breaks)
     .set({ lengthInHours: Number(lengthInHours) })
-    .where(eq(SO_sequence_breaks.id, Number(breakId)));
+    .where(eq(TB_sequence_breaks.id, Number(breakId)));
 }
 
 export async function newUpdateEmailContent({
@@ -99,7 +99,7 @@ export async function newUpdateEmailContent({
   content,
 }: z.infer<typeof updateEmailContentSchema>) {
   await db
-    .update(SO_sequence_steps)
+    .update(TB_sequence_steps)
     .set({ content })
-    .where(eq(SO_sequence_steps.id, Number(id)));
+    .where(eq(TB_sequence_steps.id, Number(id)));
 }

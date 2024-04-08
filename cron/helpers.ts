@@ -1,25 +1,25 @@
 import { db } from "~/db/index.server";
 import { lte, eq, inArray } from "drizzle-orm";
 import {
-  SO_analytic_settings,
-  SO_campaigns,
-  SO_sequence_breaks,
-  SO_sequence_steps,
+  TB_analytic_settings,
+  TB_campaigns,
+  TB_sequence_breaks,
+  TB_sequence_steps,
 } from "~/db/schema.server";
 
 export const sequenceStepsToSend = async () => {
   const pastDeadlineCampaigns = await db
     .select()
-    .from(SO_campaigns)
+    .from(TB_campaigns)
     .leftJoin(
-      SO_sequence_steps,
-      eq(SO_campaigns.id, SO_sequence_steps.campaignId),
+      TB_sequence_steps,
+      eq(TB_campaigns.id, TB_sequence_steps.campaignId),
     )
     .leftJoin(
-      SO_sequence_breaks,
-      eq(SO_campaigns.id, SO_sequence_breaks.campaignId),
+      TB_sequence_breaks,
+      eq(TB_campaigns.id, TB_sequence_breaks.campaignId),
     )
-    .where(lte(SO_campaigns.deadline, new Date()));
+    .where(lte(TB_campaigns.deadline, new Date()));
 
   const campaignIdToObj = Object.fromEntries(
     pastDeadlineCampaigns.map((item) => [item.campaign.id, item.campaign]),
@@ -126,8 +126,8 @@ export const sequenceStepsToSend = async () => {
   const analyticSettings = campaignIds.length
     ? await db
         .select()
-        .from(SO_analytic_settings)
-        .where(inArray(SO_analytic_settings.campaignId, campaignIds))
+        .from(TB_analytic_settings)
+        .where(inArray(TB_analytic_settings.campaignId, campaignIds))
     : [];
 
   // TS trick to make sure the list items aren't null in TS land

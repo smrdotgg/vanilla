@@ -14,6 +14,7 @@ import {
   pgEnum,
   unique,
 } from "drizzle-orm/pg-core";
+import { number } from "zod";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -23,7 +24,24 @@ import {
  */
 export const createTable = pgTableCreator((name) => `rs_${name}`);
 
-export const SO_posts = createTable(
+export const TB_users = createTable("user", {
+  id: text("id").primaryKey(),
+  email: text("email").unique().notNull(),
+  password: text("password").notNull(),
+});
+
+export const TB_sessions = createTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => TB_users.id),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+});
+
+export const TB_posts = createTable(
   "post",
   {
     id: serial("id").primaryKey(),
@@ -37,7 +55,7 @@ export const SO_posts = createTable(
   }),
 );
 
-export const SO_campaigns = createTable("campaign", {
+export const TB_campaigns = createTable("campaign", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -46,7 +64,7 @@ export const SO_campaigns = createTable("campaign", {
   sequence: text("sequence"),
 });
 
-export const SO_google_tokens = createTable("google_tokens", {
+export const TB_google_tokens = createTable("google_tokens", {
   id: serial("id").primaryKey(),
   googleId: text("google_id").notNull().unique(),
   accessToken: text("access_token").notNull(),
@@ -57,7 +75,7 @@ export const SO_google_tokens = createTable("google_tokens", {
   id_token: text("id_token"),
 });
 
-export const SO_sender_emails = createTable("sender_email", {
+export const TB_sender_emails = createTable("sender_email", {
   id: serial("id").primaryKey(),
 
   fromName: text("from_name").notNull(),
@@ -76,7 +94,7 @@ export const SO_sender_emails = createTable("sender_email", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const SO_google_user_info = createTable("google_user_info", {
+export const TB_google_user_info = createTable("google_user_info", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   googleId: text("google_id").notNull().unique(),
@@ -88,26 +106,26 @@ export const SO_google_user_info = createTable("google_user_info", {
   locale: text("locale"),
 });
 
-export const SO_google_campaign_bridge = createTable(
+export const TB_google_campaign_bridge = createTable(
   "campaign_google_email_link",
   {
     campaignId: integer("campaign_id")
-      .references(() => SO_campaigns.id)
+      .references(() => TB_campaigns.id)
       .notNull(),
     googleUserId: integer("google_user_id")
-      .references(() => SO_google_user_info.id)
+      .references(() => TB_google_user_info.id)
       .notNull(),
   },
 );
 
-export const SO_campaign_sender_email_link = createTable(
+export const TB_campaign_sender_email_link = createTable(
   "campaign_sender_email_link",
   {
     campaignId: integer("campaign_id")
-      .references(() => SO_campaigns.id)
+      .references(() => TB_campaigns.id)
       .notNull(),
     senderEmailId: integer("sender_email_id")
-      .references(() => SO_sender_emails.id, { onDelete: "cascade" })
+      .references(() => TB_sender_emails.id, { onDelete: "cascade" })
       .notNull(),
   },
   (table) => ({
@@ -115,7 +133,7 @@ export const SO_campaign_sender_email_link = createTable(
   }),
 );
 
-export const SO_sequence_step_state = pgEnum("sequence_step_state", [
+export const TB_sequence_step_state = pgEnum("sequence_step_state", [
   "sent",
   "waiting",
   "bounced",
@@ -123,13 +141,13 @@ export const SO_sequence_step_state = pgEnum("sequence_step_state", [
 
 export const SequenceStepTextFormatTypes = ["html", "plain"] as const;
 
-export const SO_sequence_step_text_format = pgEnum(
+export const TB_sequence_step_text_format = pgEnum(
   "sequence_step_text_format",
   SequenceStepTextFormatTypes,
 );
 // export const OrderMethod = strEnum(orderMethodEnum.enumValues);
 
-export const SO_sequence_steps = createTable("sequence_step", {
+export const TB_sequence_steps = createTable("sequence_step", {
   id: serial("id").primaryKey(),
   title: text("title"),
   content: text("content"),
@@ -137,23 +155,23 @@ export const SO_sequence_steps = createTable("sequence_step", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   campaignId: integer("campaign_id")
-    .references(() => SO_campaigns.id)
+    .references(() => TB_campaigns.id)
     .notNull(),
-  state: SO_sequence_step_state("state").default("waiting").notNull(),
-  format: SO_sequence_step_text_format("format").default("html").notNull(),
+  state: TB_sequence_step_state("state").default("waiting").notNull(),
+  format: TB_sequence_step_text_format("format").default("html").notNull(),
 });
 
-export const SO_sequence_breaks = createTable("sequence_break", {
+export const TB_sequence_breaks = createTable("sequence_break", {
   id: serial("id").primaryKey(),
   lengthInHours: integer("length_in_hours").notNull(),
   index: integer("index").notNull(),
-  campaignId: integer("campaign_id").references(() => SO_campaigns.id),
+  campaignId: integer("campaign_id").references(() => TB_campaigns.id),
 });
 
-export const SO_analytic_settings = createTable("analytic_settings", {
+export const TB_analytic_settings = createTable("analytic_settings", {
   id: serial("id").primaryKey(),
   campaignId: integer("campaign_id")
-    .references(() => SO_campaigns.id)
+    .references(() => TB_campaigns.id)
     .unique(),
   openRate: boolean("open_rate").default(false),
   replyRate: boolean("reply_rate").default(false),
@@ -173,7 +191,7 @@ export const SO_analytic_settings = createTable("analytic_settings", {
 //   clickthroughRate: boolean("click_through_rate").default(false),
 // });
 
-export const SO_contacts = createTable("contact", {
+export const TB_contacts = createTable("contact", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
   email: varchar("email", { length: 256 }).notNull(),
@@ -181,18 +199,18 @@ export const SO_contacts = createTable("contact", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const SO_binding_campaigns_contacts = createTable(
+export const TB_binding_campaigns_contacts = createTable(
   "campaigns_contacts",
   {
     campaignId: integer("campaign")
       .notNull()
-      .references(() => SO_campaigns.id, {
+      .references(() => TB_campaigns.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
     contactId: integer("contact")
       .notNull()
-      .references(() => SO_contacts.id, {
+      .references(() => TB_contacts.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
@@ -202,40 +220,48 @@ export const SO_binding_campaigns_contacts = createTable(
   }),
 );
 
-// export const SO_email_bounce_event = 
-export const SO_email_bounce_event = createTable("email_bounce_event", {
+// export const SO_email_bounce_event =
+export const TB_email_bounce_event = createTable("email_bounce_event", {
   id: serial("id").primaryKey(),
   targetEmail: text("target_email").notNull(),
-  sequenceStepId: integer("sequence_step_id").references(() => SO_sequence_steps.id),
+  sequenceStepId: integer("sequence_step_id").references(
+    () => TB_sequence_steps.id,
+  ),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const SO_email_open_event = createTable("email_open_event", {
-  id: serial("id").primaryKey(),
-  targetEmail: text("target_email").notNull(),
-  sequenceStepId: integer("sequence_id").references(() => SO_sequence_steps.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (t) => ({
-  unq: unique().on(t.sequenceStepId, t.targetEmail),
-}));
+export const TB_email_open_event = createTable(
+  "email_open_event",
+  {
+    id: serial("id").primaryKey(),
+    targetEmail: text("target_email").notNull(),
+    sequenceStepId: integer("sequence_id").references(
+      () => TB_sequence_steps.id,
+    ),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    unq: unique().on(t.sequenceStepId, t.targetEmail),
+  }),
+);
 
-export const SO_email_opt_out_event = createTable("email_opt_out", {
+export const TB_email_opt_out_event = createTable("email_opt_out", {
   id: serial("id").primaryKey(),
   targetEmail: text("target_email").notNull(),
-  sequenceStepId: integer("sequence_id").references(() => SO_sequence_steps.id),
+  sequenceStepId: integer("sequence_id").references(() => TB_sequence_steps.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const SO_email_link_click = createTable("email_link_click", {
+export const TB_email_link_click = createTable("email_link_click", {
   id: serial("id").primaryKey(),
   targetEmail: text("target_email").notNull(),
-  sequenceId: integer("sequence_id").references(() => SO_sequence_steps.id),
+  sequenceId: integer("sequence_id").references(() => TB_sequence_steps.id),
   link: text("link").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 /* ---  Type Exports --- */
-export type SequenceStep = typeof SO_sequence_steps.$inferSelect;
-export type SequenceBreak = typeof SO_sequence_breaks.$inferSelect;
-export type SelectContact = typeof SO_contacts.$inferSelect;
-export type InsertContact = typeof SO_contacts.$inferInsert;
+export type SequenceStep = typeof TB_sequence_steps.$inferSelect;
+export type SequenceBreak = typeof TB_sequence_breaks.$inferSelect;
+export type SelectContact = typeof TB_contacts.$inferSelect;
+export type InsertContact = typeof TB_contacts.$inferInsert;

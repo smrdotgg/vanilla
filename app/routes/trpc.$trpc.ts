@@ -13,13 +13,13 @@ export const loader = async (args: LoaderFunctionArgs) => {
 export const action = async (args: ActionFunctionArgs) => {
   return handleRequest(args);
 };
-const createContext = async (req: Request) => {
-  return createTRPCContext();
+const createContext = async (req: Request ) => {
+  return createTRPCContext({req:req});
 };
 
-function handleRequest(args: LoaderFunctionArgs | ActionFunctionArgs) {
+async function handleRequest(args: LoaderFunctionArgs | ActionFunctionArgs) {
   console.log("TESTING");
-  return fetchRequestHandler({
+    return await fetchRequestHandler({
     endpoint: "/trpc",
     req: args.request,
     router: appRouter,
@@ -32,5 +32,5 @@ function handleRequest(args: LoaderFunctionArgs | ActionFunctionArgs) {
             );
           }
         : undefined,
-  });
+  });//.then((response) => response);
 }

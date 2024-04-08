@@ -2,30 +2,30 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { Page } from "./page";
 import { db } from "~/db/index.server";
 import {
-  SO_binding_campaigns_contacts,
-  SO_campaigns,
-  SO_email_link_click,
-  SO_email_open_event,
-  SO_sequence_steps,
+  TB_binding_campaigns_contacts,
+  TB_campaigns,
+  TB_email_link_click,
+  TB_email_open_event,
+  TB_sequence_steps,
 } from "~/db/schema.server";
 import { eq, and } from "drizzle-orm";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const id = Number(args.params.id);
   const campaign = (
-    await db.select().from(SO_campaigns).where(eq(SO_campaigns.id, id))
+    await db.select().from(TB_campaigns).where(eq(TB_campaigns.id, id))
   )[0];
 
   // deliverability;
   const boundedSteps = (
     await db
       .select()
-      .from(SO_sequence_steps)
+      .from(TB_sequence_steps)
       .where(
         and(
           ...[
-            eq(SO_sequence_steps.campaignId, id),
-            eq(SO_sequence_steps.state, "bounced"),
+            eq(TB_sequence_steps.campaignId, id),
+            eq(TB_sequence_steps.state, "bounced"),
           ],
         ),
       )
@@ -33,12 +33,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const sentSteps = (
     await db
       .select()
-      .from(SO_sequence_steps)
+      .from(TB_sequence_steps)
       .where(
         and(
           ...[
-            eq(SO_sequence_steps.campaignId, id),
-            eq(SO_sequence_steps.state, "sent"),
+            eq(TB_sequence_steps.campaignId, id),
+            eq(TB_sequence_steps.state, "sent"),
           ],
         ),
       )
@@ -49,17 +49,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
   // open rate
   const openedCount = (await db
     .select()
-    .from(SO_sequence_steps)
-    .where(and(...[eq(SO_sequence_steps.campaignId, id)]))
+    .from(TB_sequence_steps)
+    .where(and(...[eq(TB_sequence_steps.campaignId, id)]))
     .leftJoin(
-      SO_email_open_event,
-      eq(SO_email_open_event.sequenceStepId, SO_sequence_steps.id),
+      TB_email_open_event,
+      eq(TB_email_open_event.sequenceStepId, TB_sequence_steps.id),
     )).filter(i => i.email_open_event).length;
   const contactsCount = (
     await db
       .select()
-      .from(SO_binding_campaigns_contacts)
-      .where(eq(SO_binding_campaigns_contacts.campaignId, id))
+      .from(TB_binding_campaigns_contacts)
+      .where(eq(TB_binding_campaigns_contacts.campaignId, id))
   ).length;
   const maxContactsOpened = sentSteps * contactsCount;
 

@@ -5,7 +5,7 @@ import {
 } from "@remix-run/node";
 import { eq } from "drizzle-orm";
 import { db } from "~/db/index.server";
-import { SO_binding_campaigns_contacts, SO_contacts } from "~/db/schema.server";
+import { TB_binding_campaigns_contacts, TB_contacts } from "~/db/schema.server";
 import { contactListSchema } from "./types";
 import Page from "./page";
 import { api } from "~/server/trpc/server.server";
@@ -15,7 +15,7 @@ const getPage = (searchParams: URLSearchParams) =>
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const page = getPage(new URL(request.url).searchParams);
-  return api.campaign.getContacts.query({
+  return api(request).campaign.getContacts.query({
     cursor: page,
     getAll: true,
     campaignId: Number(params.id),
@@ -47,10 +47,10 @@ export const action = async (args: ActionFunctionArgs) => {
   const data = contactListSchema.parse(JSON.parse(body));
   await db.transaction(async (db) => {
     await db
-      .delete(SO_binding_campaigns_contacts)
-      .where(eq(SO_binding_campaigns_contacts.campaignId, data.campaignId));
+      .delete(TB_binding_campaigns_contacts)
+      .where(eq(TB_binding_campaigns_contacts.campaignId, data.campaignId));
     if (data.contactIds.length)
-      await db.insert(SO_binding_campaigns_contacts).values(
+      await db.insert(TB_binding_campaigns_contacts).values(
         data.contactIds.map((contactId) => ({
           campaignId: data.campaignId,
           contactId: contactId,

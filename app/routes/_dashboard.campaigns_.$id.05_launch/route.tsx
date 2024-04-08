@@ -8,15 +8,15 @@ import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { db } from "~/db/index.server";
-import { SO_campaigns } from "~/db/schema.server";
+import { TB_campaigns } from "~/db/schema.server";
 import { MdOutlineAccessAlarm } from "react-icons/md";
 import { api } from "~/server/trpc/react";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const campaign = await db
     .select()
-    .from(SO_campaigns)
-    .where(eq(SO_campaigns.id, Number(params.id)));
+    .from(TB_campaigns)
+    .where(eq(TB_campaigns.id, Number(params.id)));
 
   return campaign[0].deadline == null;
 };

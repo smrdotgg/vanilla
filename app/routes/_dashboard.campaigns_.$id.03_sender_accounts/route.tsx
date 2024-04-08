@@ -1,10 +1,10 @@
 import { db } from "~/db/index.server";
 import { ContactsPage } from "./page";
 import {
-  SO_campaign_sender_email_link,
-  SO_google_campaign_bridge,
-  SO_google_user_info,
-  SO_sender_emails,
+  TB_campaign_sender_email_link,
+  TB_google_campaign_bridge,
+  TB_google_user_info,
+  TB_sender_emails,
 } from "~/db/schema.server";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { eq } from "drizzle-orm";
@@ -18,16 +18,16 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   //   .from(SO_campaign_sender_email_link)
   //   .where(eq(SO_campaign_sender_email_link.campaignId, Number(params.id)));
 
-  const googleEmails = await db.select().from(SO_google_user_info);
+  const googleEmails = await db.select().from(TB_google_user_info);
   const selectedGoogle = await db
     .select()
-    .from(SO_google_campaign_bridge)
-    .where(eq(SO_google_campaign_bridge.campaignId, Number(params.id)));
-  const senderAccounts = await db.select().from(SO_sender_emails);
+    .from(TB_google_campaign_bridge)
+    .where(eq(TB_google_campaign_bridge.campaignId, Number(params.id)));
+  const senderAccounts = await db.select().from(TB_sender_emails);
   const selectedSenders = await db
     .select()
-    .from(SO_campaign_sender_email_link)
-    .where(eq(SO_campaign_sender_email_link.campaignId, Number(params.id)));
+    .from(TB_campaign_sender_email_link)
+    .where(eq(TB_campaign_sender_email_link.campaignId, Number(params.id)));
 
   // return { googleEmails, selectedGoogle, senderAccounts, selectedSenders };
   return { senderAccounts, selectedSenders };
@@ -43,10 +43,10 @@ export const action = async (args: ActionFunctionArgs) => {
   const data = senderEmailListSchema.parse(JSON.parse(body));
   await db.transaction(async (db) => {
     await db
-      .delete(SO_google_campaign_bridge)
-      .where(eq(SO_google_campaign_bridge.campaignId, data.campaignId));
+      .delete(TB_google_campaign_bridge)
+      .where(eq(TB_google_campaign_bridge.campaignId, data.campaignId));
     if (data.senderIds.length)
-      await db.insert(SO_google_campaign_bridge).values(
+      await db.insert(TB_google_campaign_bridge).values(
         data.senderIds.map((senderid) => ({
           campaignId: data.campaignId,
           googleUserId: senderid,

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SO_analytic_settings, SO_campaigns } from "~/db/schema.server";
+import { TB_analytic_settings, TB_campaigns } from "~/db/schema.server";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
@@ -14,14 +14,14 @@ export const analyticsRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.db
-        .insert(SO_analytic_settings)
+        .insert(TB_analytic_settings)
         .values({
           optOutRate: input.toggle,
           optOutUrl: input.link,
           campaignId: input.campaignId,
         })
         .onConflictDoUpdate({
-          target: SO_analytic_settings.campaignId,
+          target: TB_analytic_settings.campaignId,
           set: {
             optOutRate: input.toggle,
             optOutUrl: input.link,
@@ -50,13 +50,13 @@ export const analyticsRouter = createTRPCRouter({
         optOutUrl: input.unsubLink,
     };
     await ctx.db
-      .insert(SO_analytic_settings)
+      .insert(TB_analytic_settings)
       .values({
         ...data,
         campaignId: input.campaignId,
       })
       .onConflictDoUpdate({
-        target: SO_analytic_settings.campaignId,
+        target: TB_analytic_settings.campaignId,
         set: data,
         });
 

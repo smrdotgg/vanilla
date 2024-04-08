@@ -9,9 +9,9 @@ import { exchangeCodeForTokens } from "~/api/google/get_token";
 import { getUserInfo } from "~/api/google/get_user_info";
 import { db } from "~/db/index.server";
 import {
-  SO_google_tokens,
-  SO_google_user_info,
-  SO_sender_emails,
+  TB_google_tokens,
+  TB_google_user_info,
+  TB_sender_emails,
 } from "~/db/schema.server";
 import { eq } from "drizzle-orm";
 import { api } from "~/server/trpc/server.server";
@@ -29,10 +29,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     const userInfo = await getUserInfo({ accessToken: newCode.access_token });
     await db.transaction(async (db) => {
       await db
-        .delete(SO_google_user_info)
-        .where(eq(SO_google_user_info.googleId, userInfo.id));
+        .delete(TB_google_user_info)
+        .where(eq(TB_google_user_info.googleId, userInfo.id));
 
-      await db.insert(SO_google_user_info).values({
+      await db.insert(TB_google_user_info).values({
         googleId: userInfo.id,
         email: userInfo.email,
         name: userInfo.name,
@@ -44,14 +44,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       });
 
       await db
-        .delete(SO_google_tokens)
-        .where(eq(SO_google_tokens.googleId, userInfo.id));
+        .delete(TB_google_tokens)
+        .where(eq(TB_google_tokens.googleId, userInfo.id));
 
       const currentDate = new Date();
       const expirationDate = new Date(
         currentDate.getTime() + newCode.expires_in * 1000,
       );
-      await db.insert(SO_google_tokens).values({
+      await db.insert(TB_google_tokens).values({
         scope: newCode.scope,
         googleId: userInfo.id,
         expiresIn: expirationDate,
@@ -64,16 +64,16 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     return redirect(url.pathname);
   }
 
-  const googleUserInfos = (await db.select().from(SO_google_user_info)).map(
+  const googleUserInfos = (await db.select().from(TB_google_user_info)).map(
     (googleUser) => ({
       email: googleUser.email,
       name: googleUser.name,
       profilePic: googleUser.picture,
     }),
   );
-  const senderAccounts = await db.select().from(SO_sender_emails);
+  const senderAccounts = await db.select().from(TB_sender_emails);
 
-  const x = await api.post.hello.query({ text: "Semere" });
+  const x = await api(request).post.hello.query({ text: "Semere" });
   return { googleUserInfos, senderAccounts, x };
 };
 

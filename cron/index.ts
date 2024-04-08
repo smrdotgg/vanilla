@@ -2,13 +2,13 @@ import { schedule } from "node-cron";
 import { addTracking } from "./tracking";
 import { db } from "~/db/index.server";
 import {
-  SO_binding_campaigns_contacts,
-  SO_campaign_sender_email_link,
-  SO_campaigns,
-  SO_contacts,
-  SO_email_bounce_event,
-  SO_sender_emails,
-  SO_sequence_steps,
+  TB_binding_campaigns_contacts,
+  TB_campaign_sender_email_link,
+  TB_campaigns,
+  TB_contacts,
+  TB_email_bounce_event,
+  TB_sender_emails,
+  TB_sequence_steps,
 } from "~/db/schema.server";
 import { sequenceStepsToSend } from "./helpers";
 import { sendWithCustomData } from "./send_email";
@@ -34,23 +34,23 @@ const main = async () => {
 
   const x = await db
     .select()
-    .from(SO_campaigns)
-    .where(inArray(SO_campaigns.id, campaignIds))
+    .from(TB_campaigns)
+    .where(inArray(TB_campaigns.id, campaignIds))
     .leftJoin(
-      SO_campaign_sender_email_link,
-      eq(SO_campaign_sender_email_link.campaignId, SO_campaigns.id),
+      TB_campaign_sender_email_link,
+      eq(TB_campaign_sender_email_link.campaignId, TB_campaigns.id),
     )
     .leftJoin(
-      SO_sender_emails,
-      eq(SO_sender_emails.id, SO_campaign_sender_email_link.senderEmailId),
+      TB_sender_emails,
+      eq(TB_sender_emails.id, TB_campaign_sender_email_link.senderEmailId),
     )
     .leftJoin(
-      SO_binding_campaigns_contacts,
-      eq(SO_binding_campaigns_contacts.campaignId, SO_campaigns.id),
+      TB_binding_campaigns_contacts,
+      eq(TB_binding_campaigns_contacts.campaignId, TB_campaigns.id),
     )
     .leftJoin(
-      SO_contacts,
-      eq(SO_contacts.id, SO_binding_campaigns_contacts.contactId),
+      TB_contacts,
+      eq(TB_contacts.id, TB_binding_campaigns_contacts.contactId),
     );
   log("Database query completed");
 
@@ -119,7 +119,7 @@ const main = async () => {
             return { ...response, stepId: step.id };
           } catch (e) {
             await db
-              .insert(SO_email_bounce_event)
+              .insert(TB_email_bounce_event)
               .values({ sequenceStepId: step.id, targetEmail: t.email });
             return null;
           }
@@ -131,11 +131,11 @@ const main = async () => {
   log("Emails sent, updating the sequence steps state");
 
   await db
-    .update(SO_sequence_steps)
+    .update(TB_sequence_steps)
     .set({ state: "sent" })
     .where(
       inArray(
-        SO_sequence_steps.id,
+        TB_sequence_steps.id,
         masterAwait.filter((s) => s?.stepId).map(s => s!.stepId),
       ),
     );

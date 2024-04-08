@@ -23,38 +23,50 @@ import { appRouter, AppRouter } from "../api/root";
 //   return createTRPCContext();
 // });
 
-export const api = createTRPCProxyClient<AppRouter>({
-  transformer,
-  links: [
-    loggerLink({
-      enabled: (op) =>
-        process.env.NODE_ENV === "development" ||
-        (op.direction === "down" && op.result instanceof Error),
-    }),
-    /**
-     * Custom RSC link that lets us invoke procedures without using http requests. Since Server
-     * Components always run on the server, we can just call the procedure as a function.
-     */
-    () =>
-      ({ op }) =>
-        observable((observer) => {
-          createTRPCContext()
-            .then((ctx) => {
-              return callProcedure({
-                procedures: appRouter._def.procedures,
-                path: op.path,
-                rawInput: op.input,
-                ctx,
-                type: op.type,
+// class MyHeaders {
+//   get getData(){
+//     const x = [['name','semere'], ['age','22']];
+//     const headers = new Headers();
+//     headers.append();
+//   }
+//   constructor(num: number){
+//
+//   }
+// }
+
+export const api = ( req: Request ) =>
+  createTRPCProxyClient<AppRouter>({
+    transformer,
+    links: [
+      loggerLink({
+        enabled: (op) =>
+          process.env.NODE_ENV === "development" ||
+          (op.direction === "down" && op.result instanceof Error),
+      }),
+      /**
+       * Custom RSC link that lets us invoke procedures without using http requests. Since Server
+       * Components always run on the server, we can just call the procedure as a function.
+       */
+      () =>
+        ({ op }) =>
+          observable((observer) => {
+            createTRPCContext({ req: req })
+              .then((ctx) => {
+                return callProcedure({
+                  procedures: appRouter._def.procedures,
+                  path: op.path,
+                  rawInput: op.input,
+                  ctx,
+                  type: op.type,
+                });
+              })
+              .then((data) => {
+                observer.next({ result: { data } });
+                observer.complete();
+              })
+              .catch((cause: TRPCErrorResponse) => {
+                observer.error(TRPCClientError.from(cause));
               });
-            })
-            .then((data) => {
-              observer.next({ result: { data } });
-              observer.complete();
-            })
-            .catch((cause: TRPCErrorResponse) => {
-              observer.error(TRPCClientError.from(cause));
-            });
-        }),
-  ],
-});
+          }),
+    ],
+  });

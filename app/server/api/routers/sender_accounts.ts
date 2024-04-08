@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import {
-  SO_sender_emails,
-  SO_campaign_sender_email_link,
+  TB_sender_emails,
+  TB_campaign_sender_email_link,
 } from "~/db/schema.server";
 import { rowSchema } from "~/routes/_dashboard.sender_accounts/components/bulk_modal";
 
@@ -16,12 +16,12 @@ export const senderAccountsRouter = createTRPCRouter({
       const db = ctx.db;
       await db.transaction(async (db) => {
         await db
-          .delete(SO_campaign_sender_email_link)
+          .delete(TB_campaign_sender_email_link)
           .where(
-            eq(SO_campaign_sender_email_link.campaignId, input.campaignId),
+            eq(TB_campaign_sender_email_link.campaignId, input.campaignId),
           );
         if (input.ids.length)
-          await db.insert(SO_campaign_sender_email_link).values(
+          await db.insert(TB_campaign_sender_email_link).values(
             input.ids.map((senderid) => ({
               senderEmailId: senderid,
               campaignId: input.campaignId,
@@ -32,6 +32,6 @@ export const senderAccountsRouter = createTRPCRouter({
   createBulk: publicProcedure
     .input(rowSchema.array())
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(SO_sender_emails).values(input);
+      await ctx.db.insert(TB_sender_emails).values(input);
     }),
 });

@@ -1,4 +1,4 @@
-import { Link, NavLink } from "@remix-run/react";
+import { Form, Link, NavLink } from "@remix-run/react";
 import { GrInProgress } from "react-icons/gr";
 import { FaHome } from "react-icons/fa";
 
@@ -10,6 +10,7 @@ import { ModeToggle } from "../ui/mode-toggle";
 import { ReactNode, useState } from "react";
 import { Theme, useTheme } from "remix-themes";
 import downloadsvg from "./download.svg";
+import { Button } from "../ui/button";
 
 type dashRoute =
   | "/home"
@@ -124,7 +125,12 @@ export function DashLayout({
             ))}
           </>
         </div>
+        <div className="flex flex-col justify-end">
+        <form  method="post" action="/auth/sign-out"  >
+          <Button type="submit">Sign Out</Button>
+        </form>
         <ModeToggle />
+        </div>
       </div>
 
       <div className="flex-grow  overflow-x-hidden">{children}</div>

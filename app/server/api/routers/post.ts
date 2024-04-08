@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SO_posts } from "~/db/schema.server";
+import { TB_posts } from "~/db/schema.server";
 
 import {
   createTRPCRouter,
@@ -26,7 +26,7 @@ export const postRouter = createTRPCRouter({
       // simulate a slow db call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      await ctx.db.insert(SO_posts).values({
+      await ctx.db.insert(TB_posts).values({
         name: "",
         // name: input.name,
         // createdById: ctx.session.user.id,

@@ -1,8 +1,8 @@
 import { redirect } from "@remix-run/node";
 import { db } from "~/db/index.server";
 import {
-  SO_binding_campaigns_contacts,
-  SO_campaigns,
+  TB_binding_campaigns_contacts,
+  TB_campaigns,
 } from "~/db/schema.server";
 import { eq, sql } from "drizzle-orm";
 import { Page } from "./page";
@@ -11,22 +11,22 @@ import { Page } from "./page";
 export const loader = async () => {
   const d = await db
     .select({
-      id: SO_campaigns.id,
-      name: SO_campaigns.name,
-      createdAt: SO_campaigns.createdAt,
-      updatedAt: SO_campaigns.updatedAt,
-      deadline: SO_campaigns.deadline,
+      id: TB_campaigns.id,
+      name: TB_campaigns.name,
+      createdAt: TB_campaigns.createdAt,
+      updatedAt: TB_campaigns.updatedAt,
+      deadline: TB_campaigns.deadline,
       contactCount:
-        sql<number>`COUNT(${SO_binding_campaigns_contacts.contactId})`.mapWith(
+        sql<number>`COUNT(${TB_binding_campaigns_contacts.contactId})`.mapWith(
           Number,
         ),
     })
-    .from(SO_campaigns)
+    .from(TB_campaigns)
     .leftJoin(
-      SO_binding_campaigns_contacts,
-      eq(SO_binding_campaigns_contacts.campaignId, SO_campaigns.id),
+      TB_binding_campaigns_contacts,
+      eq(TB_binding_campaigns_contacts.campaignId, TB_campaigns.id),
     )
-    .groupBy(SO_campaigns.id)
+    .groupBy(TB_campaigns.id)
     .then((list) =>
       list.map((camp) => ({
         ...camp,
@@ -40,6 +40,6 @@ export const loader = async () => {
 export { Page as default };
 
 export const action = async () => {
-  const newCampaigns = await db.insert(SO_campaigns).values({}).returning();
+  const newCampaigns = await db.insert(TB_campaigns).values({}).returning();
   return redirect(`/campaigns/${newCampaigns[0].id}`);
 };

@@ -19,7 +19,6 @@ export const appRouter = createTRPCRouter({
   contacts: contactsRouter,
   analytics: analyticsRouter,
   sequence: sequenceRouter,
-  // campaignRouter
 });
 
 // export type definition of API

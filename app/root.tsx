@@ -6,6 +6,8 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigate,
+  useRouteError,
 } from "@remix-run/react";
 import "./tailwind.css";
 import { themeSessionResolver } from "./sessions.server";
@@ -21,13 +23,14 @@ import { Provider } from "jotai";
 
 import { TRPCReactProvider } from "./server/trpc/react";
 import clsx from "clsx";
+import { ModeToggle } from "./components/ui/mode-toggle";
+import { api } from "./server/trpc/server.server";
+import { useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  if (url.pathname == "/")  return redirect("home");
-
+  if (url.pathname == "/") return redirect("home");
   const { getTheme } = await themeSessionResolver(request);
-  const x = getTheme();
   return {
     theme: getTheme(),
     ENV: {
@@ -39,10 +42,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>();
+
   return (
     <Providers theme={data?.theme ?? Theme.DARK}>
       <LayoutCore>{children}</LayoutCore>
     </Providers>
+  );
+}
+
+export function ErrorBoundary() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/auth/sign-in");
+  }, []);
+  return (
+    <div className="flex h-screen w-screen *:m-auto">
+      <p>Loading...</p>
+    </div>
   );
 }
 
@@ -60,6 +76,7 @@ function LayoutCore({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        {/* <Theme */}
         {children}
         <ScrollRestoration />
         <Toaster />

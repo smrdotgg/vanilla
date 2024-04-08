@@ -2,9 +2,9 @@ import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import {  eq } from "drizzle-orm";
 import { db } from "~/db/index.server";
 import {
-  SO_analytic_settings,
-  SO_email_opt_out_event,
-  SO_sequence_steps,
+  TB_analytic_settings,
+  TB_email_opt_out_event,
+  TB_sequence_steps,
 } from "~/db/schema.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -17,17 +17,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (!sequenceStepId) throw Error("Sequence Step ID is required");
 
 
-  await db.insert(SO_email_opt_out_event).values({
+  await db.insert(TB_email_opt_out_event).values({
     targetEmail: email,
     sequenceStepId: Number(sequenceStepId),
   });
   const seqStep = await db
     .select()
-    .from(SO_sequence_steps)
-    .where(eq(SO_sequence_steps.id, Number(sequenceStepId)))
+    .from(TB_sequence_steps)
+    .where(eq(TB_sequence_steps.id, Number(sequenceStepId)))
     .leftJoin(
-      SO_analytic_settings,
-      eq(SO_analytic_settings.campaignId, SO_sequence_steps.campaignId),
+      TB_analytic_settings,
+      eq(TB_analytic_settings.campaignId, TB_sequence_steps.campaignId),
     );
   const link = seqStep[0].analytic_settings?.optOutUrl;
   if (link) {

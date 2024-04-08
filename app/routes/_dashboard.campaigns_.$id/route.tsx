@@ -15,11 +15,11 @@ import { Input } from "~/components/ui/input";
 import { db } from "~/db/index.server";
 import { useAtomValue, atom } from "jotai";
 import {
-  SO_analytic_settings,
-  SO_binding_campaigns_contacts,
-  SO_campaign_sender_email_link,
-  SO_campaigns,
-  SO_sequence_steps,
+  TB_analytic_settings,
+  TB_binding_campaigns_contacts,
+  TB_campaign_sender_email_link,
+  TB_campaigns,
+  TB_sequence_steps,
 } from "~/db/schema.server";
 import { createEnumSchema } from "~/lib/zod_enum_schema";
 import { PageSelect } from "./page_select";
@@ -46,13 +46,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   const campaignContacts = await db
     .select()
-    .from(SO_binding_campaigns_contacts)
-    .where(eq(SO_binding_campaigns_contacts.campaignId, Number(params.id)));
+    .from(TB_binding_campaigns_contacts)
+    .where(eq(TB_binding_campaigns_contacts.campaignId, Number(params.id)));
 
   const campaign = await db
     .select()
-    .from(SO_campaigns)
-    .where(eq(SO_campaigns.id, Number(params.id)));
+    .from(TB_campaigns)
+    .where(eq(TB_campaigns.id, Number(params.id)));
 
   const url = new URL(request.url);
   const qParams = Object.fromEntries(url.searchParams);
@@ -63,18 +63,18 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   const sequence = await db
     .select()
-    .from(SO_sequence_steps)
-    .where(eq(SO_sequence_steps.campaignId, Number(params.id)));
+    .from(TB_sequence_steps)
+    .where(eq(TB_sequence_steps.campaignId, Number(params.id)));
 
   const senders = await db
     .select()
-    .from(SO_campaign_sender_email_link)
-    .where(eq(SO_campaign_sender_email_link.campaignId, Number(params.id)));
+    .from(TB_campaign_sender_email_link)
+    .where(eq(TB_campaign_sender_email_link.campaignId, Number(params.id)));
 
   const analytics = await db
     .select()
-    .from(SO_analytic_settings)
-    .where(eq(SO_analytic_settings.campaignId, Number(params.id)));
+    .from(TB_analytic_settings)
+    .where(eq(TB_analytic_settings.campaignId, Number(params.id)));
 
   return {
     basics: Boolean(campaign[0].name),
@@ -195,7 +195,7 @@ export const action = async (args: ActionFunctionArgs) => {
   if (intent == "set_name") {
     const data = setNameSchema.parse(body);
     await db
-      .update(SO_campaigns)
+      .update(TB_campaigns)
       .set({ updatedAt: new Date(), name: data.newName });
   }
   return null;
