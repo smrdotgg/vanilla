@@ -17,13 +17,11 @@ export default function Page() {
         <h1>Sign Up Form</h1>
         <Form method="post" className="flex flex-col gap-3 align-bottom">
           <Input
-            value={"semere@gmail.com"}
             name="email"
             type="email"
             placeholder="email"
           />
           <Input
-            value={"semere123"}
             name="password"
             type="password"
             placeholder="password"

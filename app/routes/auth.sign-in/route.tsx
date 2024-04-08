@@ -16,8 +16,8 @@ export default function Page() {
       <div className="w-96 flex flex-col gap-3 align-bottom">
         <h1>Sign In Form</h1>
         <Form method="post" className="flex flex-col gap-3 align-bottom">
-          <Input value={"semere@gmail.com"} name="email" type="email" placeholder="email" />
-          <Input value={"semere123"} name="password" type="password" placeholder="password" />
+          <Input name="email" type="email" placeholder="email" />
+          <Input name="password" type="password" placeholder="password" />
           <Button type="submit">Submit</Button>
         </Form>
         <Link to="/auth/sign-up">
