@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { db } from "~/db/index.server";
 import { TB_users } from "~/db/schema.server";
+import { getBaseUrl } from "~/server/trpc/shared";
 
 export default function Page() {
   const actionResult = useActionData<typeof action>();
@@ -22,6 +23,9 @@ export default function Page() {
         </Form>
         <Link to="/auth/sign-up">
           Sign Up
+        </Link>
+        <Link to={`${getBaseUrl()}/auth/sign-in-with-google`}>
+          Google
         </Link>
       </div>
     </div>
@@ -48,6 +52,8 @@ export const action = async (args: ActionFunctionArgs) => {
     .where(eq(TB_users.email, email));
 
   if (user.length === 0) throw new Error();
+
+  if (user[0].password === null) throw new Error();
 
   const passwordIsCorrect = await new Scrypt().verify(
     user[0].password,

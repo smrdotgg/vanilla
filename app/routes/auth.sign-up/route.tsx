@@ -1,7 +1,6 @@
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { Scrypt, generateId } from "lucia";
-import { useEffect } from "react";
 import { z } from "zod";
 import { lucia } from "~/auth/lucia.server";
 import { Button } from "~/components/ui/button";

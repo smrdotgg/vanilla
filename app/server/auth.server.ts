@@ -9,3 +9,4 @@ export const getCookieSession = async (req: Request) => {
     }
   }
 }
+

@@ -50,17 +50,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ErrorBoundary() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    navigate("/auth/sign-in");
-  }, []);
-  return (
-    <div className="flex h-screen w-screen *:m-auto">
-      <p>Loading...</p>
-    </div>
-  );
-}
+// export function ErrorBoundary() {
+//   // const navigate = useNavigate();
+//   // useEffect(() => {
+//   //   navigate("/auth/sign-in");
+//   // }, []);
+//   return (
+//     <div className="flex h-screen w-screen *:m-auto">
+//       <p>Loading...</p>
+//     </div>
+//   );
+// }
 
 function LayoutCore({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>();

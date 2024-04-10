@@ -24,11 +24,42 @@ import { number } from "zod";
  */
 export const createTable = pgTableCreator((name) => `rs_${name}`);
 
+export const TB_oath_ids = pgEnum("oauth_ids", [
+  "google",
+]);
+
+
+// export const TB_oauth_users = createTable(
+//   "oauth_user",
+//   {
+//     providerId: TB_oath_ids("provider_id").notNull(),
+//     providerUserId: text("provider_user_id").notNull(),
+//     userId: text("user_id")
+//       .notNull()
+//       .references(() => TB_users.id),
+//   },
+//   (table) => ({
+//     unq: primaryKey({ columns: [table.providerId, table.providerUserId] }),
+//   }),
+// );
+
 export const TB_users = createTable("user", {
   id: text("id").primaryKey(),
   email: text("email").unique().notNull(),
-  password: text("password").notNull(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  oauthProvider: TB_oath_ids("oauth_provider"),
+  password: text("password"),
 });
+
+// export const TB_user_email_verification_codes = createTable("verification_code", {
+//   id: serial("id").primaryKey(),
+//   userId: text("user_id").notNull().references(() => TB_users.id),
+//   code: text("code").notNull(),
+//   expirestAt: timestamp("expires_at", {
+//     withTimezone: true,
+//     mode: "date",
+//   }).notNull()
+// });
 
 export const TB_sessions = createTable("sessions", {
   id: text("id").primaryKey(),
