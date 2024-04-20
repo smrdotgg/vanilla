@@ -26,6 +26,7 @@ import clsx from "clsx";
 import { ModeToggle } from "./components/ui/mode-toggle";
 import { api } from "./server/trpc/server.server";
 import { useEffect } from "react";
+import { env } from "./api";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -33,10 +34,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
   return {
     theme: getTheme(),
-    ENV: {
-      STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
-      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-    },
   };
 }
 

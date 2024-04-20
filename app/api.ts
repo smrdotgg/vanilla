@@ -1,5 +1,6 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
+require('dotenv').config()
 
 export const env = createEnv({
   server: {
@@ -18,6 +19,7 @@ export const env = createEnv({
     POSTGRES_PORT: z.coerce.number(),
     POSTGRES_DB: z.string(),
     VERCEL_URL: z.string().nullish(),
+    NODE_ENV: z.enum(['development', 'production']),
   },
  
   /**

@@ -11,6 +11,7 @@ import { type TRPCErrorResponse } from "@trpc/server/rpc";
 import { transformer } from "./shared";
 import { createTRPCContext } from "../api/trpc";
 import { appRouter, AppRouter } from "../api/root";
+import { env } from "~/api";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
@@ -40,7 +41,7 @@ export const api = ( req: Request ) =>
     links: [
       loggerLink({
         enabled: (op) =>
-          process.env.NODE_ENV === "development" ||
+          env.NODE_ENV === "development" ||
           (op.direction === "down" && op.result instanceof Error),
       }),
       /**

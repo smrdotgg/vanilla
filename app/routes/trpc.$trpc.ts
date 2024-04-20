@@ -6,6 +6,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
+import { env } from "~/api";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   return handleRequest(args);
@@ -25,7 +26,7 @@ async function handleRequest(args: LoaderFunctionArgs | ActionFunctionArgs) {
     router: appRouter,
     createContext: () => createContext(args.request),
     onError:
-      process.env.NODE_ENV === "development"
+      env.NODE_ENV === "development"
         ? ({ path, error }) => {
             console.error(
               `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`,

@@ -2,6 +2,7 @@ import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { generateCodeVerifier, generateState } from "arctic";
 import { google } from "~/auth/lucia.server";
 import { serializeCookie } from "oslo/cookie";
+import { env } from "~/api";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const state = generateState();
@@ -13,7 +14,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     "Set-Cookie",
     serializeCookie("google_oauth_state", state, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // set `Secure` flag in HTTPS
+      secure: env.NODE_ENV === "production", // set `Secure` flag in HTTPS
       maxAge: 60 * 10, // 10 minutes
       path: "/",
     }),
@@ -22,7 +23,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     "Set-Cookie",
     serializeCookie("code_verifier", codeVerifier, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: env.NODE_ENV === "production",
       maxAge: 60 * 10,
       path: "/",
     }),

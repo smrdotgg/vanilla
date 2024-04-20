@@ -8,7 +8,7 @@ import { env } from "~/api";
 const adapter = new DrizzlePostgreSQLAdapter(db, TB_sessions, TB_users);
 
 
-export const google = new Google(process.env.GOOGLE_CLIENT_ID!, process.env.GOOGLE_CLIENT_SECRET!, `${env.PUBLIC_URL}auth/signed-in-with-google`);
+export const google = new Google(env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_SECRET, `${env.PUBLIC_URL}auth/signed-in-with-google`);
 
 export const lucia = new Lucia(adapter, {
 	sessionCookie: {

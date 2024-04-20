@@ -8,10 +8,6 @@ export default {
   driver: "pg",
   dbCredentials: {
     connectionString: url,
-    // connectionString: process.env.DATABASE_URL!,
   },
   tablesFilter: ["rs_*"],
 } satisfies Config;
-
-
-

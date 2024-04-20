@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { getUrl, transformer } from "./shared";
 import { AppRouter } from "../api/root";
+import { env } from "~/api";
 
 const createQueryClient = () => new QueryClient();
 
@@ -30,7 +31,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
       links: [
         loggerLink({
           enabled: (op) =>
-            process.env.NODE_ENV === "development" ||
+            env.NODE_ENV === "development" ||
             (op.direction === "down" && op.result instanceof Error),
         }),
         unstable_httpBatchStreamLink({
