@@ -19,10 +19,14 @@ export const NewEditor = ({
   isPlainText: boolean;
 }) => {
   const [prevContent, setPrevContent] = useState(
-    isPlainText ? decodeHtml(contentString?.replace(/<br\s*\/?>/gi, "\n") ?? "") : (contentString ?? ""),
+    isPlainText
+      ? decodeHtml(contentString?.replace(/<br\s*\/?>/gi, "\n") ?? "")
+      : contentString ?? "",
   );
   const [content, setContent] = useState(
-    isPlainText ? decodeHtml(contentString?.replace(/<br\s*\/?>/gi, "\n") ?? "") : (contentString ?? ""),
+    isPlainText
+      ? decodeHtml(contentString?.replace(/<br\s*\/?>/gi, "\n") ?? "")
+      : contentString ?? "",
   );
   const params = useParams();
   const [plainTextMode, setPlainTextMode] = useState(isPlainText);
@@ -35,7 +39,9 @@ export const NewEditor = ({
   }, [plainTextMode]);
 
   useEffect(() => {
-    const parsedContent = plainTextMode ? encodeHtml(content).replace(/\n/g, "<br>") : content;
+    const parsedContent = plainTextMode
+      ? encodeHtml(content).replace(/\n/g, "<br>")
+      : content;
     const handler = setTimeout(() => {
       const performAsyncOperation = async () => {
         updateContentMutation.mutate({
@@ -59,9 +65,11 @@ export const NewEditor = ({
           <Checkbox
             onCheckedChange={() => setPlainTextMode(!plainTextMode)}
             checked={plainTextMode}
+            id="plainTextCheckbox" 
           />
-          <p>Plain Text Mode</p>
+          <label htmlFor="plainTextCheckbox">Plain Text Mode</label> 
         </div>
+
         {plainTextMode && (
           <Textarea
             className="h-96 rounded-none bg-white text-black"

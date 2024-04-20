@@ -142,8 +142,8 @@ const main = async () => {
   log("Sequence steps state updated");
 };
 
-// await main();
+await main();
 
-console.log("cron job about to start waiting for an hour...");
-schedule("*/10 * * * *", main);
-console.log("Added console logs throughout the script for better tracking");
+// console.log("cron job about to start waiting for an hour...");
+// schedule("*/10 * * * *", main);
+// console.log("Added console logs throughout the script for better tracking");

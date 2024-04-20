@@ -3,6 +3,7 @@ import { Form, Link, useActionData } from "@remix-run/react";
 import { Scrypt, generateId } from "lucia";
 import { z } from "zod";
 import { lucia } from "~/auth/lucia.server";
+import { ContinueWithGoogleButton } from "~/components/auth/google";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { db } from "~/db/index.server";
@@ -28,6 +29,7 @@ export default function Page() {
           <Button type="submit">Submit</Button>
         </Form>
         <Link to="/auth/sign-in">Sign in</Link>
+        <ContinueWithGoogleButton />
         <p className="text-red-400">{actionResult?.error ?? ""}</p>
       </div>
     </div>

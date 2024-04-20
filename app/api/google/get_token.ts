@@ -1,3 +1,5 @@
+import { env } from "~/api";
+
 interface ErrorResponse {
   error: string;
   error_description: string;
@@ -19,8 +21,8 @@ export async function exchangeCodeForTokens({
   redirectUri: string;
   code: string;
 }) {
-  const clientId = process.env.GOOGLE_CLIENT_ID!;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET!;
+  const clientId = env.GOOGLE_CLIENT_ID!;
+  const clientSecret = env.GOOGLE_CLIENT_SECRET!;
   const TOKEN_URI = "https://oauth2.googleapis.com/token";
 
   const response = await fetch(TOKEN_URI, {

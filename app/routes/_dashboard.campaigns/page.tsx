@@ -1,8 +1,9 @@
-import { Form, useLoaderData } from "@remix-run/react";
+import { Await, Form, useLoaderData } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { CampaignTable } from "./table";
 import { loader } from "./route";
+import { Suspense } from "react";
 
 export function Page() {
   const data = useLoaderData<typeof loader>();
@@ -24,8 +25,9 @@ export function Page() {
         <div className="pt-2"></div>
         <Input className="ml-6 w-96" placeholder="Search" />
         <div className="pt-6"></div>
+        <div className="pt-6"></div>
         <CampaignTable
-          data={data.map((d) => ({
+          data={data.d.map((d) => ({
             id: d.id,
             name: d.name,
             isDraft: d.isDraft,

@@ -1,78 +1,44 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs, defer } from "@remix-run/node";
 import { Page } from "./page";
 import { db } from "~/db/index.server";
+import { TB_analytic_settings, TB_campaigns } from "~/db/schema.server";
+import { eq } from "drizzle-orm";
 import {
-  TB_binding_campaigns_contacts,
-  TB_campaigns,
-  TB_email_link_click,
-  TB_email_open_event,
-  TB_sequence_steps,
-} from "~/db/schema.server";
-import { eq, and } from "drizzle-orm";
+  calculateBouncedSteps,
+  ctrCalculate,
+  openRateCalucalte,
+  optOutCalculate,
+} from "./router_helpers.server";
 
-export const loader = async (args: LoaderFunctionArgs) => {
-  const id = Number(args.params.id);
-  const campaign = (
-    await db.select().from(TB_campaigns).where(eq(TB_campaigns.id, id))
-  )[0];
+export const loader = (args: LoaderFunctionArgs) => {
+  const campaignId = Number(args.params.id);
 
-  // deliverability;
-  const boundedSteps = (
-    await db
-      .select()
-      .from(TB_sequence_steps)
-      .where(
-        and(
-          ...[
-            eq(TB_sequence_steps.campaignId, id),
-            eq(TB_sequence_steps.state, "bounced"),
-          ],
-        ),
-      )
-  ).length;
-  const sentSteps = (
-    await db
-      .select()
-      .from(TB_sequence_steps)
-      .where(
-        and(
-          ...[
-            eq(TB_sequence_steps.campaignId, id),
-            eq(TB_sequence_steps.state, "sent"),
-          ],
-        ),
-      )
-  ).length;
-
-  const deliverability =(boundedSteps + sentSteps) ?  (1 - boundedSteps / (boundedSteps + sentSteps)) : 0;
-
-  // open rate
-  const openedCount = (await db
+  const campaign = db
     .select()
-    .from(TB_sequence_steps)
-    .where(and(...[eq(TB_sequence_steps.campaignId, id)]))
-    .leftJoin(
-      TB_email_open_event,
-      eq(TB_email_open_event.sequenceStepId, TB_sequence_steps.id),
-    )).filter(i => i.email_open_event).length;
-  const contactsCount = (
-    await db
-      .select()
-      .from(TB_binding_campaigns_contacts)
-      .where(eq(TB_binding_campaigns_contacts.campaignId, id))
-  ).length;
-  const maxContactsOpened = sentSteps * contactsCount;
+    .from(TB_campaigns)
+    .where(eq(TB_campaigns.id, campaignId))
+    .then((v) => v[0]);
 
-  const openRate = maxContactsOpened ? openedCount / maxContactsOpened : 0;
+  const analyticSettings = db
+    .select()
+    .from(TB_analytic_settings)
+    .where(eq(TB_analytic_settings.campaignId, campaignId))
+    .then((data) => {
+      if (data.length) {
+        return data[0];
+      } else {
+        return undefined;
+      }
+    });
 
-
-  
-  // click-through rate
-  // await db.select().from(SO_email_link_click
-
-
-
-  return { campaign, deliverability, openRate };
+  return defer({
+    campaign,
+    analyticSettings,
+    deliverability: calculateBouncedSteps({ db, campaignId }),
+    openRate: openRateCalucalte({ db, campaignId }),
+    ctr: ctrCalculate({ db, campaignId }),
+    optOut: optOutCalculate({ db, campaignId }),
+  });
 };
 
 export { Page as default };

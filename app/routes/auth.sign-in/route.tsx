@@ -4,14 +4,13 @@ import { eq } from "drizzle-orm";
 import { Scrypt } from "lucia";
 import { z } from "zod";
 import { lucia } from "~/auth/lucia.server";
+import { ContinueWithGoogleButton } from "~/components/auth/google";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { db } from "~/db/index.server";
 import { TB_users } from "~/db/schema.server";
-import { getBaseUrl } from "~/server/trpc/shared";
 
 export default function Page() {
-  const actionResult = useActionData<typeof action>();
   return (
     <div className="flex h-screen *:m-auto">
       <div className="w-96 flex flex-col gap-3 align-bottom">
@@ -24,9 +23,7 @@ export default function Page() {
         <Link to="/auth/sign-up">
           Sign Up
         </Link>
-        <Link to={`${getBaseUrl()}/auth/sign-in-with-google`}>
-          Google
-        </Link>
+        <ContinueWithGoogleButton />
       </div>
     </div>
   );

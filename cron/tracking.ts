@@ -1,11 +1,12 @@
 import { JSDOM } from "jsdom";
-const url = "https://vanilla-seven.vercel.app/";
+
+const url = process.env.URL;
 
 type analyticsSettings = {
-    optOutRate: boolean | null;
-    openRate: boolean | null;
-    clickthroughRate: boolean | null;
-} 
+  optOutRate: boolean | null;
+  openRate: boolean | null;
+  clickthroughRate: boolean | null;
+};
 
 export const addTracking = <T extends analyticsSettings>({
   sequenceStepId,
@@ -18,19 +19,24 @@ export const addTracking = <T extends analyticsSettings>({
   targetEmail: string;
   content: string;
   customerTrackingLink: string | null;
-  settings: T,
+  settings: T;
 }) => {
   if (settings.openRate)
-  content = openRateTracking({ content, sequenceStepId, targetEmail });
-if (settings.optOutRate)
-  content = unsubTracking({
-    content,
-    customerTrackingLink,
-    sequenceStepId,
-    targetEmail,
-  });
+    content = openRateTracking({ content, sequenceStepId, targetEmail });
+  if (settings.optOutRate)
+    content = unsubTracking({
+      content,
+      customerTrackingLink,
+      sequenceStepId,
+      targetEmail,
+    });
   if (settings.clickthroughRate)
-  content = ctrTracking({ content, sequenceStepId, targetEmail, customerTrackingLink });
+    content = ctrTracking({
+      content,
+      sequenceStepId,
+      targetEmail,
+      customerTrackingLink,
+    });
 
   return content;
 };
@@ -117,10 +123,12 @@ function ctrTracking({
   const aElements = dom.window.document.querySelectorAll("a");
 
   aElements.forEach((a) => {
-      const newLink = dom.window.document.createElement("a");
-      newLink.href = `${url}analytics/ctr?email=${targetEmail}&originalTarget=${encodeURIComponent(a.href)}&sequenceStepId=${sequenceStepId}`;
-      newLink.textContent = a.textContent;
-      a.replaceWith(newLink);
+    const newLink = dom.window.document.createElement("a");
+
+    newLink.href = `${url}analytics/ctr?email=${targetEmail}&originalTarget=${encodeURIComponent(a.href)}&sequenceStepId=${sequenceStepId}`;
+
+    newLink.textContent = a.textContent;
+    a.replaceWith(newLink);
   });
 
   return dom.window.document.body.innerHTML;

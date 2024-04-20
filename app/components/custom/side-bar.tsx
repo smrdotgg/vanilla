@@ -1,4 +1,5 @@
 import { Form, Link, NavLink } from "@remix-run/react";
+import { MdHttp } from "react-icons/md";
 import { GrInProgress } from "react-icons/gr";
 import { FaHome } from "react-icons/fa";
 
@@ -11,13 +12,15 @@ import { ReactNode, useState } from "react";
 import { Theme, useTheme } from "remix-themes";
 import downloadsvg from "./download.svg";
 import { Button } from "../ui/button";
+import { TbWorld } from "react-icons/tb";
 
 type dashRoute =
   | "/home"
   | "/settings"
   | "/contacts"
   | "/campaigns"
-  | "/sender_accounts";
+  | "/sender_accounts"
+  | "/domains";
 
 const elements: { route: dashRoute; name: string; icon: IconType }[] = [
   {
@@ -44,6 +47,11 @@ const elements: { route: dashRoute; name: string; icon: IconType }[] = [
     route: "/sender_accounts",
     name: "Sender Accounts",
     icon: IoIosPeople,
+  },
+  {
+    route: "/domains",
+    name: "Domains",
+    icon: TbWorld,
   },
 ];
 
@@ -97,6 +105,7 @@ export function DashLayout({
             {elements.map((e, i) => (
               <NavLink
                 key={i}
+                prefetch="intent"
                 className={({ isActive, isPending }) => {
                   if (isPending && loading != e.route) setLoading(e.route);
                   if (isActive && loading == e.route) setLoading("");
@@ -127,7 +136,7 @@ export function DashLayout({
         </div>
         <div className="flex flex-col justify-end">
         <form  method="post" action="/auth/sign-out"  >
-          <Button type="submit">Sign Out</Button>
+          <Button type="submit" variant={"ghost"} >Sign Out</Button>
         </form>
         <ModeToggle />
         </div>

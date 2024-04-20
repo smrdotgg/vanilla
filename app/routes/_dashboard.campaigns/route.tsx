@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/node";
+import { defer, redirect } from "@remix-run/node";
 import { db } from "~/db/index.server";
 import {
   TB_binding_campaigns_contacts,
@@ -7,7 +7,12 @@ import {
 import { eq, sql } from "drizzle-orm";
 import { Page } from "./page";
 
-
+const getSlowData = () =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve("hello world");
+    }, 2000); // Set timeout for 2 seconds
+  });
 export const loader = async () => {
   const d = await db
     .select({
@@ -34,7 +39,17 @@ export const loader = async () => {
       })),
     );
 
-  return d;
+  return defer({ d, slowData: getSlowData() });
+
+  // export const SO_analytic_data = createTable("analytic_data", {
+  //   id: serial("id").primaryKey(),
+  //   campaignId: integer("campaign_id").references(() => SO_campaigns.id),
+  //   openRate: boolean("open_rate").default(false),
+  //   replyRate: boolean("reply_rate").default(false),
+  //   optOutRate: boolean("opt_out_rate").default(false),
+  //   bounceRate: boolean("bounce_rate").default(false),
+  //   clickthroughRate: boolean("click_through_rate").default(false),
+  // });
 };
 
 export { Page as default };

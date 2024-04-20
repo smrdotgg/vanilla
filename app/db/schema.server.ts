@@ -24,10 +24,7 @@ import { number } from "zod";
  */
 export const createTable = pgTableCreator((name) => `rs_${name}`);
 
-export const TB_oath_ids = pgEnum("oauth_ids", [
-  "google",
-]);
-
+export const TB_oath_ids = pgEnum("oauth_ids", ["google"]);
 
 // export const TB_oauth_users = createTable(
 //   "oauth_user",
@@ -212,16 +209,6 @@ export const TB_analytic_settings = createTable("analytic_settings", {
   clickthroughRate: boolean("click_through_rate").default(false),
 });
 
-// export const SO_analytic_data = createTable("analytic_data", {
-//   id: serial("id").primaryKey(),
-//   campaignId: integer("campaign_id").references(() => SO_campaigns.id),
-//   openRate: boolean("open_rate").default(false),
-//   replyRate: boolean("reply_rate").default(false),
-//   optOutRate: boolean("opt_out_rate").default(false),
-//   bounceRate: boolean("bounce_rate").default(false),
-//   clickthroughRate: boolean("click_through_rate").default(false),
-// });
-
 export const TB_contacts = createTable("contact", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
@@ -251,7 +238,6 @@ export const TB_binding_campaigns_contacts = createTable(
   }),
 );
 
-// export const SO_email_bounce_event =
 export const TB_email_bounce_event = createTable("email_bounce_event", {
   id: serial("id").primaryKey(),
   targetEmail: text("target_email").notNull(),
@@ -276,17 +262,20 @@ export const TB_email_open_event = createTable(
   }),
 );
 
-export const TB_email_opt_out_event = createTable("email_opt_out", {
+export const TB_email_opt_out_event = createTable("email_opt_out_event", {
+  id: serial("id").primaryKey(),
+  targetEmail: text("target_email").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  campaignId: integer("campaign_id").references(() => TB_campaigns.id).notNull(),
+}, (table) => ({
+  a: unique().on(table.targetEmail, table.campaignId),
+}));
+
+
+export const TB_email_link_click_event = createTable("email_link_click_event", {
   id: serial("id").primaryKey(),
   targetEmail: text("target_email").notNull(),
   sequenceStepId: integer("sequence_id").references(() => TB_sequence_steps.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const TB_email_link_click = createTable("email_link_click", {
-  id: serial("id").primaryKey(),
-  targetEmail: text("target_email").notNull(),
-  sequenceId: integer("sequence_id").references(() => TB_sequence_steps.id),
   link: text("link").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
