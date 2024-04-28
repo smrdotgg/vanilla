@@ -392,3 +392,18 @@ export const checkDomainAvailability = async ({domains} : {domains: string[]}) =
     return results;
   }
 };
+
+
+export const getDomainToPriceMap = async (domains: string[] | undefined) => {
+  const domainToPriceMap: { [key: string]: number } = {};
+  if (domains) {
+    for (let domain of domains) {
+      const price = await getTldPrice(domain.split(".")[1]);
+      if (price !== null) {
+        domainToPriceMap[domain] = price;
+      }
+    }
+  }
+  return domainToPriceMap;
+};
+

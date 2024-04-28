@@ -28,8 +28,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         .select()
         .from(TB_domainPurchaseDetails)
         .where(eq(TB_domainPurchaseDetails.userId, session.user.id));
-      console.log(`GOT X = ${JSON.stringify(x)}`);
-      console.log(`compairng TB_domainPurchaseDetails.userId, ${session.id}`);
       return x;
     })
     .then((results) => {

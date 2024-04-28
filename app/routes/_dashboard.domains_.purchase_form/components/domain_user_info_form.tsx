@@ -793,6 +793,7 @@ export function DomainUserInfoForm({
             </Button>
             <Button type="submit">Submit</Button>
           </div>
+            <div className="pt-4"></div>
         </form>
       </Form>
     </>

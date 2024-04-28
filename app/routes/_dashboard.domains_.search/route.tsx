@@ -6,7 +6,7 @@ import {
 import { Page } from "./page";
 import { INTENTS } from "./types";
 import { getCookieSessionOrThrow } from "~/server/auth.server";
-import { getData, getTldPrice } from "./helpers.server";
+import { getData, getDomainToPriceMap, } from "./helpers.server";
 
 type LoaderResponse = {
   results: ReturnType<typeof getData>;
@@ -22,18 +22,6 @@ const globalForDb = globalThis as unknown as {
 
 let cache = globalForDb.conn ?? {};
 
-const getDomainToPriceMap = async (domains: string[] | undefined) => {
-  const domainToPriceMap: { [key: string]: number } = {};
-  if (domains) {
-    for (let domain of domains) {
-      const price = await getTldPrice(domain.split(".")[1]);
-      if (price !== null) {
-        domainToPriceMap[domain] = price;
-      }
-    }
-  }
-  return domainToPriceMap;
-};
 
 export const loader = (args: LoaderFunctionArgs) => {
   const queryFormData = new URL(args.request.url).searchParams.get("query");
