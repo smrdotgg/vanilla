@@ -88,7 +88,7 @@ export default function ContactsPage() {
             </div>
             <div className="flex flex-col gap-2 overflow-y-auto">
               {data.order.map((orderElement, i) => (
-                <div key={i}>
+                <div index={i}>
                   {orderElement.type === "break" ? (
                     <BreakTile data={data.breaks[orderElement.id]} />
                   ) : (

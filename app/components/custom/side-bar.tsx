@@ -105,6 +105,7 @@ export function DashLayout({
             {elements.map((e, i) => (
               <NavLink
                 key={i}
+                index={i}
                 prefetch="intent"
                 className={({ isActive, isPending }) => {
                   if (isPending && loading != e.route) setLoading(e.route);
@@ -135,14 +136,16 @@ export function DashLayout({
           </>
         </div>
         <div className="flex flex-col justify-end">
-        <form  method="post" action="/auth/sign-out"  >
-          <Button type="submit" variant={"ghost"} >Sign Out</Button>
-        </form>
-        <ModeToggle />
+          <form method="post" action="/auth/sign-out">
+            <Button type="submit" variant={"ghost"}>
+              Sign Out
+            </Button>
+          </form>
+          <ModeToggle />
         </div>
       </div>
 
-      <div className="flex-grow  overflow-x-hidden">{children}</div>
+      <div className="flex-grow overflow-x-hidden">{children}</div>
     </div>
   );
 }

@@ -36,7 +36,7 @@ export function Cart({
             <div className="flex max-h-96 flex-col overflow-y-auto">
               {cartState.map((cartItem, index) => (
                 <div
-                  key={index}
+                  index={index}
                   className="flex justify-between rounded bg-primary-foreground px-3 py-1 *:my-auto"
                 >
                   <div className="flex gap-2 *:my-auto">

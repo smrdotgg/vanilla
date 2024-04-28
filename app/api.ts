@@ -2,10 +2,16 @@ import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 import {config} from 'dotenv';
 
-config();
+const isServer =  (typeof process !== "undefined");
+
+if (typeof process !== "undefined") {
+  config();
+}
+
 
 export const env = createEnv({
   server: {
+    CLIENT_IP: z.string(),
     // shared for dev and prod
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
@@ -14,6 +20,7 @@ export const env = createEnv({
     // namecheap
     NAMECHEAP_API_KEY: z.string(),
     NAMECHEAP_API_URL: z.string().url(),
+    NAMECHEAP_API_USERNAME: z.string(),
     // pg
     POSTGRES_USER:z.string(),
     POSTGRES_PASSWORD: z.string(),
@@ -39,7 +46,7 @@ export const env = createEnv({
    * What object holds the environment variables at runtime. This is usually
    * `process.env` or `import.meta.env`.
    */
-  runtimeEnv: process.env,
+  runtimeEnv: isServer ? process.env : import.meta.env,
  
   /**
    * By default, this library will feed the environment variables directly to

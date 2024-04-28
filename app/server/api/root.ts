@@ -5,6 +5,7 @@ import { campaignRouter } from "./routers/campaign";
 import { contactsRouter } from "./routers/contacts";
 import {analyticsRouter} from "./routers/analytics";
 import {sequenceRouter} from "./routers/sequence";
+import { domainsRouter } from "./routers/domains";
 
 
 /**
@@ -19,6 +20,7 @@ export const appRouter = createTRPCRouter({
   contacts: contactsRouter,
   analytics: analyticsRouter,
   sequence: sequenceRouter,
+  domains: domainsRouter,
 });
 
 // export type definition of API

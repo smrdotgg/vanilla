@@ -59,7 +59,7 @@ export function ContactsDisplay({
           {contacts.map((c, i) => (
             <ContactDisplay
               rowIsSelected={rowIsSelected}
-              key={i}
+              index={i}
               contact={c}
               formDisabled={formDisabled}
               manageRowClick={manageRowClick}

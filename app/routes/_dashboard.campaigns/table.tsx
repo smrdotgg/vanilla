@@ -8,7 +8,7 @@ export function CampaignTable({ data }: { data: CampaignTableCellData[] }) {
   return (
     <div className="flex flex-grow flex-col overflow-y-auto">
       {data.map((d, i) => (
-        <CampaignRow key={i} campaign={d} />
+        <CampaignRow index={i} campaign={d} />
       ))}
     </div>
   );

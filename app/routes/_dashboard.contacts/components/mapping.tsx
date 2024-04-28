@@ -75,7 +75,7 @@ function SelectRow({
         </SelectTrigger>
         <SelectContent>
           {choices.map((h, i) => (
-            <SelectItem key={i} value={h}>
+            <SelectItem index={i} value={h}>
               {h}
             </SelectItem>
           ))}

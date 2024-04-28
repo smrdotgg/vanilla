@@ -51,7 +51,7 @@ export function SampleShow({
           <TableRow className="*:max-w-20">
             <TableHead>No.</TableHead>
             {Object.entries(mapping).map((h, i) => (
-              <TableHead key={i}>{camelCaseToTitle(h[0])}</TableHead>
+              <TableHead index={i}>{camelCaseToTitle(h[0])}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -60,13 +60,13 @@ export function SampleShow({
             .slice(0, showAll ? undefined : breakpoint)
             .map((row, index) => {
               return (
-                <TableRow key={index}>
+                <TableRow index={index}>
                   <TableCell className={`text-gray-500`}>
                     {index + 1}.
                   </TableCell>
                   {Object.entries(mapping).map(([v, k], i) => (
                     <TableCell
-                      key={i}
+                      index={i}
                       className={row[k] ? "" : `text-gray-500`}
                     >
                       {row[k] ?? "N/A"}

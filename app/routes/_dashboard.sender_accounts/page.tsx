@@ -44,7 +44,7 @@ export function Page() {
         />
         <div className="pt-6"></div>
         {data.googleUserInfos.map((d, i) => (
-          <EmailCell {...d} key={i} />
+          <EmailCell {...d} index={i} />
         ))}
         <div className="flex flex-col gap-2">
           {data.senderAccounts
@@ -55,7 +55,7 @@ export function Page() {
             )
             .map((senderAcc, i) => (
               <div
-                key={i}
+                index={i}
                 className=" flex cursor-pointer justify-between p-2 px-6 *:my-auto hover:bg-secondary"
               >
                 <div className="">

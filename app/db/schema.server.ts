@@ -58,6 +58,65 @@ export const TB_users = createTable("user", {
 //   }).notNull()
 // });
 
+export type DomainPurchaseDetailsSelect =
+  typeof TB_domainPurchaseDetails.$inferSelect;
+
+export const TB_domainPurchaseDetails = createTable(
+  "domain_purchase_form_info",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .unique()
+      .references(() => TB_users.id),
+
+    registrantFirstName: text("registrant_first_name"),
+    registrantLastName: text("registrant_last_name"),
+    registrantAddress1: text("registrant_address_1"),
+    registrantCity: text("registrant_city"),
+    registrantStateProvince: text("registrant_state_province"),
+    registrantPostalCode: text("registrant_postal_code"),
+    registrantCountry: text("registrant_country"),
+    registrantEmailAddress: text("registrant_email_address"),
+    registrantPhoneCountryCode: text("registrant_phone_country_code"),
+    registrantPhoneNumber: text("registrant_phone_number"),
+
+    techFirstName: text("tech_first_name"),
+    techLastName: text("tech_last_name"),
+    techAddress1: text("tech_address_1"),
+    techCity: text("tech_city"),
+    techStateProvince: text("tech_state_province"),
+    techPostalCode: text("tech_postal_code"),
+    techCountry: text("tech_country"),
+    techEmailAddress: text("tech_email_address"),
+    techPhoneCountryCode: text("tech_phone_country_code"),
+    techPhoneNumber: text("tech_phone_number"),
+
+    adminFirstName: text("admin_first_name"),
+    adminLastName: text("admin_last_name"),
+    adminAddress1: text("admin_address_1"),
+    adminCity: text("admin_city"),
+    adminStateProvince: text("admin_state_province"),
+    adminPostalCode: text("admin_postal_code"),
+    adminCountry: text("admin_country"),
+    adminEmailAddress: text("admin_email_address"),
+    adminPhoneCountryCode: text("admin_phone_country_code"),
+    adminPhoneNumber: text("admin_phone_number"),
+
+
+    billingFirstName: text("billing_first_name"),
+    billingLastName: text("billing_last_name"),
+    billingAddress1: text("billing_address_1"),
+    billingCity: text("billing_city"),
+    billingStateProvince: text("billing_state_province"),
+    billingPostalCode: text("billing_postal_code"),
+    billingCountry: text("billing_country"),
+    billingEmailAddress: text("billing_email_address"),
+    billingPhoneCountryCode: text("billing_phone_country_code"),
+    billingPhoneNumber:text("billing_phone_number")
+  },
+);
+
 export const TB_sessions = createTable("sessions", {
   id: text("id").primaryKey(),
   userId: text("user_id")
@@ -262,15 +321,20 @@ export const TB_email_open_event = createTable(
   }),
 );
 
-export const TB_email_opt_out_event = createTable("email_opt_out_event", {
-  id: serial("id").primaryKey(),
-  targetEmail: text("target_email").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  campaignId: integer("campaign_id").references(() => TB_campaigns.id).notNull(),
-}, (table) => ({
-  a: unique().on(table.targetEmail, table.campaignId),
-}));
-
+export const TB_email_opt_out_event = createTable(
+  "email_opt_out_event",
+  {
+    id: serial("id").primaryKey(),
+    targetEmail: text("target_email").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    campaignId: integer("campaign_id")
+      .references(() => TB_campaigns.id)
+      .notNull(),
+  },
+  (table) => ({
+    a: unique().on(table.targetEmail, table.campaignId),
+  }),
+);
 
 export const TB_email_link_click_event = createTable("email_link_click_event", {
   id: serial("id").primaryKey(),
@@ -279,6 +343,38 @@ export const TB_email_link_click_event = createTable("email_link_click_event", {
   link: text("link").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const TB_domain = createTable("domain", {
+  id: serial("id").primaryKey(),
+  name: text("name").unique(),
+  ownerUser: text("user_id")
+    .references(() => TB_users.id)
+    .notNull(),
+  purchasedAt: timestamp("purchased_at").defaultNow().notNull(),
+  price: integer("price").notNull(),
+});
+
+export const TB_cart = createTable("cart", {
+  id: serial("id").primaryKey(),
+  user: text("user_id")
+    .references(() => TB_users.id)
+    .notNull()
+    .unique(),
+});
+
+export const TB_cart_item = createTable(
+  "cart_item",
+  {
+    id: serial("id").primaryKey(),
+    cart: integer("cart_id")
+      .references(() => TB_cart.id)
+      .notNull(),
+    name: text("name"),
+  },
+  (t) => ({
+    unq: unique().on(t.cart, t.name),
+  }),
+);
 
 /* ---  Type Exports --- */
 export type SequenceStep = typeof TB_sequence_steps.$inferSelect;

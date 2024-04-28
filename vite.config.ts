@@ -16,6 +16,7 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  envPrefix: "PUBLIC_",
   optimizeDeps: {
     exclude: ["oslo"],
   },

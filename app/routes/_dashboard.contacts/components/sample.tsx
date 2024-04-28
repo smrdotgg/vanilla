@@ -39,7 +39,7 @@ export function SampleShow({
         <TableBody>
           {data.data.slice(0, 10).map((row, index) => {
             return (
-              <TableRow key={index}>
+              <TableRow index={index}>
                 <TableCell className={row[mapping.name] ? "" : `text-gray-500`}>
                   {row[mapping.name] ?? "N/A"}
                 </TableCell>

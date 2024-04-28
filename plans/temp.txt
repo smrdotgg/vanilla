@@ -1,0 +1,53 @@
+
+  registrantFirstName: formSectionSchema.FirstName,
+  registrantLastName: formSectionSchema.LastName,
+  registrantAddress1: formSectionSchema.Address1,
+  registrantCity: formSectionSchema.City,
+  registrantStateProvince: formSectionSchema.StateProvince,
+  registrantPostalCode: formSectionSchema.PostalCode,
+  registrantCountry: formSectionSchema.Country,
+  registrantEmailAddress: formSectionSchema.EmailAddress,
+  registrantPhoneCountryCode: formSectionSchema.PhoneCountryCode,
+  registrantPhoneNumber: formSectionSchema.PhoneNumber,
+  ------
+
+
+
+  techFirstName: formSectionSchema.FirstName,
+  techLastName: formSectionSchema.LastName,
+  techEmailAddress: formSectionSchema.EmailAddress,
+  techAddress1: formSectionSchema.Address1,
+  techStateProvince: formSectionSchema.StateProvince,
+  techCountry: formSectionSchema.Country,
+  techCity: formSectionSchema.City,
+  techPhoneCountryCode: formSectionSchema.PhoneCountryCode,
+  techPhoneNumber: formSectionSchema.PhoneNumber,
+  techPostalCode: formSectionSchema.PostalCode,
+  -----
+
+
+
+
+  adminFirstName: formSectionSchema.FirstName,
+  adminLastName: formSectionSchema.LastName,
+  adminAddress1: formSectionSchema.Address1,
+  adminCity: formSectionSchema.City,
+  adminStateProvince: formSectionSchema.StateProvince,
+  adminPostalCode: formSectionSchema.PostalCode,
+  adminCountry: formSectionSchema.Country,
+
+  adminPhoneCountryCode: formSectionSchema.PhoneCountryCode,
+  adminPhoneNumber: formSectionSchema.PhoneNumber,
+
+  adminEmailAddress: formSectionSchema.EmailAddress,
+
+  billingFirstName: formSectionSchema.FirstName,
+  billingLastName: formSectionSchema.LastName,
+  billingAddress1: formSectionSchema.Address1,
+  billingCity: formSectionSchema.City,
+  billingStateProvince: formSectionSchema.StateProvince,
+  billingPostalCode: formSectionSchema.PostalCode,
+  billingCountry: formSectionSchema.Country,
+  billingPhoneCountryCode: formSectionSchema.PhoneCountryCode,
+  billingPhoneNumber: formSectionSchema.PhoneNumber,
+  billingEmailAddress: formSectionSchema.EmailAddress,

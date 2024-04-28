@@ -40,6 +40,7 @@ const authZod = z.object({
   email: z.string().email(),
   password: z.string(),
 });
+
 export async function action(args: ActionFunctionArgs) {
   const formData = await args.request.formData();
   const formEmail = String(formData.get("email"));

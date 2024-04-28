@@ -1,9 +1,8 @@
-import { Await, Form, useLoaderData } from "@remix-run/react";
+import {  Form, useLoaderData } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { CampaignTable } from "./table";
 import { loader } from "./route";
-import { Suspense } from "react";
 
 export function Page() {
   const data = useLoaderData<typeof loader>();

@@ -27,13 +27,18 @@ import { ModeToggle } from "./components/ui/mode-toggle";
 import { api } from "./server/trpc/server.server";
 import { useEffect } from "react";
 import { env } from "./api";
+import { getCookieSession } from "./server/auth.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   if (url.pathname == "/") return redirect("home");
   const { getTheme } = await themeSessionResolver(request);
+  const data = await getCookieSession(request);
+  //
+  // return data?.userId;
   return {
     theme: getTheme(),
+    userId: data?.userId,
   };
 }
 
@@ -72,7 +77,7 @@ function LayoutCore({ children }: { children: React.ReactNode }) {
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme ?? "dark")} />
         <Links />
       </head>
-      <body>
+      <body className="overflow-hidden">
         {/* <Theme */}
         {children}
         <ScrollRestoration />

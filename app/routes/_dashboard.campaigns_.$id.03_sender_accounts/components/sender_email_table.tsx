@@ -51,7 +51,7 @@ export function SenderEmailTable({
         <div className="flex flex-grow flex-col overflow-y-auto">
           {contacts.map((c, i) => (
             <SenderEmailDisplay
-              key={i}
+              index={i}
               contact={c}
               formDisabled={formDisabled}
               setSelectedContactsMap={setSelectedContactsMap}

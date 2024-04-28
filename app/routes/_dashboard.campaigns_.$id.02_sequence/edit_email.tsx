@@ -68,7 +68,7 @@ export const EditEmailPage = ({
       </div>
 
       <ClientOnly fallback={<h1>loading</h1>}>
-        {() => <NewEditor isPlainText={isPlainText} id={id} key={id} contentString={content} />}
+        {() => <NewEditor isPlainText={isPlainText} id={id} index={id} contentString={content} />}
       </ClientOnly>
     </div>
   );
