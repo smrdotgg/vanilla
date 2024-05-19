@@ -10,6 +10,8 @@ if (typeof process !== "undefined") {
 
 export const env = createEnv({
   server: {
+    SQLITE_URL: z.string(),
+    SQLITE_AUTHKEY: z.string().nullish(),
     CLIENT_IP: z.string(),
     // shared for dev and prod
     GOOGLE_CLIENT_ID: z.string(),
@@ -68,3 +70,5 @@ export const env = createEnv({
    */
   emptyStringAsUndefined: true,
 });
+console.log(env.SQLITE_URL);
+console.log(env.SQLITE_AUTHKEY);

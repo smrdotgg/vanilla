@@ -12,7 +12,7 @@ installGlobals();
 export default defineConfig({
   plugins: [
     remix({
-      presets: Boolean(env.VERCEL_URL) ? [vercelPreset()] : [],
+      presets: env.VERCEL_URL ? [vercelPreset()] : [],
     }),
     tsconfigPaths(),
   ],
