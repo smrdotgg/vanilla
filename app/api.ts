@@ -1,13 +1,12 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
-import {config} from 'dotenv';
+import { config } from "dotenv";
 
-const isServer =  (typeof process !== "undefined");
+const isServer = typeof process !== "undefined";
 
 if (typeof process !== "undefined") {
   config();
 }
-
 
 export const env = createEnv({
   server: {
@@ -22,32 +21,38 @@ export const env = createEnv({
     NAMECHEAP_API_URL: z.string().url(),
     NAMECHEAP_API_USERNAME: z.string(),
     // pg
-    POSTGRES_USER:z.string(),
+    POSTGRES_USER: z.string(),
     POSTGRES_PASSWORD: z.string(),
     POSTGRES_URL: z.string(),
     POSTGRES_PORT: z.coerce.number(),
     POSTGRES_DB: z.string(),
     VERCEL_URL: z.string().nullish(),
-    NODE_ENV: z.enum(['development', 'production']),
+    NODE_ENV: z.enum(["development", "production"]),
+    CONTABO_CLIENT_ID: z.string(),
+    CONTABO_CLIENT_SECRET: z.string(),
+    CONTABO_USERNAME: z.string(),
+    CONTABO_PASSWORD: z.string(),
+    CONTABO_LOGIN_PASSWORD: z.string(),
+    CONTABO_LOGIN_PASSWORD_ID: z.coerce.number(),
   },
- 
+
   /**
    * The prefix that client-side variables must have. This is enforced both at
    * a type-level and at runtime.
    */
   clientPrefix: "PUBLIC_",
- 
+
   client: {
     // url
     PUBLIC_URL: z.string().url(),
   },
- 
+
   /**
    * What object holds the environment variables at runtime. This is usually
    * `process.env` or `import.meta.env`.
    */
   runtimeEnv: isServer ? process.env : import.meta.env,
- 
+
   /**
    * By default, this library will feed the environment variables directly to
    * the Zod validator.

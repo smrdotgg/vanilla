@@ -30,6 +30,7 @@ import { env } from "./api";
 import { getCookieSession } from "./server/auth.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+console.log("TRIGGERED");
   const url = new URL(request.url);
   if (url.pathname == "/") return redirect("home");
   const { getTheme } = await themeSessionResolver(request);

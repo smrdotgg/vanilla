@@ -13,3 +13,8 @@ export function hoursToEnglishString(hours: number): string {
     );
   return nonZeroParts.join(" and ");
 }
+
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

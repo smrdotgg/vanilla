@@ -3,7 +3,7 @@ import { topDomains } from "./components/tlds";
 import { processApiResponse } from "./gpttype";
 import SXTJ from "simple-xml-to-json";
 
-const nameCheapBaseUrl = `${env.NAMECHEAP_API_URL}xml.response?ApiUser=semeretereffe&ApiKey=${env.NAMECHEAP_API_KEY}&UserName=${env.NAMECHEAP_API_USERNAME}&ClientIp=${env.CLIENT_IP}`;
+const nameCheapBaseUrl = `${env.NAMECHEAP_API_URL}xml.response?ApiUser=${env.NAMECHEAP_API_USERNAME}&ApiKey=${env.NAMECHEAP_API_KEY}&UserName=${env.NAMECHEAP_API_USERNAME}&ClientIp=${env.CLIENT_IP}`;
 
 let cachedResponseText: string | undefined;
 let myJson: any;
@@ -351,10 +351,14 @@ export const getData = async (request: Request) => {
   const domains = queryFormData.includes(".")
     ? [queryFormData]
     : topDomains.map((td) => queryFormData + td);
-  return checkDomainAvailability({domains});
+  return checkDomainAvailability({ domains });
 };
 
-export const checkDomainAvailability = async ({domains} : {domains: string[]}) => {
+export const checkDomainAvailability = async ({
+  domains,
+}: {
+  domains: string[];
+}) => {
   const apiUrl = `${nameCheapBaseUrl}&Command=namecheap.domains.check&DomainList=${domains.join(",")}`;
   console.log(apiUrl);
   const response = await fetch(apiUrl);
@@ -393,7 +397,6 @@ export const checkDomainAvailability = async ({domains} : {domains: string[]}) =
   }
 };
 
-
 export const getDomainToPriceMap = async (domains: string[] | undefined) => {
   const domainToPriceMap: { [key: string]: number } = {};
   if (domains) {
@@ -406,4 +409,3 @@ export const getDomainToPriceMap = async (domains: string[] | undefined) => {
   }
   return domainToPriceMap;
 };
-

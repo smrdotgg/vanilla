@@ -39,6 +39,25 @@ export const TB_oath_ids = pgEnum("oauth_ids", ["google"]);
 //     unq: primaryKey({ columns: [table.providerId, table.providerUserId] }),
 //   }),
 // );
+//
+// export const TB_splitbox_setup_state = pgEnum("splitbox_setup_state", [
+//   "pending",
+//   "ready",
+//   "error"
+// ]);
+
+
+export const TB_splitboxes = createTable("splitbox", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  computeIdOnHostingPlatform: text("compute_id_on_hosting_platform")
+    .unique()
+    .notNull(),
+  userId: text("user_id")
+    .references(() => TB_users.id)
+    .notNull(),
+  // state: TB_splitbox_setup_state("state").notNull().default("pending"),
+});
 
 export const TB_users = createTable("user", {
   id: text("id").primaryKey(),
@@ -103,7 +122,6 @@ export const TB_domainPurchaseDetails = createTable(
     adminPhoneCountryCode: text("admin_phone_country_code"),
     adminPhoneNumber: text("admin_phone_number"),
 
-
     billingFirstName: text("billing_first_name"),
     billingLastName: text("billing_last_name"),
     billingAddress1: text("billing_address_1"),
@@ -113,9 +131,11 @@ export const TB_domainPurchaseDetails = createTable(
     billingCountry: text("billing_country"),
     billingEmailAddress: text("billing_email_address"),
     billingPhoneCountryCode: text("billing_phone_country_code"),
-    billingPhoneNumber:text("billing_phone_number")
+    billingPhoneNumber: text("billing_phone_number"),
   },
 );
+
+// export const TB_;
 
 export const TB_sessions = createTable("sessions", {
   id: text("id").primaryKey(),
@@ -351,8 +371,8 @@ export const TB_domain = createTable("domain", {
     .references(() => TB_users.id)
     .notNull(),
   purchasedAt: timestamp("purchased_at").defaultNow().notNull(),
-  price: integer("price").notNull(),
 });
+export type DomainSelectType = typeof TB_domain.$inferSelect;
 
 export const TB_cart = createTable("cart", {
   id: serial("id").primaryKey(),
@@ -381,3 +401,4 @@ export type SequenceStep = typeof TB_sequence_steps.$inferSelect;
 export type SequenceBreak = typeof TB_sequence_breaks.$inferSelect;
 export type SelectContact = typeof TB_contacts.$inferSelect;
 export type InsertContact = typeof TB_contacts.$inferInsert;
+// purchaseDomain

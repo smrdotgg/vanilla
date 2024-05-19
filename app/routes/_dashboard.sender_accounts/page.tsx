@@ -1,8 +1,4 @@
-import {
-  Link,
-  useLoaderData,
-  useRevalidator,
-} from "@remix-run/react";
+import { Link, useLoaderData, useRevalidator } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { loader } from "./route";
@@ -44,7 +40,7 @@ export function Page() {
         />
         <div className="pt-6"></div>
         {data.googleUserInfos.map((d, i) => (
-          <EmailCell {...d} index={i} />
+          <EmailCell key={i} {...d} />
         ))}
         <div className="flex flex-col gap-2">
           {data.senderAccounts
@@ -55,7 +51,7 @@ export function Page() {
             )
             .map((senderAcc, i) => (
               <div
-                index={i}
+                key={i}
                 className=" flex cursor-pointer justify-between p-2 px-6 *:my-auto hover:bg-secondary"
               >
                 <div className="">
@@ -88,26 +84,3 @@ function EmailCell(props: { name: string; email: string; profilePic: string }) {
   );
 }
 
-function AddAccountButton() {
-  const baseUri = "https://accounts.google.com/o/oauth2/auth";
-  const scopes = [
-    "https://www.googleapis.com/auth/userinfo.email",
-    "https://www.googleapis.com/auth/userinfo.profile",
-    "https://www.googleapis.com/auth/gmail.send",
-  ];
-  const uriSearchParams = new URLSearchParams({
-    response_type: "code",
-    client_id:
-      "271133683810-5o7hj207b74ck9l5sj490ervlvrp0q85.apps.googleusercontent.com",
-    redirect_uri: "http://localhost:3000/sender_accounts",
-    access_type: "offline",
-    prompt: "consent",
-    scope: scopes.join(" "),
-  });
-  const fullUri = `${baseUri}?${uriSearchParams.toString()}`;
-  return (
-    <Button asChild>
-      <Link to={fullUri}>Add Account</Link>
-    </Button>
-  );
-}

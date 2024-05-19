@@ -1,4 +1,5 @@
 import { Form, Link, NavLink } from "@remix-run/react";
+import { RxBorderSplit } from "react-icons/rx";
 import { MdHttp } from "react-icons/md";
 import { GrInProgress } from "react-icons/gr";
 import { FaHome } from "react-icons/fa";
@@ -13,6 +14,7 @@ import { Theme, useTheme } from "remix-themes";
 import downloadsvg from "./download.svg";
 import { Button } from "../ui/button";
 import { TbWorld } from "react-icons/tb";
+// import { BorderSplitIcon } from "@radix-ui/react-icons";
 
 type dashRoute =
   | "/home"
@@ -20,7 +22,8 @@ type dashRoute =
   | "/contacts"
   | "/campaigns"
   | "/sender_accounts"
-  | "/domains";
+  | "/domains"
+  | "/splitboxes";
 
 const elements: { route: dashRoute; name: string; icon: IconType }[] = [
   {
@@ -52,6 +55,11 @@ const elements: { route: dashRoute; name: string; icon: IconType }[] = [
     route: "/domains",
     name: "Domains",
     icon: TbWorld,
+  },
+  {
+    route: "/splitboxes",
+    name: "Splitboxes",
+    icon: RxBorderSplit,
   },
 ];
 
@@ -105,7 +113,6 @@ export function DashLayout({
             {elements.map((e, i) => (
               <NavLink
                 key={i}
-                index={i}
                 prefetch="intent"
                 className={({ isActive, isPending }) => {
                   if (isPending && loading != e.route) setLoading(e.route);

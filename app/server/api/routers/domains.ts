@@ -11,6 +11,7 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
+import { DomainService } from "~/services/domain.server";
 
 export const domainsRouter = createTRPCRouter({
   setDomainUserInfo: protectedProcedure
@@ -28,7 +29,15 @@ export const domainsRouter = createTRPCRouter({
           set: newVals,
         });
     }),
-
+  purchaseDomain: protectedProcedure
+    .input(z.object({ domainName: z.string(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.id !== input.userId) throw Error();
+      return await DomainService.purchaseDomain({
+        userId: input.userId,
+        domainName: input.domainName,
+      });
+    }),
   getContacts: publicProcedure
     .input(z.object({ cursor: z.number().default(1) }))
     .query(async ({ input, ctx }) => {
