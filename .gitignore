@@ -9,3 +9,6 @@ bun.lockb
 
 cron/test.ts
 .vercel/
+
+*.sqlite
+plans/
