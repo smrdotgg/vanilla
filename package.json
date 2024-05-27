@@ -76,7 +76,6 @@
     "lucide-react": "^0.344.0",
     "mel-spintax": "^1.0.4",
     "node-cron": "^3.0.3",
-    "node-jq": "^4.3.2",
     "node-spintax": "^1.0.4",
     "nodemailer": "^6.9.12",
     "oslo": "^1.2.0",
