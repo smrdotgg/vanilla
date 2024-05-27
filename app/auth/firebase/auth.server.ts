@@ -32,7 +32,7 @@ const { getSession, commitSession, destroySession } =
       path: "/",
       sameSite: "lax",
       secrets: ["f3cr@z7"],
-      secure: true,
+      secure: false,
     },
   });
 
