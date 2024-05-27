@@ -22,7 +22,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
           cd ${{ secrets.VPS_PATH }}
-          # ~/.local/share/fnm/fnm use 20
+          /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm use 20
           # Find and kill the process running npm start
           pkill -f "npm run start"
           git pull origin main
