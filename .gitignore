@@ -1,0 +1,14 @@
+node_modules
+
+/.cache
+/build
+/public/build
+.env*
+
+bun.lockb
+
+cron/test.ts
+.vercel/
+
+*.sqlite
+plans/
