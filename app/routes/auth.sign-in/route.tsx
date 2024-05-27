@@ -167,7 +167,7 @@ const signInCallback = async ({
               )}
             />
             <div>
-              <Link to="/auth/sign-in">Sign up</Link>
+              <Link to="/auth/sign-up">Sign up</Link>
             </div>
             <Button disabled={loading} type="submit">
               {loading ? "Signing in..." : "Sign in"}

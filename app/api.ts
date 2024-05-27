@@ -5,7 +5,7 @@ import { config } from "dotenv";
 const isServer = typeof process !== "undefined";
 
 if (typeof process !== "undefined") {
-  config();
+  // config();
 }
 
 export const env = createEnv({
@@ -27,7 +27,6 @@ export const env = createEnv({
     NAMECHEAP_API_KEY: z.string(),
     NAMECHEAP_API_URL: z.string().url(),
     NAMECHEAP_API_USERNAME: z.string(),
-
 
     FIREBASE_TYPE: z.string(),
     FIREBASE_PROJECT_ID: z.string(),
@@ -66,6 +65,13 @@ export const env = createEnv({
   client: {
     // url
     PUBLIC_URL: z.string().url(),
+    PUBLIC_FIREBASE_APIKEY: z.string(),
+    PUBLIC_FIREBASE_AUTH_DOMAIN: z.string(),
+    PUBLIC_FIREBASE_PROEJCT_ID: z.string(),
+    PUBLIC_FIREBASE_STORAGE_BUCKET: z.string(),
+    PUBLIC_FIREBASE_APP_ID: z.string(),
+    PUBLIC_FIREBASE_MEASUREMENT_ID: z.string(),
+    PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string(),
   },
 
   /**
