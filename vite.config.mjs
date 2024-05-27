@@ -17,7 +17,7 @@ export default defineConfig({
       // },
       presets: env.VERCEL_URL ? [vercelPreset()] : [],
     }),
-    tsconfigPaths({loose: true}),
+    tsconfigPaths({loose: true, root: "."}),
   ],
   envPrefix: "PUBLIC_",
   optimizeDeps: {
