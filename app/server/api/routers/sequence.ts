@@ -1,12 +1,15 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { SequenceStepTextFormatTypes, TB_sequence_steps } from "~/db/schema.server";
+import {
+  SequenceStepTextFormatTypes,
+  TB_sequence_steps,
+} from "~/db/schema.server";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const sequenceRouter = createTRPCRouter({
   updateTitle: publicProcedure
-    .input(z.object({ title: z.string(), id: z.number() }))
+    .input(z.object({ title: z.string(), id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(TB_sequence_steps)
@@ -14,7 +17,13 @@ export const sequenceRouter = createTRPCRouter({
         .where(eq(TB_sequence_steps.id, input.id));
     }),
   updateContent: publicProcedure
-    .input(z.object({ content: z.string(), id: z.number(), type: z.enum(SequenceStepTextFormatTypes)  }))
+    .input(
+      z.object({
+        content: z.string(),
+        id: z.string(),
+        type: z.enum(SequenceStepTextFormatTypes),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(TB_sequence_steps)

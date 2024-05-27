@@ -26,7 +26,7 @@ export const parsePurchaseResponse = async (bodyText: string) => {
   const errorsObject = (successJson["ApiResponse"]["children"] as any[]).find(
     (o) => Object.hasOwn(o, "Errors"),
   );
-  if (Object.keys(errorsObject).length !== 0) throw Error("Got and error from Namecheap API "+ JSON.stringify(errorsObject));
+  if (Object.keys(errorsObject["Errors"]).length !== 0) throw Error("Got and error from Namecheap API "+ JSON.stringify(errorsObject));
 
   const dataObject: {
     Domain: string;

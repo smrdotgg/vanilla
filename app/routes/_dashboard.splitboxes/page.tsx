@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import { loader } from "./route";
 
 export const Page = () => {
-  const x = useLoaderData<typeof loader>();
+  const {splitboxes} = useLoaderData<typeof loader>();
 
   return (
     <div>
@@ -11,18 +11,14 @@ export const Page = () => {
         <Button asChild>
           <Link to="/splitboxes/new">New Splitbox</Link>
         </Button>
-          <p>
-          {JSON.stringify(x)}
-          </p>
       </div>
       <h1>Splitboxes</h1>
-      <div>
-        {/* {splitboxes.map((splitbox) => ( */}
-        {/*   <div key={splitbox.id}> */}
-        {/*     <Link to={`/splitboxes/${splitbox.id}`}>{splitbox.name}</Link> */}
-        {/*   </div> */}
-        {/* ))} */}
-        <div></div>
+      <div className="flex flex-col gap-2 px-4 *:rounded *:p-2">
+        {splitboxes.map((splitbox) => (
+          <div key={splitbox.id} className="dark:bg-gray-800 bg-gray-200">
+            <Link to={`/splitboxes/${splitbox.id}`}>{splitbox.name}</Link>
+          </div>
+        ))}
       </div>
     </div>
   );

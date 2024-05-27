@@ -1,69 +1,190 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
-import { Form, Link, useActionData } from "@remix-run/react";
-import { eq } from "drizzle-orm";
-import { Scrypt } from "lucia";
+import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { useFetcher, Link, useActionData } from "@remix-run/react";
 import { z } from "zod";
-import { lucia } from "~/auth/lucia.server";
-import { ContinueWithGoogleButton } from "~/components/auth/google";
 import { Button } from "~/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { db } from "~/db/index.server";
-import { TB_users } from "~/db/schema.server";
+import {
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import { auth } from "~/auth/firebase/auth";
+import { sessionLogin, validateSession } from "~/auth/firebase/auth.server";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { HOME_ROUTE } from "~/auth/contants";
+
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const sessionData = await validateSession(request);
+  if (sessionData !== undefined) redirect(HOME_ROUTE);
+  return null;
+};
+
+
+export function ContinueWithGoogleButton() {
+  const fetcher = useFetcher();
+
+  const signInWithGoogle = async () => {
+    console.log("Signing out before Google sign-in...");
+    await signOut(auth);
+    console.log("Sign-out successful. Initiating Google sign-in...");
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then(async (res) => {
+        console.log("Google sign-in successful. Getting ID token...");
+        const idToken = await res.user.getIdToken();
+        console.log("ID token retrieved. Submitting to fetcher...");
+        fetcher.submit(
+          { idToken: idToken, "google-login": true },
+          { method: "post" },
+        );
+      })
+      .catch((err) => {
+        console.error("Error during Google sign-in:", err);
+      });
+  };
+
+  return (
+    <button
+      className="ui button"
+      type="button"
+      onClick={() => signInWithGoogle()}
+    >
+      <i className="icon google"></i>
+      Login with Google
+    </button>
+  );
+}
+
+
+const formSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
 
 export default function Page() {
+  const fetcher = useFetcher();
+  const [errorState, setErrorState] = useState("");
+  const actionResult = useActionData<typeof action>();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+  const [loading, setLoading] = useState(false);
+
+  const error = errorState.length
+    ? errorState
+    : Number(actionResult?.error.length)
+      ? actionResult?.error
+      : undefined;
+
+  const signInCallback = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
+    setLoading(true);
+    try {
+      await signOut(auth);
+      const { user, providerId, operationType } =
+        await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await user.getIdToken();
+      fetcher.submit(
+        { idToken: idToken, "google-login": false },
+        { method: "post" },
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      setLoading(false);
+      const errorCode = String(e.code);
+      if (errorCode.includes("network")) {
+        setErrorState("Network error. Please try again.");
+      } else if (errorCode.includes("auth")) {
+        setErrorState("Incorrect email or password");
+      } else {
+        setErrorState("Unknown error occured");
+      }
+    }
+  };
+
   return (
     <div className="flex h-screen *:m-auto">
-      <div className="w-96 flex flex-col gap-3 align-bottom">
+      <div className="flex w-96 flex-col gap-3 align-bottom">
         <h1>Sign In Form</h1>
-        <Form method="post" className="flex flex-col gap-3 align-bottom">
-          <Input name="email" type="email" placeholder="email" />
-          <Input name="password" type="password" placeholder="password" />
-          <Button type="submit">Submit</Button>
+
+        <Form {...form}>
+          <form
+            onChange={() => console.log(form.getValues())}
+            onSubmit={form.handleSubmit(signInCallback)}
+            className="space-y-8"
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>Your email.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>Your account password.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div>
+              <Link to="/auth/sign-in">Sign up</Link>
+            </div>
+            <Button disabled={loading} type="submit">
+              {loading ? "Signing in..." : "Sign in"}
+            </Button>
+            <p className="text-red-400">{error ?? <>&nbsp;</>}</p>
+          </form>
         </Form>
-        <Link to="/auth/sign-up">
-          Sign Up
-        </Link>
         <ContinueWithGoogleButton />
       </div>
     </div>
   );
 }
 
-const authZod = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
 
-export const action = async (args: ActionFunctionArgs) => {
-  const formData = await args.request.formData();
-  const formEmail = String(formData.get("email"));
-  const formPassword = String(formData.get("password"));
-  const { password, email } = authZod.parse({
-    email: formEmail,
-    password: formPassword,
-  });
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
 
-  const user = await db
-    .select()
-    .from(TB_users)
-    .where(eq(TB_users.email, email));
-
-  if (user.length === 0) throw new Error();
-
-  if (user[0].password === null) throw new Error();
-
-  const passwordIsCorrect = await new Scrypt().verify(
-    user[0].password,
-    password,
-  );
-  if (!passwordIsCorrect) throw new Error();
-
-  const newSession = await lucia.createSession(user[0].id, {});
-  const newSessionCookie = lucia.createSessionCookie(newSession.id);
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": newSessionCookie.serialize(),
-    },
-  });
+  try {
+    return await sessionLogin({
+      request,
+      idToken: String(formData.get("idToken")),
+      redirectTo: "/home",
+    });
+  } catch (error) {
+    return { error: String(error) };
+  }
 };
-

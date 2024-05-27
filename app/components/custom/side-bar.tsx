@@ -10,10 +10,10 @@ import { IoPersonSharp, IoSettingsSharp } from "react-icons/io5";
 import type { IconType } from "react-icons/lib";
 import { ModeToggle } from "../ui/mode-toggle";
 import { ReactNode, useState } from "react";
-import { Theme, useTheme } from "remix-themes";
 import downloadsvg from "./download.svg";
 import { Button } from "../ui/button";
 import { TbWorld } from "react-icons/tb";
+import { useTheme } from "remix-themes";
 // import { BorderSplitIcon } from "@radix-ui/react-icons";
 
 type dashRoute =
@@ -76,12 +76,12 @@ export function DashLayout({
   let loading = "";
   const setLoading = (x: string) => {};
 
-  const [theme] = useTheme();
+  const [ theme, setTheme ] = useTheme();
   return (
     <div className=" max-w-screen min-w-screen flex max-h-screen min-h-screen ">
       {loading === "" ? (
         <></>
-      ) : theme === Theme.DARK ? (
+      ) : theme === "dark" ? (
         <img
           src="/loading-dark.svg"
           className="absolute left-1/2 top-10 h-10 -translate-x-1/2"
@@ -156,6 +156,3 @@ export function DashLayout({
     </div>
   );
 }
-// <div className="h-14 px-2 w-full  flex justify-end bg-primary dark:bg-secondary *:my-auto">
-//   <ThemeToggle />
-// </div>

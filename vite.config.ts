@@ -12,12 +12,15 @@ installGlobals();
 export default defineConfig({
   plugins: [
     remix({
+      // future: {
+      //   unstable_singleFetch: true,
+      // },
       presets: env.VERCEL_URL ? [vercelPreset()] : [],
     }),
     tsconfigPaths(),
   ],
   envPrefix: "PUBLIC_",
   optimizeDeps: {
-    exclude: ["oslo"],
+    exclude: ["oslo", "firebase-admin"],
   },
 });

@@ -133,6 +133,7 @@ export function DomainUserInfoForm({
 
   return (
     <>
+      {JSON.stringify(initialData)}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

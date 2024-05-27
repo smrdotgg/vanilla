@@ -1,69 +1,156 @@
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData } from "@remix-run/react";
-import { Scrypt, generateId } from "lucia";
+import {
+  redirect,
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
+import { Link, useActionData, useFetcher, useSubmit } from "@remix-run/react";
 import { z } from "zod";
-import { lucia } from "~/auth/lucia.server";
-import { ContinueWithGoogleButton } from "~/components/auth/google";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { db } from "~/db/index.server";
-import { TB_users } from "~/db/schema.server";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { signOut, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "~/auth/firebase/auth";
+import { sessionLogin, validateSession } from "~/auth/firebase/auth.server";
+import { HOME_ROUTE } from "~/auth/contants";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const sessionData = await validateSession(request);
+  if (sessionData !== undefined) redirect(HOME_ROUTE);
+  return null;
+};
 
 export default function Page() {
+  const fetcher = useFetcher();
+  const [errorState, setErrorState] = useState("");
   const actionResult = useActionData<typeof action>();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+  const error = errorState.length ? errorState : actionResult?.error;
+
+  const signUpWithEmailAndPassword = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
+    try {
+      await signOut(auth);
+      const { user, providerId, operationType } =
+        await createUserWithEmailAndPassword(auth, email, password);
+      const idToken = await user.getIdToken();
+      fetcher.submit(
+        { idToken: idToken, "google-login": false },
+        { method: "post" },
+      );
+    } catch (e) {
+      setErrorState(String(e));
+    }
+  };
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    signUpWithEmailAndPassword(values);
+  }
+
   return (
     <div className="flex h-screen *:m-auto">
       <div className="flex w-96 flex-col gap-3 align-bottom">
         <h1>Sign Up Form</h1>
-        <Form method="post" className="flex flex-col gap-3 align-bottom">
-          <Input
-            name="email"
-            type="email"
-            placeholder="email"
-          />
-          <Input
-            name="password"
-            type="password"
-            placeholder="password"
-          />
-          <Button type="submit">Submit</Button>
+        <Form {...form}>
+          <form
+            onChange={() => console.log(form.getValues())}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8"
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>Your email.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>Your account password.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Confirm your account password
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div>
+              <Link to="/auth/sign-in">Sign in</Link>
+            </div>
+            <Button type="submit">Submit</Button>
+            <p className="text-red-400">{error ?? <>&nbsp;</>}</p>
+          </form>
         </Form>
-        <Link to="/auth/sign-in">Sign in</Link>
-        <ContinueWithGoogleButton />
-        <p className="text-red-400">{actionResult?.error ?? ""}</p>
       </div>
     </div>
   );
 }
 
-const authZod = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
-
-export async function action(args: ActionFunctionArgs) {
-  const formData = await args.request.formData();
-  const formEmail = String(formData.get("email"));
-  const formPassword = String(formData.get("password"));
-  const { password, email } = authZod.parse({
-    email: formEmail,
-    password: formPassword,
+const formSchema = z
+  .object({
+    email: z.string().email(),
+    password: z.string().min(8),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
   });
 
-  const newId = generateId(20);
-  const hashedPassword = await new Scrypt().hash(password);
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
   try {
-    await db
-      .insert(TB_users)
-      .values({ email: email, password: hashedPassword, id: newId });
-  } catch (errors) {
-    return json({ ok: false, error: "Email is already registered" }, 400);
+    return await sessionLogin({
+      request,
+      idToken: String(formData.get("idToken")),
+      redirectTo: "/home",
+    });
+  } catch (error) {
+    console.error("Error in action:", error);
+    return { error: String(error) };
   }
-  const newSession = await lucia.createSession(newId, {});
-  const newSessionCookie = lucia.createSessionCookie(newSession.id);
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": newSessionCookie.serialize(),
-    },
-  });
-}
+};

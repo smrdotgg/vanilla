@@ -5,7 +5,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const contactsRouter = createTRPCRouter({
   setDeadline: publicProcedure
-    .input(z.object({ campaignId: z.number(), deadline: z.date() }))
+    .input(z.object({ campaignId: z.string(), deadline: z.date() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(TB_campaigns)
@@ -40,7 +40,7 @@ export const contactsRouter = createTRPCRouter({
     .input(
       z.object({
         mode: z.enum(["all", "none"]),
-        exceptions: z.number().array(),
+        exceptions: z.string().array(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

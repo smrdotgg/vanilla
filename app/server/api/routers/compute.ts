@@ -17,13 +17,14 @@ export const computeRouter = createTRPCRouter({
   createSplitbox: protectedProcedure
     .input(z.object({ name: z.string(), id: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      ctx.session;
       const data = await ComputeManager.createVPSInstance();
       const newSplitBox = await ctx.db
         .insert(TB_splitboxes)
         .values({
           id: input.id,
           name: input.name,
-          userId: ctx.session.user.id,
+          userId: ctx.session.uid,
           computeIdOnHostingPlatform: data.id,
         });
       return newSplitBox;
@@ -33,7 +34,7 @@ export const computeRouter = createTRPCRouter({
     .input(
       z.object({
         content: z.string(),
-        id: z.number(),
+        id: z.string(),
         type: z.enum(SequenceStepTextFormatTypes),
       }),
     )

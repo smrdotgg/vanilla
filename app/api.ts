@@ -10,6 +10,11 @@ if (typeof process !== "undefined") {
 
 export const env = createEnv({
   server: {
+    DEBUG_LOGS: z.coerce.boolean().nullish(),
+    MIGRATIONS_FOLDER: z.string(),
+
+    BACKEND_URI: z.string(),
+    BACKEND_PORT: z.coerce.number(),
     SQLITE_URL: z.string(),
     SQLITE_AUTHKEY: z.string().nullish(),
     CLIENT_IP: z.string(),
@@ -22,6 +27,20 @@ export const env = createEnv({
     NAMECHEAP_API_KEY: z.string(),
     NAMECHEAP_API_URL: z.string().url(),
     NAMECHEAP_API_USERNAME: z.string(),
+
+
+    FIREBASE_TYPE: z.string(),
+    FIREBASE_PROJECT_ID: z.string(),
+    FIREBASE_PRIVATE_KEY_ID: z.string(),
+    FIREBASE_PRIVATE_KEY: z.string(),
+    FIREBASE_CLIENT_EMAIL: z.string(),
+    FIREBASE_CLIENT_ID: z.string(),
+    FIREBASE_AUTH_URI: z.string(),
+    FIREBASE_TOKEN_URI: z.string(),
+    FIREBASE_AUTH_PROVIDER_CERT_URL: z.string(),
+    FIREBASE_CLIENT_CERT_URL: z.string(),
+    FIREBASE_UNIVERSAL_DOMAIN: z.string(),
+
     // pg
     POSTGRES_USER: z.string(),
     POSTGRES_PASSWORD: z.string(),
@@ -70,5 +89,3 @@ export const env = createEnv({
    */
   emptyStringAsUndefined: true,
 });
-console.log(env.SQLITE_URL);
-console.log(env.SQLITE_AUTHKEY);

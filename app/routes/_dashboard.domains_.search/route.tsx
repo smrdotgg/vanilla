@@ -1,12 +1,8 @@
-import {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  defer,
-} from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs, defer } from "@remix-run/node";
 import { Page } from "./page";
 import { INTENTS } from "./types";
-import { getCookieSessionOrThrow } from "~/server/auth.server";
-import { getData, getDomainToPriceMap, } from "./helpers.server";
+import { getData, getDomainToPriceMap } from "./helpers.server";
+import { validateSessionAndRedirectIfInvalid } from "~/auth/firebase/auth.server";
 
 type LoaderResponse = {
   results: ReturnType<typeof getData>;
@@ -20,8 +16,7 @@ const globalForDb = globalThis as unknown as {
   conn: { [key: string]: LoaderResponse } | undefined;
 };
 
-let cache = globalForDb.conn ?? {};
-
+const cache = globalForDb.conn ?? {};
 
 export const loader = (args: LoaderFunctionArgs) => {
   const queryFormData = new URL(args.request.url).searchParams.get("query");
@@ -31,9 +26,9 @@ export const loader = (args: LoaderFunctionArgs) => {
   } else {
     query = String(queryFormData);
   }
-  if (cache[query] !== undefined) {
-    return defer({ ...cache[query]! });
-  }
+  // if (cache[query] !== undefined) {
+  //   return defer({ ...cache[query]! });
+  // }
   const results = getData(args.request);
   const domains = results.then((results) =>
     results?.CommandResponse?.DomainCheckResults.map((d) => d.Domain),
@@ -55,9 +50,10 @@ export const loader = (args: LoaderFunctionArgs) => {
 };
 
 export { Page as default };
-export const action = async (args: ActionFunctionArgs) => {
-  const user = await getCookieSessionOrThrow(args.request);
-  const formData = await args.request.formData();
+export const action = async ({ request }: ActionFunctionArgs) => {
+  await validateSessionAndRedirectIfInvalid(request);
+
+  const formData = await request.formData();
   const intent = String(formData.get("intent"));
   if (intent === INTENTS.search) {
     const query = String(formData.get("query"));

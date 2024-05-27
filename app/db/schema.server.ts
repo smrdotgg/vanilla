@@ -1,6 +1,7 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
+import { rword } from "rword";
 import { sql } from "drizzle-orm";
 import {
   index,
@@ -17,7 +18,9 @@ import {
 
   // pgEnum,
 } from "drizzle-orm/sqlite-core";
+import { createId } from "@paralleldrive/cuid2";
 import { number } from "zod";
+import { db } from "./index.server";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -26,33 +29,21 @@ import { number } from "zod";
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 export const createTable = sqliteTableCreator((name) => `${name}`);
+const drizzleDate = (name: string) => integer(name, { mode: "timestamp_ms" });
 
 // export const TB_oath_ids = pgEnum("oauth_ids", ["google"]);
 const TB_oath_ids = text("oauth_ids", { enum: ["google"] });
 
-// export const TB_oauth_users = createTable(
-//   "oauth_user",
-//   {
-//     providerId: TB_oath_ids("provider_id").notNull(),
-//     providerUserId: text("provider_user_id").notNull(),
-//     userId: text("user_id")
-//       .notNull()
-//       .references(() => TB_users.id),
-//   },
-//   (table) => ({
-//     unq: primaryKey({ columns: [table.providerId, table.providerUserId] }),
-//   }),
-// );
-//
-// export const TB_splitbox_setup_state = pgEnum("splitbox_setup_state", [
-//   "pending",
-//   "ready",
-//   "error"
-// ]);
-
 export const TB_splitboxes = createTable("splitbox", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
-  name: text("name").notNull(),
+  id: text("id").$defaultFn(createId).primaryKey(),
+  name: text("name")
+    .notNull()
+    .$defaultFn(() => {
+      const first = rword.generate(1, { contains: ".*ed" });
+      const second = rword.generate(1, { contains: ".*ing" });
+      const last = rword.generate(1, { contains: "^(?!.*\b(?:ing|ed)\b).+$" });
+      return `${first}-${second}-${last}`;
+    }),
   computeIdOnHostingPlatform: text("compute_id_on_hosting_platform")
     .unique()
     .notNull(),
@@ -60,11 +51,22 @@ export const TB_splitboxes = createTable("splitbox", {
   userId: text("user_id")
     .references(() => TB_users.id)
     .notNull(),
-  // state: TB_splitbox_setup_state("state").notNull().default("pending"),
+});
+
+const randomUUID = () => {
+  return crypto.randomUUID();
+};
+
+export const TB_contabo_token = createTable("contabo_token", {
+  id: text("id").$defaultFn(createId).primaryKey(),
+  token: text("token").notNull(),
+  expiresAt: drizzleDate("expires_at").notNull(),
+  refreshToken: text("refresh_token").notNull(),
+  refreshTokenExpiresAt: drizzleDate("refresh_token_expires_at").notNull(),
 });
 
 export const TB_users = createTable("user", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   email: text("email").unique().notNull(),
   emailVerified: integer("email_verified", { mode: "boolean" })
     .default(false)
@@ -80,7 +82,7 @@ export type DomainPurchaseDetailsSelect =
 export const TB_domainPurchaseDetails = createTable(
   "domain_purchase_form_info",
   {
-    id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+    id: text("id").$defaultFn(createId).primaryKey(),
     userId: text("user_id")
       .notNull()
       .unique()
@@ -135,21 +137,17 @@ export const TB_domainPurchaseDetails = createTable(
 // export const TB_;
 
 export const TB_sessions = createTable("sessions", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => TB_users.id),
   expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
-  // expiresAt: timestamp("expires_at", {
-  //   withTimezone: true,
-  //   mode: "date",
-  // }).notNull(),
 });
 
 export const TB_posts = createTable(
   "post",
   {
-    id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+    id: text("id").$defaultFn(createId).primaryKey(),
     name: text("name").notNull(),
 
     createdAt: integer("created_at", { mode: "timestamp_ms" }),
@@ -160,25 +158,31 @@ export const TB_posts = createTable(
   }),
 );
 
-const drizzleDate = (name: string) => integer(name, { mode: "timestamp_ms" });
-
 const drizzleDateWithDefault = (name: string) =>
   integer(name, { mode: "timestamp_ms" }).default(
     sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
   );
 
 export const TB_campaigns = createTable("campaign", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   name: text("name", { length: 256 }),
 
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => {
+      return sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
+    }),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => {
+      return sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
+    }),
   deadline: drizzleDateWithDefault("deadline"),
-  sequence: text("sequence"),
+  sequence: text("sequence").references(() => TB_users.id),
 });
 
 export const TB_google_tokens = createTable("google_tokens", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   googleId: text("google_id").notNull().unique(),
   accessToken: text("access_token").notNull(),
   expiresIn: drizzleDate("expires_in").notNull(),
@@ -189,7 +193,7 @@ export const TB_google_tokens = createTable("google_tokens", {
 });
 
 export const TB_sender_emails = createTable("sender_email", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
 
   fromName: text("from_name").notNull(),
   fromEmail: text("from_email").notNull(),
@@ -208,7 +212,7 @@ export const TB_sender_emails = createTable("sender_email", {
 });
 
 export const TB_google_user_info = createTable("google_user_info", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   email: text("email").notNull().unique(),
   googleId: text("google_id").notNull().unique(),
   verifiedEmail: integer("verified_email").notNull(),
@@ -222,10 +226,10 @@ export const TB_google_user_info = createTable("google_user_info", {
 export const TB_google_campaign_bridge = createTable(
   "campaign_google_email_link",
   {
-    campaignId: integer("campaign_id")
+    campaignId: text("campaign_id")
       .references(() => TB_campaigns.id)
       .notNull(),
-    googleUserId: integer("google_user_id")
+    googleUserId: text("google_user_id")
       .references(() => TB_google_user_info.id)
       .notNull(),
   },
@@ -234,10 +238,10 @@ export const TB_google_campaign_bridge = createTable(
 export const TB_campaign_sender_email_link = createTable(
   "campaign_sender_email_link",
   {
-    campaignId: integer("campaign_id")
+    campaignId: text("campaign_id")
       .references(() => TB_campaigns.id)
       .notNull(),
-    senderEmailId: integer("sender_email_id")
+    senderEmailId: text("sender_email_id")
       .references(() => TB_sender_emails.id, { onDelete: "cascade" })
       .notNull(),
   },
@@ -246,39 +250,24 @@ export const TB_campaign_sender_email_link = createTable(
   }),
 );
 
-// export const TB_oath_ids = pgEnum("oauth_ids", ["google"]);
-// const TB_oath_ids = text("oauth_ids", { enum: ["google"] });
-// export const TB_sequence_step_state = pgEnum("sequence_step_state", [
-//   "sent",
-//   "waiting",
-//   "bounced",
-// ]);
-
-// switching to sqlite
 export const TB_sequence_step_state = text("sequence_step_state", {
   enum: ["sent", "waiting", "bounced"],
 });
 
 export const SequenceStepTextFormatTypes = ["html", "plain"] as const;
 
-// switching to sqlite
-// export const TB_sequence_step_text_format = pgEnum(
-//   "sequence_step_text_format",
-//   SequenceStepTextFormatTypes,
-// );
-// export const OrderMethod = strEnum(orderMethodEnum.enumValues);
 export const TB_sequence_step_text_format = text("sequence_step_text_format", {
   enum: SequenceStepTextFormatTypes,
 });
 
 export const TB_sequence_steps = createTable("sequence_step", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   title: text("title"),
   content: text("content"),
   index: integer("index").notNull(),
   createdAt: drizzleDateWithDefault("created_at").notNull(),
   updatedAt: drizzleDate("updated_at").notNull(),
-  campaignId: integer("campaign_id")
+  campaignId: text("campaign_id")
     .references(() => TB_campaigns.id)
     .notNull(),
   state: text("state", {
@@ -294,15 +283,15 @@ export const TB_sequence_steps = createTable("sequence_step", {
 });
 
 export const TB_sequence_breaks = createTable("sequence_break", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   lengthInHours: integer("length_in_hours").notNull(),
   index: integer("index").notNull(),
-  campaignId: integer("campaign_id").references(() => TB_campaigns.id),
+  campaignId: text("campaign_id").references(() => TB_campaigns.id),
 });
 
 export const TB_analytic_settings = createTable("analytic_settings", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
-  campaignId: integer("campaign_id")
+  id: text("id").$defaultFn(createId).primaryKey(),
+  campaignId: text("campaign_id")
     .references(() => TB_campaigns.id)
     .unique(),
 
@@ -317,7 +306,7 @@ export const TB_analytic_settings = createTable("analytic_settings", {
 });
 
 export const TB_contacts = createTable("contact", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   companyName: text("company_name"),
@@ -327,13 +316,13 @@ export const TB_contacts = createTable("contact", {
 export const TB_binding_campaigns_contacts = createTable(
   "campaigns_contacts",
   {
-    campaignId: integer("campaign")
+    campaignId: text("campaign")
       .notNull()
       .references(() => TB_campaigns.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    contactId: integer("contact")
+    contactId: text("contact")
       .notNull()
       .references(() => TB_contacts.id, {
         onDelete: "cascade",
@@ -346,22 +335,22 @@ export const TB_binding_campaigns_contacts = createTable(
 );
 
 export const TB_email_bounce_event = createTable("email_bounce_event", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   targetEmail: text("target_email").notNull(),
-  sequenceStepId: integer("sequence_step_id").references(
+  sequenceStepId: text("sequence_step_id").references(
     () => TB_sequence_steps.id,
   ),
   createdAt: drizzleDateWithDefault("created_at").notNull(),
+  name: text("name").notNull(),
+  sec: text("sec").notNull(),
 });
 
 export const TB_email_open_event = createTable(
   "email_open_event",
   {
-    id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+    id: text("id").$defaultFn(createId).primaryKey(),
     targetEmail: text("target_email").notNull(),
-    sequenceStepId: integer("sequence_id").references(
-      () => TB_sequence_steps.id,
-    ),
+    sequenceStepId: text("sequence_id").references(() => TB_sequence_steps.id),
     createdAt: drizzleDateWithDefault("created_at").notNull(),
   },
   (t) => ({
@@ -372,10 +361,10 @@ export const TB_email_open_event = createTable(
 export const TB_email_opt_out_event = createTable(
   "email_opt_out_event",
   {
-    id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+    id: text("id").$defaultFn(createId).primaryKey(),
     targetEmail: text("target_email").notNull(),
     createdAt: drizzleDateWithDefault("created_at").notNull(),
-    campaignId: integer("campaign_id")
+    campaignId: text("campaign_id")
       .references(() => TB_campaigns.id)
       .notNull(),
   },
@@ -385,25 +374,26 @@ export const TB_email_opt_out_event = createTable(
 );
 
 export const TB_email_link_click_event = createTable("email_link_click_event", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   targetEmail: text("target_email").notNull(),
-  sequenceStepId: integer("sequence_id").references(() => TB_sequence_steps.id),
+  sequenceStepId: text("sequence_id").references(() => TB_sequence_steps.id),
   link: text("link").notNull(),
   createdAt: drizzleDateWithDefault("created_at").notNull(),
 });
 
 export const TB_domain = createTable("domain", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   name: text("name").unique(),
   ownerUser: text("user_id")
     .references(() => TB_users.id)
     .notNull(),
   purchasedAt: drizzleDateWithDefault("purchased_at").notNull(),
+  splitboxId: text("splitbox_id").references(() => TB_splitboxes.id),
 });
 export type DomainSelectType = typeof TB_domain.$inferSelect;
 
 export const TB_cart = createTable("cart", {
-  id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
+  id: text("id").$defaultFn(createId).primaryKey(),
   user: text("user_id")
     .references(() => TB_users.id)
     .notNull()
@@ -413,8 +403,8 @@ export const TB_cart = createTable("cart", {
 export const TB_cart_item = createTable(
   "cart_item",
   {
-    id: text("id").$defaultFn(crypto.randomUUID).primaryKey(),
-    cart: integer("cart_id")
+    id: text("id").$defaultFn(createId).primaryKey(),
+    cart: text("cart_id")
       .references(() => TB_cart.id)
       .notNull(),
     name: text("name"),

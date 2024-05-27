@@ -37,7 +37,7 @@ export default function Page() {
                 {(data) =>
                   data.domains.map((domain, index) => (
                     <div
-                      index={index}
+                      key={index}
                       className="flex justify-between gap-1 rounded border bg-secondary px-4 py-5 align-top *:my-auto "
                     >
                       <div className="flex flex-col ">

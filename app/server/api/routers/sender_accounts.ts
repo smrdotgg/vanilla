@@ -11,7 +11,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const senderAccountsRouter = createTRPCRouter({
   setSelected: publicProcedure
-    .input(z.object({ campaignId: z.number(), ids: z.number().array() }))
+    .input(z.object({ campaignId: z.string(), ids: z.string().array() }))
     .mutation(async ({ ctx, input }) => {
       const db = ctx.db;
       await db.transaction(async (db) => {

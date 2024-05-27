@@ -11,10 +11,9 @@ export function Page() {
   const { userPurchaseDetails, domainIsAvailable, domain } =
     useLoaderData<typeof loader>();
 
-  const {error} = domainUserInfoZodSchema.safeParse(userPurchaseDetails);
+  // const { error } = domainUserInfoZodSchema.safeParse(userPurchaseDetails);
 
   return (
-  
     <div className="flex h-full w-full flex-col overflow-hidden px-6">
       <div className="mx-auto flex w-full max-w-[81rem] flex-col justify-center  gap-2  py-4">
         <p className="text-4xl">Domain Purchase</p>
@@ -26,6 +25,9 @@ export function Page() {
         {domainIsAvailable && (
           <DomainUserInfoForm
             initialData={
+              // {
+              //   techCity: userPurchaseDetails?.techCity ?? "",
+              // }
               domainUserInfoZodSchema.safeParse(userPurchaseDetails).data
             }
           />
@@ -34,6 +36,7 @@ export function Page() {
     </div>
   );
 }
+
 
 function DomainTakenView() {
   return (

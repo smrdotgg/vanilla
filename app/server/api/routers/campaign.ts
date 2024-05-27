@@ -7,15 +7,18 @@ import {
   TB_posts,
 } from "~/db/schema.server";
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const campaignRouter = createTRPCRouter({
-  ping: protectedProcedure
-    .query(async ({ ctx, input }) => {
-        return "SECRET DATA HOLY SMOKES";
-    }),
+  ping: protectedProcedure.query(async ({ ctx, input }) => {
+    return "SECRET DATA HOLY SMOKES";
+  }),
   setDeadline: publicProcedure
-    .input(z.object({ campaignId: z.number(), deadline: z.date() }))
+    .input(z.object({ campaignId: z.string(), deadline: z.date() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(TB_campaigns)
@@ -23,7 +26,13 @@ export const campaignRouter = createTRPCRouter({
         .where(eq(TB_campaigns.id, input.campaignId));
     }),
   getContacts: publicProcedure
-    .input(z.object({ getAll: z.boolean().default(false), campaignId: z.number(), cursor: z.number().default(1) }))
+    .input(
+      z.object({
+        getAll: z.boolean().default(false),
+        campaignId: z.string(),
+        cursor: z.number().default(1),
+      }),
+    )
     .query(async ({ input, ctx }) => {
       const batchSize = 25;
 
@@ -51,8 +60,8 @@ export const campaignRouter = createTRPCRouter({
         data: await ctx.db
           .select()
           .from(TB_contacts)
-          .limit(batchSize*input.cursor),
-          // .offset((input.cursor - 1) * batchSize),
+          .limit(batchSize * input.cursor),
+        // .offset((input.cursor - 1) * batchSize),
         cursor: input.cursor,
         campaignId: input.campaignId,
         batchSize,

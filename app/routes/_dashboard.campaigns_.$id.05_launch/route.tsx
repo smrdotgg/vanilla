@@ -12,18 +12,25 @@ import { TB_campaigns } from "~/db/schema.server";
 import { MdOutlineAccessAlarm } from "react-icons/md";
 import { api } from "~/server/trpc/react";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const campaign = await db
+export const loader = async ({
+  params,
+  context,
+  request,
+}: LoaderFunctionArgs) => {
+  const val = await db
     .select()
     .from(TB_campaigns)
-    .where(eq(TB_campaigns.id, Number(params.id)));
-
-  return campaign[0].deadline == null;
+    .where(eq(TB_campaigns.id, params.id!))
+    .then((v) => v[0].deadline == null);
+  return {
+    x: true,
+    deadlineIsNull: val,
+  };
 };
 
 export default function Page() {
-  const navigate = useNavigate();
   const loaderData = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
   const setDeadline = api.campaign.setDeadline.useMutation({
     onSuccess: () => {
       toast("Email Campaign is Live!", {
@@ -59,7 +66,7 @@ export default function Page() {
                 const dateTime = `${d}T${t}`;
                 const dateObject = new Date(dateTime);
                 setDeadline.mutate({
-                  campaignId: Number(params.id!),
+                  campaignId: params.id!,
                   deadline: dateObject,
                 });
               }}
@@ -74,7 +81,7 @@ export default function Page() {
               onClick={() => {
                 const dateObject = new Date();
                 setDeadline.mutate({
-                  campaignId: Number(params.id!),
+                  campaignId: params.id!,
                   deadline: dateObject,
                 });
               }}

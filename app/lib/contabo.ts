@@ -1,4 +1,6 @@
 import { env } from "~/api";
+import { db } from "~/db/index.server";
+import { TB_contabo_token } from "~/db/schema.server";
 
 export interface ComputeManagerInterface {
   createVPSInstance: () => Promise<{ id: string; data: unknown }>;
@@ -36,7 +38,30 @@ async function createVPSInstance() {
     }));
 }
 
+type ContaboAccessTokenResponse = {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  refresh_expires_in: number;
+  token_type: string;
+  "not-before-policy": string;
+  session_state: string;
+  scope: string;
+};
+
 async function getAccessToken() {
+  const t = await db.select().from(TB_contabo_token);
+  if (t.length > 0) {
+    const expiresAt = t[0].expiresAt;
+    const now = new Date(Date.now());
+    const isExpired = expiresAt < now;
+    if (!isExpired) {
+      return t[0].token;
+    } else {
+      await db.delete(TB_contabo_token);
+    }
+  }
+
   const fd = new URLSearchParams();
   fd.append("client_id", env.CONTABO_CLIENT_ID);
   fd.append("client_secret", env.CONTABO_CLIENT_SECRET);
@@ -44,7 +69,7 @@ async function getAccessToken() {
   fd.append("password", env.CONTABO_PASSWORD);
   fd.append("grant_type", "password");
 
-  return fetch(
+  const response = await fetch(
     "https://auth.contabo.com/auth/realms/contabo/protocol/openid-connect/token",
     {
       method: "POST",
@@ -55,10 +80,21 @@ async function getAccessToken() {
     },
   )
     .then((r) => r.json())
-    .then((js) => `${js["access_token"]}`);
+    .then((js) => {
+      console.log(JSON.stringify(js, null, 2));
+      return js as ContaboAccessTokenResponse;
+    });
+    await db.insert(TB_contabo_token).values({
+      token: response.access_token,
+      expiresAt: new Date(Date.now() + (response.expires_in - 30) * 1000),
+      refreshToken: response.refresh_token,
+      refreshTokenExpiresAt: new Date(Date.now() + (response.refresh_expires_in - 30) * 1000),
+    });
+  return response.access_token;
 }
 
 async function getVPSInstanceData({ id }: { id: string }) {
+  console.log("getVPSInstanceData", id);
   const uuid = crypto.randomUUID();
   const token = await getAccessToken();
 
@@ -88,7 +124,6 @@ async function getAllVPSInstanceData() {
   }).then((r) => r.json());
 }
 
-main();
 async function main() {
   console.log("main");
   console.log(
@@ -103,3 +138,4 @@ async function main() {
   );
   return;
 }
+// main();

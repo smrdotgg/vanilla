@@ -1,10 +1,10 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
+import { validateSessionAndRedirectIfInvalid } from "~/auth/firebase/auth.server";
 import { DashLayout } from "~/components/custom/side-bar";
-import { getCookieSession } from "~/server/auth.server";
 
-export const loader = async (args: LoaderFunctionArgs) => {
-  const session = await getCookieSession(args.request);
+export const loader = async ({request}: LoaderFunctionArgs) => {
+  const session = await validateSessionAndRedirectIfInvalid(request);
   if (session === undefined) return redirect("/auth/sign-in");
   return null;
 };

@@ -6,23 +6,29 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Link } from "@remix-run/react";
 
 type BreadCrumbItemData = {
   name: string | null;
   href?: string;
+  prefetch?: "intent" | "none" | "render" | "viewport";
 };
 
 export function MyBreadCrumb({ data }: { data: BreadCrumbItemData[] }) {
   const prevLinks = data.filter((d) => d.href);
   const currentLink = data.find((d) => !d.href);
   const prevLinkComponents = prevLinks.map((pl, index) => (
-    <BreadcrumbItem index={Number(`${index}00`)}>
-      <BreadcrumbLink href={pl.href}>{pl.name}</BreadcrumbLink>
+    <BreadcrumbItem key={index} >
+      <BreadcrumbLink asChild href={pl.href}>
+      <Link to={pl.href ?? "#"} prefetch={pl.prefetch}>
+      {pl.name}
+      </Link>
+      </BreadcrumbLink>
     </BreadcrumbItem>
   ));
   const alteredNumbers = prevLinkComponents.flatMap((num, index) =>
     index < prevLinkComponents.length - 1
-      ? [num, <BreadcrumbSeparator index={Number(`${index}11`)} />]
+      ? [num, <BreadcrumbSeparator key={index}  />]
       : num,
   );
   const lastComponent = currentLink === undefined ? undefined : <BreadcrumbItem>

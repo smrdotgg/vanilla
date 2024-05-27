@@ -18,7 +18,7 @@ export const domainsRouter = createTRPCRouter({
     .input(domainUserInfoZodSchema)
     .mutation(async ({ ctx, input }) => {
       const newVals = {
-        userId: ctx.session.userId,
+        userId: ctx.session.uid,
         ...input,
       };
       await ctx.db
@@ -32,7 +32,7 @@ export const domainsRouter = createTRPCRouter({
   purchaseDomain: protectedProcedure
     .input(z.object({ domainName: z.string(), userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      if (ctx.session.user.id !== input.userId) throw Error();
+      if (ctx.session.uid !== input.userId) throw Error();
       return await DomainService.purchaseDomain({
         userId: input.userId,
         domainName: input.domainName,
@@ -66,7 +66,7 @@ export const domainsRouter = createTRPCRouter({
     .input(
       z.object({
         mode: z.enum(["all", "none"]),
-        exceptions: z.number().array(),
+        exceptions: z.string().array(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

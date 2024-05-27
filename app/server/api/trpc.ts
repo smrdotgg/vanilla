@@ -11,7 +11,8 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { lucia } from "~/auth/lucia.server";
+import { validateSession } from "~/auth/firebase/auth.server";
+// import { lucia } from "~/auth/lucia.server";
 import { db } from "~/db/index.server";
 
 // import { getServerAuthSession } from "~/server/auth";
@@ -29,21 +30,36 @@ import { db } from "~/db/index.server";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async ({
-  req,
-}: {req: Request}) => {
+export const createTRPCContext = async ({ req }: { req: Request }) => {
   const returnObject = {
     db,
     req,
   };
-  const sessionId = lucia.readSessionCookie(req.headers.get("Cookie") ?? "");
-  if (sessionId){
-    const {session, user} = await lucia.validateSession(sessionId);
-    if (session && user){
-      return {...returnObject, session:{...session, user}, };
-    }
+
+  // const session = ;
+  const session = await validateSession(req).then((session) =>
+    session !== undefined
+      ? {
+          aud: session!.aud,
+          exp: session!.exp,
+          iat: session!.iat,
+          iss: session!.iss,
+          sub: session!.sub,
+          uid: session!.uid,
+          email: session!.email,
+          picture: session!.picture,
+          firebase: session!.firebase,
+          auth_time: session!.auth_time,
+          phone_number: session!.phone_number,
+          email_verified: session!.email_verified,
+        }
+      : undefined,
+  );
+
+  if (session !== undefined) { 
+    return { ...returnObject, session };
   }
-  return {...returnObject, session:undefined, };
+  return { ...returnObject, session: undefined };
 };
 
 /**
@@ -99,14 +115,13 @@ export const publicProcedure = t.procedure;
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new Error();
-    // throw new TRPCError({ code: "UNAUTHORIZED" });
+  if (!ctx.session || !ctx.session.uid) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx: {
       // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
+      session: { ...ctx.session, session: ctx.session },
     },
   });
 });

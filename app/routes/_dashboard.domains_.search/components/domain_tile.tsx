@@ -7,7 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Suspense, useState } from "react";
 import { Await, Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { loader } from "./../route";
-import { Theme, useTheme } from "remix-themes";
+import { useTheme } from "remix-themes";
 
 export function DomainTile() {
   const { results } = useLoaderData<typeof loader>();
@@ -83,7 +83,7 @@ function TileCore({
   const textColor = () => {
     if (!isAvailable) return "text-gray-500 line-through";
     if (opened) {
-      if (theme === Theme.LIGHT) {
+      if (theme === "light") {
         return "text-white";
       } else {
         return "text-black";
@@ -94,7 +94,7 @@ function TileCore({
   const coreComponent = (
     <>
       <div
-        index={index}
+        key={index}
         className={isAvailable ? "flex w-full justify-between" : twindClass}
       >
         <p
@@ -106,13 +106,14 @@ function TileCore({
           <Suspense fallback={<></>}>
             <Await
               resolve={
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 !searching ? domainToPriceMap : (new Promise(() => {}) as any)
               }
             >
               {(priceMap) => (
                 <div className="flex gap-2 *:my-auto">
                   <p
-                    className={`text-md ${opened ? `${theme === Theme.LIGHT ? "text-white" : "text-black"}` : "text-primary"}`}
+                    className={`text-md ${opened ? `${theme === "light" ? "text-white" : "text-black"}` : "text-primary"}`}
                   >
                     $
                     {priceMap[name] === undefined
@@ -135,7 +136,7 @@ function TileCore({
     return (
       <Popover
         open={opened}
-        index={index}
+        key={index}
         onOpenChange={() => (opened ? setOpened(undefined) : setOpened(name))}
       >
         <PopoverTrigger className={twindClass}>{coreComponent}</PopoverTrigger>

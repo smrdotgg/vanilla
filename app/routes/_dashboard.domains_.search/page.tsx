@@ -1,6 +1,8 @@
-import { useDebounceSubmit } from "remix-utils/use-debounce-submit";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// import { useDebounceSubmit } from "remix-utils/use-debounce-submit";
 import {
   Form,
+  useFetchers,
   useLoaderData,
   useNavigation,
   useSubmit,
@@ -16,12 +18,12 @@ import { TiTick } from "react-icons/ti";
 import { loader } from "./route";
 import { DomainCheckResult } from "./types";
 import { DomainTile } from "./components/domain_tile";
-
+import {useDebounceSubmit} from "../../hooks/use_debounce_submit";
+// import { useDebounceSubmit } from "remix-utils/use-debounce-submit";
 
 export function ErrorBoundary() {
   return <>error</>;
 }
-
 
 export function Page() {
   const { query } = useLoaderData<typeof loader>();
@@ -31,14 +33,14 @@ export function Page() {
 
   const submit = useDebounceSubmit();
 
-
   const navigation = useNavigation();
-  const searching =
+  const searching = Boolean(
     navigation.location &&
-    new URLSearchParams(navigation.location.search).has("query");
+      new URLSearchParams(navigation.location.search).has("query"),
+  );
+  const fetchers = useFetchers();
 
   useEffect(() => {
-
     if (document) {
       const searchField = document.getElementById("query_input");
       if (searchField instanceof HTMLInputElement) {
@@ -52,6 +54,9 @@ export function Page() {
       <div className="flex h-screen max-h-screen flex-col  pt-6">
         <div className="flex justify-between px-6 *:my-auto">
           <div className="flex flex-col">
+            <p>searching = {JSON.stringify(searching)}</p>
+            <p>fetchers = {JSON.stringify(fetchers)}</p>
+            <p>navigation = {JSON.stringify(navigation)}</p>
             <MyBreadCrumb
               data={[
                 {
@@ -77,7 +82,13 @@ export function Page() {
           <Form
             className="mx-auto w-full max-w-[50rem] pt-8"
             method="get"
-            onChange={(event) => submit(event.currentTarget, { method: "get", debounceTimeout: 500 })}
+            onChange={(event) =>
+              submit(event.currentTarget, {
+                method: "get",
+                debounceTimeout: 500,
+                // navigate: false,
+              })
+            }
             role="search"
           >
             <div className="flex gap-2">
@@ -85,8 +96,8 @@ export function Page() {
                 defaultValue={query}
                 id="query_input"
                 name="query"
-                placeholder="Search..."
                 autoComplete="off"
+                placeholder="Search..."
               />
               <Button
                 disabled={searching}
@@ -94,14 +105,14 @@ export function Page() {
                 className={`flex w-24  ${searching ? "" : ""}`}
               >
                 {searching ? (
-                  <img src={spinnerBlack} className=" h-full " />
+                  <img src={spinnerBlack} alt="loading spinner" className=" h-full " />
                 ) : (
                   "Search"
                 )}
               </Button>
             </div>
           </Form>
-          <DomainTile   />
+          <DomainTile />
           {/* {!searching && domains && (
             <SearchResults
               domains={domains.map((d:any) => ({
@@ -133,9 +144,7 @@ function SearchResults({ domains }: { domains: DomainCheckResult[] }) {
       <div className={domains.length === 0 ? "h-1/3" : "pt-8"}></div>
       <div
         className={` mx-auto flex w-full max-w-[100rem] flex-wrap justify-center  gap-2 ${domains.length === 0 ? "" : ""} `}
-      >
-
-      </div>
+      ></div>
       <div className="pt-8"></div>
     </>
   );

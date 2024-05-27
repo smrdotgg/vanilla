@@ -6,8 +6,8 @@ import {
 } from "@remix-run/node";
 import { getDomainToPriceMap ,checkDomainAvailability } from "../_dashboard.domains_.search/helpers.server";
 import { INTENTS } from "./types";
-import { getCookieSessionOrThrow } from "~/server/auth.server";
 import { api } from "~/server/trpc/server.server";
+import { validateSessionAndRedirectIfInvalid } from "~/auth/firebase/auth.server";
 
 // Define the loader function to process domain search requests
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -63,9 +63,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const body = await request.formData();
   if (body.get("intent") === INTENTS.purchaseDomain) {
     const domain = body.get("domain");
-    const { user } = await getCookieSessionOrThrow(request);
+    const {uid} = await validateSessionAndRedirectIfInvalid(request);
     await api(request).domains.purchaseDomain.mutate({
-      userId: user.id,
+      userId: uid,
       domainName: String(domain),
     });
     return redirect("/domains");

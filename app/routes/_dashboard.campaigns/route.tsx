@@ -1,4 +1,5 @@
-import { defer, redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, defer, redirect, } from "@remix-run/node";
+
 import { db } from "~/db/index.server";
 import {
   TB_binding_campaigns_contacts,
@@ -39,7 +40,7 @@ export const loader = async () => {
 
 export { Page as default };
 
-export const action = async () => {
+export const action = async ( ) => {
   const newCampaigns = await db.insert(TB_campaigns).values({}).returning();
   return redirect(`/campaigns/${newCampaigns[0].id}`);
-};
+}
