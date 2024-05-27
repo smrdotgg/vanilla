@@ -21,6 +21,8 @@ jobs:
     - name: Deploy to VPS
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          ls
+          cat .bashrc
           cd ${{ secrets.VPS_PATH }}
           source ~/.bashrc || source ~/.bash_profile || source ~/.profile
           fnm use 20
