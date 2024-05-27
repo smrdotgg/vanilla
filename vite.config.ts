@@ -15,7 +15,7 @@ export default defineConfig({
       // future: {
       //   unstable_singleFetch: true,
       // },
-      presets: env.VERCEL_URL ? [vercelPreset()] : [],
+      presets: [vercelPreset()] ,
     }),
     tsconfigPaths(),
   ],
