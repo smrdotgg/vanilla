@@ -6,9 +6,9 @@
   "scripts": {
     "api:dev": "bun run --hot ./backend/index.ts",
     "api:start": "bun ./src/index.ts",
-    "build": "remix vite:build",
-    "dev": "remix vite:dev --port 3000 --host",
-    "start": "remix-serve ./build/server/index.js --port 3000",
+    "app:build": "remix vite:build",
+    "app:dev": "remix vite:dev --port 3000 --host",
+    "app:start": "remix-serve ./build/server/index.js --port 3000",
     "typecheck": "tsc",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
