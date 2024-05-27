@@ -1,5 +1,5 @@
 import { vitePlugin as remix } from "@remix-run/dev";
-// import { installGlobals } from "@remix-run/node";
+import { installGlobals } from "@remix-run/node";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { vercelPreset } from "@vercel/remix/vite";
@@ -7,7 +7,7 @@ import { env } from "./app/api";
 
 import("./app/api");
 
-// installGlobals();
+installGlobals();
 
 export default defineConfig({
   plugins: [
@@ -17,7 +17,7 @@ export default defineConfig({
       // },
       presets: env.VERCEL_URL ? [vercelPreset()] : [],
     }),
-    tsconfigPaths(),
+    tsconfigPaths({loose: true}),
   ],
   envPrefix: "PUBLIC_",
   optimizeDeps: {
