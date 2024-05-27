@@ -27,6 +27,7 @@ jobs:
           git pull origin main
           npm install
           npm run build
-          npm run start & disown && exit
+          # npm run start & disown && exit
+          npm start & npx wait-on http://localhost:3000
         EOF
 
