@@ -89,36 +89,43 @@ export default function Page() {
       ? actionResult?.error
       : undefined;
 
-  const signInCallback = async ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) => {
-    setLoading(true);
-    try {
-      await signOut(auth);
-      const { user, providerId, operationType } =
-        await signInWithEmailAndPassword(auth, email, password);
-      const idToken = await user.getIdToken();
-      fetcher.submit(
-        { idToken: idToken, "google-login": false },
-        { method: "post" },
-      );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      setLoading(false);
-      const errorCode = String(e.code);
-      if (errorCode.includes("network")) {
-        setErrorState("Network error. Please try again.");
-      } else if (errorCode.includes("auth")) {
-        setErrorState("Incorrect email or password");
-      } else {
-        setErrorState("Unknown error occured");
-      }
+const signInCallback = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  console.log("Attempting sign in...");
+  setLoading(true);
+  try {
+    await signOut(auth);
+    console.log("User signed out successfully.");
+    const { user, providerId, operationType } =
+      await signInWithEmailAndPassword(auth, email, password);
+    console.log("User signed in successfully:", user);
+    const idToken = await user.getIdToken();
+    console.log("Retrieved ID token:", idToken);
+    fetcher.submit(
+      { idToken: idToken, "google-login": false },
+      { method: "post" },
+    );
+    console.log("Submission successful.");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    console.error("Error occurred during sign-in:", e);
+    setLoading(false);
+    const errorCode = String(e.code);
+    if (errorCode.includes("network")) {
+      setErrorState("Network error. Please try again.");
+    } else if (errorCode.includes("auth")) {
+      setErrorState("Incorrect email or password");
+    } else {
+      setErrorState("Unknown error occurred");
     }
-  };
+  }
+};
+
 
   return (
     <div className="flex h-screen *:m-auto">
@@ -174,17 +181,20 @@ export default function Page() {
   );
 }
 
-
 export const action = async ({ request }: ActionFunctionArgs) => {
+  console.log("Processing action...");
   const formData = await request.formData();
 
   try {
+    console.log("Attempting session login...");
     return await sessionLogin({
       request,
       idToken: String(formData.get("idToken")),
       redirectTo: "/home",
     });
   } catch (error) {
+    console.error("Error occurred during session login:", error);
     return { error: String(error) };
   }
 };
+
