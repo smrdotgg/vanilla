@@ -130,7 +130,7 @@ const signInCallback = async ({
   return (
     <div className="flex h-screen *:m-auto">
       <div className="flex w-96 flex-col gap-3 align-bottom">
-        <h1>Sign In Form</h1>
+        <h1>Sign In Form (Remix)</h1>
 
         <Form {...form}>
           <form
