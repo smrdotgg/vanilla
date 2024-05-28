@@ -23,6 +23,18 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
           cd ${{ secrets.VPS_PATH }}
           git stash
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
           source /home/${{ secrets.VPS_USER }}/.bashrc
           /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm use 20
           # Find and kill the process running npm start

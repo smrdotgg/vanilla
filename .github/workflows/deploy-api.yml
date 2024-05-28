@@ -22,6 +22,12 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
           cd ${{ secrets.VPS_PATH }}
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
+          echo $SHELL
           git stash
           source /home/${{ secrets.VPS_USER }}/.bashrc
           /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm use 20
