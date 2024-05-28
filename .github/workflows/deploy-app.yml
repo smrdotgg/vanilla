@@ -23,32 +23,10 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
           cd ${{ secrets.VPS_PATH }}
           git stash
-          echo $SHELL
-          echo $SHELL
-          echo $SHELL
-          echo $SHELL
-          echo $SHELL
-          node --version
-          echo $SHELL
-          node --version
-          echo $SHELL
-          node --version
-          echo $SHELL
-          node --version
-          echo $SHELL
-          node --version
-          echo $SHELL
-          node --version
-          echo $SHELL
-          node --version
-          echo $SHELL
-          node --version
-          echo $SHELL
-          node --version
-          echo $SHELL
-          echo $SHELL
-          echo $SHELL
-          source /home/${{ secrets.VPS_USER }}/.bashrc
+          source /home/${{ secrets.VPS_USER }}/.bashrc 
+          alias node=/home/semere/.local/share/fnm/node-versions/v20.13.1/installation/bin/node
+          alias npm=/home/semere/.local/share/fnm/node-versions/v20.13.1/installation/bin/npm
+          alias npx=/home/semere/.local/share/fnm/node-versions/v20.13.1/installation/bin/npx
           /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm use 20
           # Find and kill the process running npm start
           pkill -f "npm run app:start"
