@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "api:dev": "bun run --hot ./backend/index.ts",
-    "api:start": "bun ./src/index.ts",
+    "api:start": "bun ./backend/index.ts",
     "app:build": "remix vite:build",
     "app:dev": "remix vite:dev --port 3000 --host",
     "app:start": "remix-serve ./build/server/index.js --port 3000",

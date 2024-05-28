@@ -1,4 +1,4 @@
-name: Deploy App to VPS
+name: Deploy API to VPS
 
 on:
   push:
@@ -25,11 +25,10 @@ jobs:
           git stash
           /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm use 20
           # Find and kill the process running npm start
-          pkill -f "npm run app:start"
+          pkill -f "npm run api:start"
           git pull origin main
           npm install
           npm run db:migrate
-          npm run app:build
-          nohup npm run app:start & 
+          nohup npm run api:start & 
         EOF
 
