@@ -28,10 +28,23 @@ jobs:
           echo $SHELL
           echo $SHELL
           echo $SHELL
+          node --version
           echo $SHELL
+          node --version
           echo $SHELL
+          node --version
           echo $SHELL
+          node --version
           echo $SHELL
+          node --version
+          echo $SHELL
+          node --version
+          echo $SHELL
+          node --version
+          echo $SHELL
+          node --version
+          echo $SHELL
+          node --version
           echo $SHELL
           echo $SHELL
           echo $SHELL
