@@ -27,6 +27,7 @@ jobs:
 
           /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm use 20
 
+          export BUN_INSTALL=~/.bun
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
 
@@ -35,6 +36,7 @@ jobs:
           git pull origin main
           npm install
           npm run db:migrate
+
           nohup npm run api:start & 
         EOF
 
