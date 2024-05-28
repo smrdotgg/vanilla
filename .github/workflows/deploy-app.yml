@@ -24,6 +24,7 @@ jobs:
           cd ${{ secrets.VPS_PATH }}
           git stash
           source /home/${{ secrets.VPS_USER }}/.bashrc 
+          echo "${{secrets.SSH_PRIVATE_KEY}}"
           alias node=/home/semere/.local/share/fnm/node-versions/v20.13.1/installation/bin/node
           alias npm=/home/semere/.local/share/fnm/node-versions/v20.13.1/installation/bin/npm
           alias npx=/home/semere/.local/share/fnm/node-versions/v20.13.1/installation/bin/npx
