@@ -5,7 +5,7 @@ import { config } from "dotenv";
 const isServer = typeof process !== "undefined";
 
 if (typeof process !== "undefined") {
-  // config();
+  config();
 }
 
 export const env = createEnv({

@@ -1,5 +1,5 @@
 node_modules
-/.swap-pane
+swap-pane
 
 /.cache
 /build
