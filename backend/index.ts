@@ -3,7 +3,7 @@ import { env } from '~/api';
 
 
 const app = new Hono()
-app.get('/', (c) => c.text('howw'))
+app.get('/', (c) => c.text('hello world'))
 
 const url = `${env.BACKEND_URI}:${env.BACKEND_PORT}`;
 
