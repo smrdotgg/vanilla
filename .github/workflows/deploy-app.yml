@@ -23,12 +23,8 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
           cd ${{ secrets.VPS_PATH }}
           git stash
-          source /home/${{ secrets.VPS_USER }}/.bashrc 
-          source ~/.bashrc
+          eval "$(fnm env --use-on-cd)"
           echo "${{secrets.SSH_PRIVATE_KEY}}"
-          alias node=/home/${{secrets.VPS_USER}}/.local/share/fnm/node-versions/v20.13.1/installation/bin/node
-          alias npm=/home/${{ secrets.VPS_USER }}/.local/share/fnm/node-versions/v20.13.1/installation/bin/npm
-          alias npx=/home/${{ secrets.VPS_USER }}/.local/share/fnm/node-versions/v20.13.1/installation/bin/npx
           /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm use 20
           # Find and kill the process running npm start
           pkill -f "npm run app:start"
