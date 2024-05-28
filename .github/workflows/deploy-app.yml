@@ -25,9 +25,12 @@ jobs:
           cd ${{ secrets.VPS_PATH }}
           git stash
           git pull
-          eval "$(fnm env --use-on-cd)"
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
           /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm use 20
           /home/${{ secrets.VPS_USER }}/.local/share/fnm/fnm list
+
+
           # Find and kill the process running npm start
           pkill -f "npm run app:start"
           git pull origin main
