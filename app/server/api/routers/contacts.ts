@@ -1,6 +1,6 @@
 import { count, eq, inArray, notInArray } from "drizzle-orm";
 import { z } from "zod";
-import { TB_campaigns, TB_contacts, TB_posts } from "~/db/schema.server";
+import { TB_campaigns, TB_contacts, } from "~/db/schema.server";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const contactsRouter = createTRPCRouter({
@@ -62,15 +62,5 @@ export const contactsRouter = createTRPCRouter({
         }
       }
     }),
-  create: publicProcedure
-    .input(z.object({ name: z.string().min(1) }))
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(TB_posts).values({
-        name: "",
-      });
-    }),
 
-  getSecretMessage: publicProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
 });

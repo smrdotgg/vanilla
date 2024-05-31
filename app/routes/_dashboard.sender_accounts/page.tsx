@@ -1,13 +1,10 @@
-import { Link, useLoaderData, useRevalidator } from "@remix-run/react";
-import { Button } from "~/components/ui/button";
+import { useRevalidator } from "@remix-run/react";
 import { Input } from "~/components/ui/input";
-import { loader } from "./route";
 import { BulkButton } from "./components/bulk_modal/index";
 import { api } from "~/server/trpc/react";
 import { useState } from "react";
 
 export function Page() {
-  const data = useLoaderData<typeof loader>();
   const revalidator = useRevalidator();
   const x = api.senderAccounts.createBulk.useMutation({
     onSuccess: () =>
@@ -39,31 +36,6 @@ export function Page() {
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="pt-6"></div>
-        {data.googleUserInfos.map((d, i) => (
-          <EmailCell key={i} {...d} />
-        ))}
-        <div className="flex flex-col gap-2">
-          {data.senderAccounts
-            .filter(
-              (v) =>
-                v.fromName.toLowerCase().includes(search.toLowerCase()) ||
-                v.fromEmail.toLowerCase().includes(search.toLowerCase()),
-            )
-            .map((senderAcc, i) => (
-              <div
-                key={i}
-                className=" flex cursor-pointer justify-between p-2 px-6 *:my-auto hover:bg-secondary"
-              >
-                <div className="">
-                  <p className="font-bold">{senderAcc.fromName}</p>
-                  <p>{senderAcc.fromEmail}</p>
-                </div>
-                <div>
-                  <Button variant="outline">Manage</Button>
-                </div>
-              </div>
-            ))}
-        </div>
       </div>
     </>
   );
@@ -83,4 +55,3 @@ function EmailCell(props: { name: string; email: string; profilePic: string }) {
     </div>
   );
 }
-

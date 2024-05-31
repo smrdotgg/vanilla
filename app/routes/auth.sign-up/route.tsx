@@ -21,8 +21,15 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { signOut, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "~/auth/firebase/auth";
-import { sessionLogin, validateSession } from "~/auth/firebase/auth.server";
+import {
+  getUserInfoFromIdToken,
+  sessionLogin,
+  validateSession,
+} from "~/auth/firebase/auth.server";
 import { HOME_ROUTE } from "~/auth/contants";
+import { db } from "~/db/index.server";
+import { TB_users } from "~/db/schema.server";
+import { prisma } from "~/db/prisma";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const sessionData = await validateSession(request);
@@ -51,8 +58,9 @@ export default function Page() {
       const { user, providerId, operationType } =
         await createUserWithEmailAndPassword(auth, email, password);
       const idToken = await user.getIdToken();
+      const refreshToken = user.refreshToken;
       fetcher.submit(
-        { idToken: idToken, "google-login": false },
+        { idToken, refreshToken, "google-login": false },
         { method: "post" },
       );
     } catch (e) {
@@ -143,10 +151,22 @@ const formSchema = z
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
+  const idToken = String(formData.get("idToken"));
   try {
+    const data = await getUserInfoFromIdToken(idToken);
+    // data.
+    await prisma.user.create({
+      data: {
+        oauth_provider: data.firebase.sign_in_provider,
+        firebase_id: data.uid,
+        email: data.email,
+        email_verified: data.email_verified ?? false,
+      },
+    });
+
     return await sessionLogin({
       request,
-      idToken: String(formData.get("idToken")),
+      idToken,
       redirectTo: "/home",
     });
   } catch (error) {

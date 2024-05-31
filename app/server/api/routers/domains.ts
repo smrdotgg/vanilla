@@ -3,7 +3,6 @@ import { z } from "zod";
 import {
   TB_contacts,
   TB_domainPurchaseDetails,
-  TB_posts,
 } from "~/db/schema.server";
 import { domainUserInfoZodSchema } from "~/routes/_dashboard.domains_.purchase_form/components/domain_user_info_form";
 import {
@@ -88,15 +87,4 @@ export const domainsRouter = createTRPCRouter({
         }
       }
     }),
-  create: publicProcedure
-    .input(z.object({ name: z.string().min(1) }))
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(TB_posts).values({
-        name: "",
-      });
-    }),
-
-  getSecretMessage: publicProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
 });

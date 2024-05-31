@@ -1,0 +1,213 @@
+import {
+  Form,
+  Link,
+  NavLink,
+  useFetcher,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+} from "@remix-run/react";
+import { RxBorderSplit } from "react-icons/rx";
+import { GrInProgress } from "react-icons/gr";
+import { FaHome } from "react-icons/fa";
+
+import { HiClipboardDocument } from "react-icons/hi2";
+import { loader } from "../route";
+import { IoIosPeople } from "react-icons/io";
+import { IoPersonSharp, IoSettingsSharp } from "react-icons/io5";
+import type { IconType } from "react-icons/lib";
+import downloadsvg from "../assets/download.svg";
+import { TbWorld } from "react-icons/tb";
+import { useTheme } from "remix-themes";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
+import { ModeToggle } from "~/components/ui/mode-toggle";
+import { filterNulls } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
+import { INTENTS } from "../types";
+
+type dashRoute =
+  | "/home"
+  | "/settings"
+  | "/contacts"
+  | "/campaigns"
+  | "/sender_accounts"
+  | "/domains"
+  | "/splitboxes";
+
+const elements: { route: dashRoute; name: string; icon: IconType }[] = [
+  {
+    route: "/home",
+    name: "Home",
+    icon: FaHome,
+  },
+  {
+    route: "/settings",
+    name: "Settings",
+    icon: IoSettingsSharp,
+  },
+  {
+    route: "/contacts",
+    name: "Contacts",
+    icon: IoPersonSharp,
+  },
+  {
+    route: "/campaigns",
+    name: "Campaigns",
+    icon: HiClipboardDocument,
+  },
+  {
+    route: "/sender_accounts",
+    name: "Sender Accounts",
+    icon: IoIosPeople,
+  },
+  {
+    route: "/domains",
+    name: "Domains",
+    icon: TbWorld,
+  },
+  {
+    route: "/splitboxes",
+    name: "Splitboxes",
+    icon: RxBorderSplit,
+  },
+];
+
+export function DashLayout({
+  children,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  selected,
+}: {
+  children: React.ReactNode;
+  selected?: dashRoute;
+}) {
+  const [loading, setLoading] = useState("");
+
+  return (
+    <div className="flex h-screen max-h-screen w-screen flex-col  overflow-hidden">
+      {/* Top Bar */}
+      <div className="flex h-16 max-h-16 min-h-16 w-full items-center bg-gray-900 px-4 text-white">
+        <Link to="/">
+          <img
+            className="mr-auto"
+            alt="Splitbox Logo"
+            src={downloadsvg}
+            width={24}
+            height={24}
+          />
+        </Link>
+        <SlashDivide />
+        <WorkspaceSelect />
+      </div>
+      <div className="flex max-h-full flex-1 overflow-hidden">
+        {/* Side Bar */}
+        <div className=" flex h-full max-h-full w-64 flex-col justify-between overflow-hidden bg-gray-900 text-white">
+          <div className="flex h-full flex-col overflow-y-auto">
+            {elements.map((e, i) => (
+              <NavLink
+                key={i}
+                prefetch="intent"
+                className={({ isActive, isPending }) => {
+                  if (isPending && loading !== e.route) setLoading(e.route);
+                  if (isActive && loading === e.route) setLoading("");
+                  return `
+                  flex min-h-8 
+                  ${
+                    isActive
+                      ? "border-r-2 border-r-black bg-white text-black"
+                      : isPending
+                        ? "cursor-wait bg-gray-600 text-black dark:text-white"
+                        : "bg-gray-900 text-white transition duration-100 hover:bg-gray-900"
+                  }`;
+                }}
+                to={e.route}
+              >
+                {loading == e.route ? (
+                  <div className="flex h-full w-full items-center px-3">
+                    <GrInProgress className="h-8 min-w-4" size={16} />
+                    <div className="pl-2"></div>
+
+                    <p>{e.name}</p>
+                  </div>
+                ) : (
+                  <div className="flex h-full w-full items-center px-3">
+                    <e.icon className="h-8 min-w-4" size={16} />
+                    <div className="pl-2"></div>
+                    <p>{e.name}</p>
+                  </div>
+                )}
+              </NavLink>
+            ))}
+          </div>
+          <ModeToggle />
+        </div>
+        {/* Main Content */}
+        <div className="flex max-h-full flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-800">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SlashDivide() {
+  return <p className="mx-3 text-6xl text-gray-400">/</p>;
+}
+
+function WorkspaceSelect() {
+  const { user, selectedWorkspaceJoinDataFromCookie } =
+    useLoaderData<typeof loader>();
+  const [showModal, setShowModal] = useState(false);
+
+  const selectedWorkspace =
+    selectedWorkspaceJoinDataFromCookie?.workspace ??
+    user.workspace_user_join_list[0].workspace;
+
+  const myWorkspaces = user.workspace_user_join_list.map((join) => ({
+    name: join.workspace.name,
+    id: join.workspace.id,
+  }));
+
+  const { submit, state } = useFetcher();
+
+  const onChange = (newVal: string) => {
+    const formData = new FormData();
+    formData.append("intent", INTENTS.changeSelectedWorksapce);
+    formData.append("targetWorkspaceId", newVal);
+    submit(formData, { action: "/set_selected_workspace", method: "post" });
+  };
+
+  return (
+    <Select
+      disabled={state !== "idle"}
+      onValueChange={onChange}
+      name="targetWorkspaceId"
+      value={selectedWorkspace.id.toString()}
+    >
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select Workspace" />
+      </SelectTrigger>
+      <SelectContent>
+        {myWorkspaces.map((w) => (
+          <SelectItem key={w.id} value={String(w.id)}>
+            {w.name}
+          </SelectItem>
+        ))}
+        <Button
+          asChild
+          onClick={() => setShowModal(true)}
+          className="flex w-full "
+          variant={"ghost"}
+        >
+          <Link to={"/create_workspace"}>+ Create new Workspace</Link>
+        </Button>
+      </SelectContent>
+    </Select>
+  );
+}

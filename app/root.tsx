@@ -21,8 +21,15 @@ import clsx from "clsx";
 import { Provider } from "jotai";
 import { TRPCReactProvider } from "./server/trpc/react";
 import { LoaderFunctionArgs } from "@remix-run/node";
+import { getClientIPAddress } from "remix-utils/get-client-ip-address";
+import { env } from "./api";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  // const ip = getClientIPAddress(request);
+  // console.log(`env = ${ip}`);
+  // if (env.MY_IP !== null && env.MY_IP !== undefined && env.MY_IP !== ip) {
+  //   throw new Response(null, { status: 404 });
+  // }
   const url = new URL(request.url);
   if (url.pathname == "/") {
     return redirect("/home");

@@ -1,0 +1,27 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1716386676267,
+      "tag": "0000_ambiguous_lady_mastermind",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1716972246030,
+      "tag": "0001_outstanding_butterfly",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1717071126601,
+      "tag": "0002_fast_korath",
+      "breakpoints": true
+    }
+  ]
+}

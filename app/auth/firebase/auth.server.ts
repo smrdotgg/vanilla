@@ -112,6 +112,10 @@ const setCookieAndRedirect = async (
   });
 };
 
+const getUserInfoFromIdToken = (idToken: string) => {
+  return admin.auth().verifyIdToken(idToken);
+}
+
 /**
  * login the session by verifying the token, if all is good create/set cookie
  * and redirect to the appropriate route
@@ -134,7 +138,7 @@ const sessionLogin = async ({
   try {
     // admin.app().auth().verifyIdToken(idToken);
     // getAuth().verifyIdToken(idToken);
-    const token = await admin.auth().verifyIdToken(idToken);
+    const token = await admin.auth().verifyIdToken(idToken, true);
     console.log("idToken verified");
 
     return admin
@@ -195,5 +199,6 @@ export {
   sessionLogin,
   sessionLogout,
   validateSession,
+  getUserInfoFromIdToken,
   validateSessionAndRedirectIfInvalid,
 };

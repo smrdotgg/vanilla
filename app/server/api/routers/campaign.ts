@@ -4,7 +4,6 @@ import {
   TB_binding_campaigns_contacts,
   TB_campaigns,
   TB_contacts,
-  TB_posts,
 } from "~/db/schema.server";
 
 import {
@@ -113,19 +112,4 @@ export const campaignRouter = createTRPCRouter({
         }
       });
     }),
-  create: publicProcedure
-    .input(z.object({ name: z.string().min(1) }))
-    .mutation(async ({ ctx, input }) => {
-      // simulate a slow db call
-
-      await ctx.db.insert(TB_posts).values({
-        name: "",
-        // name: input.name,
-        // createdById: ctx.session.user.id,
-      });
-    }),
-
-  getSecretMessage: publicProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
 });

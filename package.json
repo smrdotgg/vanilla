@@ -27,6 +27,8 @@
     "@libsql/client": "^0.6.0",
     "@lucia-auth/adapter-drizzle": "^1.0.7",
     "@paralleldrive/cuid2": "^2.2.2",
+    "@planetscale/database": "^1.18.0",
+    "@prisma/client": "5.14.0",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-context-menu": "^2.1.5",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -69,6 +71,7 @@
     "firebase": "^10.12.1",
     "firebase-admin": "^12.1.1",
     "hono": "^4.3.9",
+    "is-ip": "^5.0.1",
     "isbot": "^4.1.0",
     "jotai": "^2.7.0",
     "jq": "^1.7.2",
@@ -82,6 +85,7 @@
     "oslo": "^1.2.0",
     "papaparse": "^5.4.1",
     "postgres": "^3.4.3",
+    "prisma": "^5.14.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
@@ -90,7 +94,7 @@
     "react-hook-form": "^7.51.3",
     "react-icons": "^5.0.1",
     "remix-themes": "^1.3.1",
-    "remix-utils": "^7.5.0",
+    "remix-utils": "^7.6.0",
     "rword": "^3.2.1",
     "simple-xml-to-json": "^1.2.0",
     "sonner": "^1.4.3",
@@ -134,7 +138,7 @@
     "wrangler": "^3.0.0"
   },
   "overrides": {
-	    "@remix-run/server-runtime": "2.9.1"
+    "@remix-run/server-runtime": "2.9.1"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -36,4 +37,27 @@ export function levenshteinDistance(s: string, t: string): number {
   }
 
   return v1[t.length];
+}
+
+export function filterNulls<T>(array: (T | null)[]): T[] {
+  return array.filter((item): item is T => item !== null);
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function jsonToFormData(json:any) {
+    const formData = new FormData();
+
+    function appendFormData(data:any, parentKey) {
+        if (data && typeof data === 'object' && !(data instanceof Date) && !(data instanceof File)) {
+            Object.keys(data).forEach(key => {
+                appendFormData(data[key], parentKey ? `${parentKey}[${key}]` : key);
+            });
+        } else {
+            const value = data == null ? '' : data;
+            formData.append(parentKey, value);
+        }
+    }
+
+    appendFormData(json);
+
+    return formData;
 }
