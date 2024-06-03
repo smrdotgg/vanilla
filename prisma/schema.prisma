@@ -1,11 +1,20 @@
-generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+// generator client {
+//   provider = "prisma-client-js"
+//   previewFeatures = ["driverAdapters"]
+// }
+//
+// datasource db {
+//   provider = "sqlite"
+//   url      = env("DATABASE_URL")
+// }
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+generator client {
+  provider = "prisma-client-js"
 }
 
 model analytic_settings {
@@ -53,7 +62,7 @@ model cart {
 model cart_item {
   id      Int     @id @default(autoincrement())
   cart_id Int
-  name    String?
+  name    String? @unique()
   cart    cart    @relation(fields: [cart_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([cart_id, name], map: "cart_item_cart_id_name_unique")

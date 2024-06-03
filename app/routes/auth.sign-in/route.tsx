@@ -13,11 +13,13 @@ import {
 import { auth } from "~/auth/firebase/auth";
 import { sessionLogin, validateSession } from "~/auth/firebase/auth.server";
 import { HOME_ROUTE } from "~/auth/contants";
+import { prisma } from "~/db/prisma";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+const users = await prisma.user.findMany();
   const sessionData = await validateSession(request);
   if (sessionData !== undefined) return redirect(HOME_ROUTE);
-  return null;
+  return users;
 };
 
 export function ContinueWithGoogleButton() {
