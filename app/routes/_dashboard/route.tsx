@@ -17,7 +17,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   console.log(`Cookie = ${JSON.stringify(cookie)}`);
   const session = await validateSessionAndRedirectIfInvalid(request).then(
     async (session) => {
-      const user = await prisma.user.findFirst({
+      let user = await prisma.user.findFirst({
         select: {
           id: true,
           firebase_id: true,
@@ -27,14 +27,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         where: { firebase_id: { equals: session.uid } },
       });
       if (!user) {
-        await prisma.user.create({
+        user = await prisma.user.create({
           data: {
             firebase_id: session.uid,
             email_verified: session.email_verified ?? false,
             oauth_provider: session.firebase.sign_in_provider,
           },
+        select: {
+          id: true,
+          firebase_id: true,
+          workspace_user_join_list: { include: { workspace: true } },
+          email: true,
+        },
         });
-        throw Error("User not found");
       }
 
       const selectedWorkspaceJoinDataFromCookie =

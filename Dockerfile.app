@@ -17,6 +17,8 @@ RUN npm install
 
 # Build the app
 COPY . .
+# CMD ["npm", "prisma", "db", "push"]
+RUN npm prisma db push
 RUN npm run app:build
 
 # Expose port and start the app
