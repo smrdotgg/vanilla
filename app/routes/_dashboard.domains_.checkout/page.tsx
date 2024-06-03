@@ -35,7 +35,6 @@ export function Page() {
 
   return (
     <div className="flex h-full w-full   *:m-auto justify-center">
-    <p>selected = ({selectedWorkspaceId})</p>
       <Card>
         <CardHeader>
           <CardTitle>Complete your purchase</CardTitle>

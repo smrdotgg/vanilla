@@ -17,16 +17,11 @@ const globalForDb = globalThis as unknown as {
   conn: { [key: string]: LoaderResponse } | undefined;
 };
 
-const cache = globalForDb.conn ?? {};
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const query = new URL(args.request.url).searchParams.get("query") ?? "";
   console.log(`Query received: ${query}`);
 
-  if (cache[query]) {
-    console.log(`Cache hit for query: ${query}`);
-    return cache[query];
-  }
 
   console.log(`Cache miss for query: ${query}. Fetching data...`);
   const results = getData(args.request);
@@ -47,13 +42,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     return domainPriceMap;
   });
 
-  cache[query] = {
-    query: query,
-    results: await results,
-    domainToPriceMap: await domainToPriceMap,
-  };
 
-  console.log("Cached data:", cache[query]);
 
   return {
     query: query,
