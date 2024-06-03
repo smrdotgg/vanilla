@@ -1,15 +1,6 @@
 version: '3.8'
 
 services:
-  # Migration Service
-  migrate:
-    image: migration-image
-    build:
-      context: .
-      dockerfile: Dockerfile.migrate
-    env_file: .env
-      # command: ["npx", "db:migrate"]
-
   # Backend API Service
   api:
     image: api-image
@@ -19,8 +10,6 @@ services:
     ports:
       - "4000:4000"
     env_file: .env
-    depends_on:
-      - migrate
 
   # Remix App Service
   app:
@@ -31,6 +20,4 @@ services:
     ports:
       - "80:3000"
     env_file: .env
-    depends_on:
-      - api
 
