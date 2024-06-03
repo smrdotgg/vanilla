@@ -58,7 +58,6 @@ const validateSession = async (
   }
 };
 
-const decodedCache: { [key: string]: CleanDecodedIdToken } = {};
 /**
  * Checks if the session associated with the provided request is valid.
  * Rediects otherwise.
@@ -72,10 +71,6 @@ const validateSessionAndRedirectIfInvalid = async (
   request: Request,
 ): Promise<CleanDecodedIdToken> => {
   const cookieString = request.headers.get("cookie");
-  const cachedVal = decodedCache[cookieString ?? ""];
-  if (cachedVal !== undefined) {
-    return cachedVal;
-  }
   const session = await getSession(cookieString);
 
   try {
@@ -85,7 +80,6 @@ const validateSessionAndRedirectIfInvalid = async (
     const decodedClaims = await admin
       .auth()
       .verifySessionCookie(session.get("idToken"), true /** checkRevoked */);
-    decodedCache[cookieString ?? crypto.randomUUID()] = decodedClaims;
     return decodedClaims;
   } catch (error) {
     console.error("Error in validateSessionAndRedirectIfInvalid:", error);
