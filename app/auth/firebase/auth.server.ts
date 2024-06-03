@@ -12,9 +12,9 @@ if (Number(admin.apps?.length) === 0) {
   admin.initializeApp({
     projectId: env.FIREBASE_PROJECT_ID,
     credential: admin.credential.cert({
-        projectId: env.FIREBASE_PROJECT_ID,
-        privateKey: env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-        clientEmail: env.FIREBASE_CLIENT_EMAIL,
+      projectId: env.FIREBASE_PROJECT_ID,
+      privateKey: env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      clientEmail: env.FIREBASE_CLIENT_EMAIL,
     }),
   });
 }
@@ -26,7 +26,7 @@ const { getSession, commitSession, destroySession } =
   createCookieSessionStorage({
     cookie: {
       name: "fb:token",
-      expires: new Date(Date.now() + 600),
+      expires: new Date(Date.now() + 60 * 60 * 24 * 5),
       httpOnly: true,
       maxAge: 600,
       path: "/",
@@ -58,6 +58,7 @@ const validateSession = async (
   }
 };
 
+const decodedCache: { [key: string]: CleanDecodedIdToken } = {};
 /**
  * Checks if the session associated with the provided request is valid.
  * Rediects otherwise.
@@ -70,7 +71,13 @@ const validateSession = async (
 const validateSessionAndRedirectIfInvalid = async (
   request: Request,
 ): Promise<CleanDecodedIdToken> => {
-  const session = await getSession(request.headers.get("cookie"));
+  const cookieString = request.headers.get("cookie");
+  const cachedVal = decodedCache[cookieString ?? ""];
+  if (cachedVal !== undefined) {
+    return cachedVal;
+  }
+  const session = await getSession(cookieString);
+
   try {
     console.log("Verifying session...");
     // Verify the session cookie. In this case an additional check is added to detect
@@ -78,8 +85,7 @@ const validateSessionAndRedirectIfInvalid = async (
     const decodedClaims = await admin
       .auth()
       .verifySessionCookie(session.get("idToken"), true /** checkRevoked */);
-    console.log("Session verified");
-    console.log(`Decoded claims: ${JSON.stringify(decodedClaims)}`);
+    decodedCache[cookieString ?? crypto.randomUUID()] = decodedClaims;
     return decodedClaims;
   } catch (error) {
     console.error("Error in validateSessionAndRedirectIfInvalid:", error);
@@ -114,7 +120,7 @@ const setCookieAndRedirect = async (
 
 const getUserInfoFromIdToken = (idToken: string) => {
   return admin.auth().verifyIdToken(idToken);
-}
+};
 
 /**
  * login the session by verifying the token, if all is good create/set cookie

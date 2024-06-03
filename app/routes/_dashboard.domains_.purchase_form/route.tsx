@@ -10,8 +10,11 @@ import { TB_domainPurchaseDetails } from "~/db/schema.server";
 import { eq } from "drizzle-orm";
 import { INTENTS } from "./types";
 import { api } from "~/server/trpc/server.server";
+import { prisma } from "~/db/prisma";
+import { validateSessionAndRedirectIfInvalid } from "~/auth/firebase/auth.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const session = await validateSessionAndRedirectIfInvalid(request);
   const domain = new URL(request.url).searchParams.get("domain");
   if ((domain?.length ?? 0) === 0) {
     return redirect("/domains/search");
@@ -27,8 +30,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     .then(
       (domains) => domains !== undefined && domains?.length > 0 && domains[0],
     );
+
+  const userPurchaseDetails = await prisma.domain_purchase_form_info.findFirst({
+    where: {
+      user_old: {
+        firebase_id: session.uid,
+      },
+    },
+  });
+
   return {
-    userPurchaseDetails: {},
+    userPurchaseDetails: userPurchaseDetails,
     domainIsAvailable,
     domain,
   };

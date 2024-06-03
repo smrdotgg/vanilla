@@ -3,13 +3,14 @@ import { Page } from "./page";
 import { INTENTS } from "./types";
 import { getData, getDomainToPriceMap } from "./helpers.server";
 import { validateSessionAndRedirectIfInvalid } from "~/auth/firebase/auth.server";
+import { prisma } from "~/db/prisma";
 
 type LoaderResponse = {
-  results: ReturnType<typeof getData>;
+  results: Awaited<ReturnType<typeof getData>>;
   query: string;
-  domainToPriceMap: Promise<{
-    [key: string]: number;
-  }>;
+  domainToPriceMap: {
+    [key: string]: { name: string; price: number; time: number };
+  };
 };
 
 const globalForDb = globalThis as unknown as {
@@ -18,38 +19,51 @@ const globalForDb = globalThis as unknown as {
 
 const cache = globalForDb.conn ?? {};
 
-export const loader = (args: LoaderFunctionArgs) => {
-  const queryFormData = new URL(args.request.url).searchParams.get("query");
-  let query: string;
-  if (queryFormData == null || String(queryFormData).length === 0) {
-    query = "";
-  } else {
-    query = String(queryFormData);
+export const loader = async (args: LoaderFunctionArgs) => {
+  const query = new URL(args.request.url).searchParams.get("query") ?? "";
+  console.log(`Query received: ${query}`);
+
+  if (cache[query]) {
+    console.log(`Cache hit for query: ${query}`);
+    return cache[query];
   }
-  // if (cache[query] !== undefined) {
-  //   return defer({ ...cache[query]! });
-  // }
+
+  console.log(`Cache miss for query: ${query}. Fetching data...`);
   const results = getData(args.request);
-  const domains = results.then((results) =>
-    results?.CommandResponse?.DomainCheckResults.map((d) => d.Domain),
-  );
-  const domainToPriceMap = domains.then((domains) =>
-    getDomainToPriceMap(domains),
-  );
+
+  results.then((res) => console.log(`results: ${JSON.stringify(res)}`));
+
+  const domains = results.then((results) => {
+    const domainList = results?.CommandResponse?.DomainCheckResults.map(
+      (d) => d.Domain,
+    );
+    console.log("Domains:", domainList);
+    return domainList;
+  });
+
+  const domainToPriceMap = domains.then((domains) => {
+    const domainPriceMap = getDomainToPriceMap(domains);
+    console.log("Domain to Price Map:", domainPriceMap);
+    return domainPriceMap;
+  });
+
   cache[query] = {
-    query,
-    results,
-    domainToPriceMap,
+    query: query,
+    results: await results,
+    domainToPriceMap: await domainToPriceMap,
   };
 
-  return defer({
-    results,
-    query,
-    domainToPriceMap,
-  });
+  console.log("Cached data:", cache[query]);
+
+  return {
+    query: query,
+    results: await results,
+    domainToPriceMap: await domainToPriceMap,
+  };
 };
 
 export { Page as default };
+
 export const action = async ({ request }: ActionFunctionArgs) => {
   await validateSessionAndRedirectIfInvalid(request);
 

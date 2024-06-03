@@ -118,7 +118,7 @@ export function DomainUserInfoForm({
 }) {
   const form = useForm<z.infer<typeof domainUserInfoZodSchema>>({
     resolver: zodResolver(domainUserInfoZodSchema),
-    defaultValues: Boolean(initialData) ? initialData : {},
+    defaultValues: initialData ? initialData : {},
   });
   const { submit } = useFetcher();
   const {state} = useNavigation();
@@ -133,7 +133,7 @@ export function DomainUserInfoForm({
 
   return (
     <>
-      {JSON.stringify(initialData)}
+      {/* {JSON.stringify(initialData)} */}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -272,8 +272,8 @@ export function DomainUserInfoForm({
                           <SelectValue placeholder="Country Code" />
                         </SelectTrigger>
                         <SelectContent>
-                          {phoneCountryCodes.countries.map((data) => (
-                            <SelectItem value={data.code}>
+                          {phoneCountryCodes.countries.map((data, index) => (
+                            <SelectItem value={data.code} key={index} >
                               {data.name} ({data.code})
                             </SelectItem>
                           ))}
@@ -434,8 +434,8 @@ export function DomainUserInfoForm({
                           <SelectValue placeholder="Country Code" />
                         </SelectTrigger>
                         <SelectContent>
-                          {phoneCountryCodes.countries.map((data) => (
-                            <SelectItem value={data.code}>
+                          {phoneCountryCodes.countries.map((data, index) => (
+                            <SelectItem key={index} value={data.code}>
                               {data.name} ({data.code})
                             </SelectItem>
                           ))}
@@ -596,8 +596,8 @@ export function DomainUserInfoForm({
                           <SelectValue placeholder="Country Code" />
                         </SelectTrigger>
                         <SelectContent>
-                          {phoneCountryCodes.countries.map((data) => (
-                            <SelectItem value={data.code}>
+                          {phoneCountryCodes.countries.map((data, index) => (
+                            <SelectItem value={data.code} key={index}>
                               {data.name} ({data.code})
                             </SelectItem>
                           ))}
@@ -759,8 +759,8 @@ export function DomainUserInfoForm({
                           <SelectValue placeholder="Country Code" />
                         </SelectTrigger>
                         <SelectContent>
-                          {phoneCountryCodes.countries.map((data) => (
-                            <SelectItem value={data.code}>
+                          {phoneCountryCodes.countries.map((data, index) => (
+                            <SelectItem value={data.code} key={index}>
                               {data.name} ({data.code})
                             </SelectItem>
                           ))}

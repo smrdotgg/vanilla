@@ -14,6 +14,7 @@ import { ZodError } from "zod";
 import { validateSession } from "~/auth/firebase/auth.server";
 // import { lucia } from "~/auth/lucia.server";
 import { db } from "~/db/index.server";
+import { prisma } from "~/db/prisma";
 
 // import { getServerAuthSession } from "~/server/auth";
 // import { db } from "~/server/db";
@@ -33,6 +34,7 @@ import { db } from "~/db/index.server";
 export const createTRPCContext = async ({ req }: { req: Request }) => {
   const returnObject = {
     db,
+    prisma,
     req,
   };
 
@@ -55,11 +57,16 @@ export const createTRPCContext = async ({ req }: { req: Request }) => {
         }
       : undefined,
   );
-
-  if (session !== undefined) { 
-    return { ...returnObject, session };
+  const user =
+    session !== undefined
+      ? await returnObject.prisma.user.findFirst({
+          where: { firebase_id: session.uid },
+        })
+      : null;
+  if (session !== undefined && user !== undefined && user !== null) {
+    return { ...returnObject, session, user };
   }
-  return { ...returnObject, session: undefined };
+  return { ...returnObject, session: undefined, user: undefined };
 };
 
 /**
@@ -115,7 +122,7 @@ export const publicProcedure = t.procedure;
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.uid) {
+  if (!ctx.session || !ctx.session.uid || ctx.user === undefined || ctx.user === null) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({

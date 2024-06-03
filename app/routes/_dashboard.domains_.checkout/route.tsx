@@ -4,10 +4,15 @@ import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
 } from "@remix-run/node";
-import { getDomainToPriceMap ,checkDomainAvailability } from "../_dashboard.domains_.search/helpers.server";
+import {
+  getDomainToPriceMap,
+  checkDomainAvailability,
+} from "../_dashboard.domains_.search/helpers.server";
 import { INTENTS } from "./types";
 import { api } from "~/server/trpc/server.server";
 import { validateSessionAndRedirectIfInvalid } from "~/auth/firebase/auth.server";
+import { COOKIES } from "~/cookies/workspace";
+import { prisma } from "~/db/prisma";
 
 // Define the loader function to process domain search requests
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -42,32 +47,76 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       const domainNames = domainObjects.map((d) => d.Domain);
       // Retrieve pricing information for the found domain
       const domainToPriceMap = await getDomainToPriceMap(domainNames);
+
       return {
         available: domainObjects[0].Available,
         price: domainToPriceMap[domainNames[0]],
         name: domainObjects[0].Domain,
       };
     });
+      const cookieHeader = request.headers.get("Cookie");
+      const cookie =
+        (await COOKIES.selected_workspace_id.parse(cookieHeader)) || {};
+      console.log("Parsed cookie:", cookie);
+
+      const selected_workspace_id = String(cookie.selected_workspace_id);
 
   // Return the domain data
   return {
+        selectedWorkspaceId: selected_workspace_id,
     domainData: await domainData,
   };
 };
 
-
 export { Page as default };
-
-
 export const action = async ({ request }: ActionFunctionArgs) => {
+  console.log("Starting action function...");
+
   const body = await request.formData();
+  console.log("Received form data:", body);
+
   if (body.get("intent") === INTENTS.purchaseDomain) {
+    console.log("Intent is to purchase domain...");
+
     const domain = body.get("domain");
-    const {uid} = await validateSessionAndRedirectIfInvalid(request);
+    console.log("Domain to purchase:", domain);
+
+    const { uid } = await validateSessionAndRedirectIfInvalid(request);
+    console.log("User ID:", uid);
+
+    const user = await prisma.user.findFirst({ where: { firebase_id: uid } });
+    console.log("User details:", user);
+
+    if (!user) throw Error("User not found");
+
+    const cookieHeader = request.headers.get("Cookie");
+    console.log("Cookie header:", cookieHeader);
+
+    const cookie =
+      (await COOKIES.selected_workspace_id.parse(cookieHeader)) || {};
+    console.log("Parsed cookie:", cookie);
+
+    const selected_workspace_id = String(cookie.selected_workspace_id);
+    console.log("Selected workspace ID:", selected_workspace_id);
+
+    if (
+      selected_workspace_id === "undefined" ||
+      selected_workspace_id === "null" ||
+      selected_workspace_id.length === 0 ||
+      selected_workspace_id === "NaN"
+    )
+      throw Error("Workspace not selected in header");
+
+    console.log("Workspace ID is valid.");
+
     await api(request).domains.purchaseDomain.mutate({
-      userId: uid,
+      userId: String(user.id),
+      workspaceId: selected_workspace_id,
       domainName: String(domain),
     });
+
+    console.log("Domain purchase mutation successful.");
+
     return redirect("/domains");
   } else {
     console.log("Unhandled intent: ", body.get("intent"));

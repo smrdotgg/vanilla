@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { env } from '~/api';
+import { insertDomainMainData, insertDomainPricingData } from './cron/updateTldTable';
 
 
 const app = new Hono()

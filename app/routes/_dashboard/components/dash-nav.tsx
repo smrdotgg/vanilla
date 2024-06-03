@@ -31,6 +31,7 @@ import { ModeToggle } from "~/components/ui/mode-toggle";
 import { filterNulls } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { INTENTS } from "../types";
+import { flushSync } from "react-dom";
 
 type dashRoute =
   | "/home"
@@ -89,6 +90,9 @@ export function DashLayout({
 }) {
   const [loading, setLoading] = useState("");
 
+  const x = useNavigation();
+
+  const { selected_workspace_id} = useLoaderData<typeof loader>();
   return (
     <div className="flex h-screen max-h-screen w-screen flex-col  overflow-hidden">
       {/* Top Bar */}
@@ -114,17 +118,27 @@ export function DashLayout({
                 key={i}
                 prefetch="intent"
                 className={({ isActive, isPending }) => {
-                  if (isPending && loading !== e.route) setLoading(e.route);
-                  if (isActive && loading === e.route) setLoading("");
-                  return `
-                  flex min-h-8 
-                  ${
-                    isActive
-                      ? "border-r-2 border-r-black bg-white text-black"
-                      : isPending
-                        ? "cursor-wait bg-gray-600 text-black dark:text-white"
-                        : "bg-gray-900 text-white transition duration-100 hover:bg-gray-900"
-                  }`;
+                  if (isPending && loading !== e.route) {
+                    flushSync(() => setLoading(e.route));
+                  } else if (!isPending && loading === e.route) {
+                    flushSync(() => setLoading(""));
+                  }
+
+                  const baseClasses = "flex min-h-8";
+                  let stateClasses = "";
+
+                  if (isActive) {
+                    stateClasses =
+                      "border-r-2 border-r-black bg-white text-black";
+                  } else if (isPending) {
+                    stateClasses =
+                      "cursor-wait bg-gray-600 text-black dark:text-white";
+                  } else {
+                    stateClasses =
+                      "bg-gray-900 text-white transition duration-100 hover:bg-gray-900";
+                  }
+
+                  return `${baseClasses} ${stateClasses}`;
                 }}
                 to={e.route}
               >
@@ -148,7 +162,7 @@ export function DashLayout({
           <ModeToggle />
         </div>
         {/* Main Content */}
-        <div className="flex max-h-full flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-800">
+        <div className="flex max-h-full flex-1 overflow-y-auto ">
           {children}
         </div>
       </div>
@@ -161,13 +175,10 @@ function SlashDivide() {
 }
 
 function WorkspaceSelect() {
-  const { user, selectedWorkspaceJoinDataFromCookie } =
+  const { user, selectedWorkspace } =
     useLoaderData<typeof loader>();
   const [showModal, setShowModal] = useState(false);
 
-  const selectedWorkspace =
-    selectedWorkspaceJoinDataFromCookie?.workspace ??
-    user.workspace_user_join_list[0].workspace;
 
   const myWorkspaces = user.workspace_user_join_list.map((join) => ({
     name: join.workspace.name,
@@ -188,7 +199,7 @@ function WorkspaceSelect() {
       disabled={state !== "idle"}
       onValueChange={onChange}
       name="targetWorkspaceId"
-      value={selectedWorkspace.id.toString()}
+      value={selectedWorkspace?.id.toString()}
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select Workspace" />

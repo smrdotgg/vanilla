@@ -8,74 +8,50 @@ datasource db {
 }
 
 model analytic_settings {
-  id                 String    @id
-  campaign_id        String?   @unique(map: "analytic_settings_campaign_id_unique")
-  open_rate          Boolean   @default(false)
-  reply_rate         Boolean   @default(false)
-  opt_out_rate       Boolean   @default(false)
-  opt_out_url        Boolean   @default(false)
-  bounce_rate        Boolean   @default(false)
-  click_through_rate Boolean   @default(false)
-  campaign           campaign? @relation(fields: [campaign_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                 Int     @id @default(autoincrement())
+  campaign_id        String? @unique(map: "analytic_settings_campaign_id_unique")
+  open_rate          Boolean @default(false)
+  reply_rate         Boolean @default(false)
+  opt_out_rate       Boolean @default(false)
+  opt_out_url        Boolean @default(false)
+  bounce_rate        Boolean @default(false)
+  click_through_rate Boolean @default(false)
 }
 
 model campaign {
-  id                                                       String                       @id
-  name                                                     Unsupported("text(256)")?
-  created_at                                               Int
-  updated_at                                               Int
-  deadline                                                 DateTime?                    @default(now())
+  id                         Int                          @id @default(autoincrement())
+  name                       String
+  created_at                 Int
+  updated_at                 Int
+  deadline                   DateTime?                    @default(now())
   // analytic_settings                                        analytic_settings?
-  user_id                                                  Int
-  campaign_google_email_link                               campaign_google_email_link[] @ignore
-  campaign_sender_email_link                               campaign_sender_email_link[]
-  campaigns_contacts_campaigns_contacts_campaignTocampaign campaigns_contacts[]         @relation("campaigns_contacts_campaignTocampaign")
-  email_opt_out_event                                      email_opt_out_event[]
-  sequence_break                                           sequence_break[]
-  sequence_step                                            sequence_step[]
-  analytic_settings                                        analytic_settings?
-  user                                                     user?                        @relation(fields: [userId], references: [id])
-  userId                                                   Int?
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model campaign_google_email_link {
-  campaign_id      String
-  google_user_id   String
-  google_user_info google_user_info @relation(fields: [google_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  campaign         campaign         @relation(fields: [campaign_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@ignore
+  user_id                    Int
+  campaign_sender_email_link campaign_sender_email_link[]
+  email_opt_out_event        email_opt_out_event[]
+  sequence_break             sequence_break[]
+  sequence_step              sequence_step[]
+  user                       user?                        @relation(fields: [userId], references: [id])
+  userId                     Int?
 }
 
 model campaign_sender_email_link {
-  campaign_id     String
-  sender_email_id String
+  id              Int          @id @default(autoincrement())
+  campaign_id     Int
+  sender_email_id Int
   sender_email    sender_email @relation(fields: [sender_email_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   campaign        campaign     @relation(fields: [campaign_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@id([campaign_id, sender_email_id])
-}
-
-model campaigns_contacts {
-  campaign                                       String
-  contact                                        String
-  contact_campaigns_contacts_contactTocontact    contact  @relation("campaigns_contacts_contactTocontact", fields: [contact], references: [id], onDelete: Cascade)
-  campaign_campaigns_contacts_campaignTocampaign campaign @relation("campaigns_contacts_campaignTocampaign", fields: [campaign], references: [id], onDelete: Cascade)
-
-  @@id([campaign, contact])
 }
 
 model cart {
-  id        String      @id
+  id        Int         @id @default(autoincrement())
   user_id   Int         @unique(map: "cart_user_id_unique")
   user      user        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   cart_item cart_item[]
 }
 
 model cart_item {
-  id      String  @id
-  cart_id String
+  id      Int     @id @default(autoincrement())
+  cart_id Int
   name    String?
   cart    cart    @relation(fields: [cart_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -83,7 +59,7 @@ model cart_item {
 }
 
 model contabo_token {
-  id                       String @id
+  id                       Int    @id @default(autoincrement())
   token                    String
   expires_at               Int
   refresh_token            String
@@ -91,26 +67,29 @@ model contabo_token {
 }
 
 model contact {
-  id                                                     String               @id
-  name                                                   String
-  email                                                  String
-  company_name                                           String?
-  created_at                                             DateTime             @default(now())
-  campaigns_contacts_campaigns_contacts_contactTocontact campaigns_contacts[] @relation("campaigns_contacts_contactTocontact")
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String
+  company_name String?
+  created_at   DateTime @default(now())
 }
 
 model domain {
-  id           String    @id
-  name         String?   @unique(map: "domain_name_unique")
+  id           Int       @id @default(autoincrement())
   user_id      Int
   purchased_at DateTime  @default(now())
-  splitbox_id  String?
+  name         String    @unique(map: "domain_name_unique")
+  splitbox_id  Int?
   splitbox     splitbox? @relation(fields: [splitbox_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_old     user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchased_by user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  workspace_id Int
+  workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  // workspace_id
 }
 
 model domain_purchase_form_info {
-  id                            String  @id
+  id                            Int     @id @default(autoincrement())
   user_id                       Int     @unique(map: "domain_purchase_form_info_user_id_unique")
   registrant_first_name         String?
   registrant_last_name          String?
@@ -156,9 +135,9 @@ model domain_purchase_form_info {
 }
 
 model email_bounce_event {
-  id               String         @id
+  id               Int            @id @default(autoincrement())
   target_email     String
-  sequence_step_id String?
+  sequence_step_id Int?
   created_at       DateTime       @default(now())
   name             String
   sec              String
@@ -166,18 +145,18 @@ model email_bounce_event {
 }
 
 model email_link_click_event {
-  id            String         @id
+  id            Int            @id @default(autoincrement())
   target_email  String
-  sequence_id   String?
+  sequence_id   Int?
   link          String
   created_at    DateTime       @default(now())
   sequence_step sequence_step? @relation(fields: [sequence_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model email_open_event {
-  id            String         @id
+  id            Int            @id @default(autoincrement())
   target_email  String
-  sequence_id   String?
+  sequence_id   Int?
   created_at    DateTime       @default(now())
   sequence_step sequence_step? @relation(fields: [sequence_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -185,17 +164,17 @@ model email_open_event {
 }
 
 model email_opt_out_event {
-  id           String   @id
-  target_email String
+  id           Int      @id @default(autoincrement())
+  target_email Int
   created_at   DateTime @default(now())
-  campaign_id  String
+  campaign_id  Int
   campaign     campaign @relation(fields: [campaign_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([target_email, campaign_id], map: "email_opt_out_event_target_email_campaign_id_unique")
 }
 
 model google_tokens {
-  id            String  @id
+  id            Int     @id @default(autoincrement())
   google_id     String  @unique(map: "google_tokens_google_id_unique")
   access_token  String
   expires_in    Int
@@ -206,16 +185,15 @@ model google_tokens {
 }
 
 model google_user_info {
-  id                         String                       @id
-  email                      String                       @unique(map: "google_user_info_email_unique")
-  google_id                  String                       @unique(map: "google_user_info_google_id_unique")
-  verified_email             Int
-  name                       String
-  given_name                 String?
-  family_name                String?
-  picture                    String
-  locale                     String?
-  campaign_google_email_link campaign_google_email_link[] @ignore
+  id             Int     @id @default(autoincrement())
+  email          String  @unique(map: "google_user_info_email_unique")
+  google_id      String  @unique(map: "google_user_info_google_id_unique")
+  verified_email Int
+  name           String
+  given_name     String?
+  family_name    String?
+  picture        String
+  locale         String?
 }
 
 model migrations {
@@ -225,7 +203,7 @@ model migrations {
 }
 
 model sender_email {
-  id                         String                       @id
+  id                         Int                          @id @default(autoincrement())
   from_name                  String
   from_email                 String
   user_name                  String
@@ -240,21 +218,21 @@ model sender_email {
 }
 
 model sequence_break {
-  id              String    @id
+  id              Int       @id @default(autoincrement())
   length_in_hours Int
   index           Int
-  campaign_id     String?
+  campaign_id     Int?
   campaign        campaign? @relation(fields: [campaign_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model sequence_step {
-  id                     String                   @id
+  id                     Int                      @id @default(autoincrement())
   title                  String?
   content                String?
   index                  Int
   created_at             DateTime                 @default(now())
   updated_at             DateTime                 @default(now())
-  campaign_id            String
+  campaign_id            Int
   state                  String                   @default("waiting")
   format                 String                   @default("html")
   email_bounce_event     email_bounce_event[]
@@ -264,7 +242,7 @@ model sequence_step {
 }
 
 model splitbox {
-  id                             String   @id
+  id                             Int      @id @default(autoincrement())
   name                           String
   compute_id_on_hosting_platform String   @unique(map: "splitbox_compute_id_on_hosting_platform_unique")
   userId                         Int
@@ -291,6 +269,7 @@ model workspace {
   id                  Int                   @id @default(autoincrement())
   name                String
   workspace_user_join workspace_user_join[]
+  domain              domain[]
 }
 
 model workspace_user_join {
@@ -300,4 +279,22 @@ model workspace_user_join {
   role         String
   workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   user         user      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model tld_price_info {
+  id                          Int                     @id @default(autoincrement())
+  name                        String                  @unique()
+  min_registration_year_count Int
+  tld_yearly_price_info       tld_yearly_price_info[]
+}
+
+model tld_yearly_price_info {
+  id           Int @id @default(autoincrement())
+  tld_price_id Int @map("tld_price_info_id")
+  price        Int
+  year         Int
+
+  tld_price_info tld_price_info @relation(fields: [tld_price_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([tld_price_id, year])
 }

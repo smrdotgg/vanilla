@@ -51,7 +51,7 @@ export const api = ( req: Request ) =>
       () =>
         ({ op }) =>
           observable((observer) => {
-            createTRPCContext({ req: req })
+            createTRPCContext({ req })
               .then((ctx) => {
                 return callProcedure({
                   procedures: appRouter._def.procedures,
@@ -66,6 +66,7 @@ export const api = ( req: Request ) =>
                 observer.complete();
               })
               .catch((cause: TRPCErrorResponse) => {
+                console.log("ERROR");
                 observer.error(TRPCClientError.from(cause));
               });
           }),

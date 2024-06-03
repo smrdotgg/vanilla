@@ -1,87 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { env } from "~/api";
 import { topDomains } from "./components/tlds";
 import { processApiResponse } from "./gpttype";
 import SXTJ from "simple-xml-to-json";
+import { prisma } from "~/db/prisma";
 
 const nameCheapBaseUrl = `${env.NAMECHEAP_API_URL}xml.response?ApiUser=${env.NAMECHEAP_API_USERNAME}&ApiKey=${env.NAMECHEAP_API_KEY}&UserName=${env.NAMECHEAP_API_USERNAME}&ClientIp=${env.CLIENT_IP}`;
+console.log("NAME CHEAP BASE URL");
+console.log(nameCheapBaseUrl);
 
 let cachedResponseText: string | undefined;
 let myJson: any;
 export const getTldPrice = async (tld: string) => {
-  try {
-    const apiUrl = `${env.PUBLIC_URL}namecheap_domain_price_response.xml`;
-
-    if (myJson) {
-      const children = myJson["ApiResponse"]["children"];
-
-      const commandResponseIndex = children.findIndex((el: any) =>
-        el.hasOwnProperty("CommandResponse"),
-      );
-      // console.log(JSON.stringify(children, null, 2))
-      let data = children[commandResponseIndex]["CommandResponse"];
-      data = data["children"][0]["UserGetPricingResult"];
-      data = data["children"][0]["ProductType"];
-      // console.log('ping 1');
-      // console.log(JSON.stringify(data, null, 2));
-      data = data["children"];
-      // console.log('ping 2');
-      // console.log(JSON.stringify(data, null, 2));
-      // This means invalid TLD
-      if (data === undefined) return null;
-      data = data[0]["ProductCategory"];
-      // console.log("ping 3");
-      // console.log(JSON.stringify(data, null, 2));
-      data = data["children"];
-
-      data = data.find(
-        (obj: any) =>
-          String(obj["Product"]["Name"]).toLowerCase() === tld.toLowerCase(),
-      );
-      data = data["Product"];
-      data = data["children"][0]["Price"];
-      const price = Number(data["Price"]);
-      return price;
-    }
-
-    const response = await fetch(apiUrl);
-    if (!response.ok) {
-      const errorMessage = await response.text();
-      // console.log("Error:", errorMessage);
-      return null;
-    } else {
-      // if (cachedResponse === undefined) cachedResponse = response;
-
-      cachedResponseText = await response.text();
-      const responseText = JSON.parse(JSON.stringify(cachedResponseText));
-      myJson = JSON.parse(JSON.stringify(SXTJ.convertXML(responseText)));
-
-      const children = myJson["ApiResponse"]["children"];
-
-      const commandResponseIndex = children.findIndex((el: any) =>
-        el.hasOwnProperty("CommandResponse"),
-      );
-      // console.log(JSON.stringify(children, null, 2))
-      let data = children[commandResponseIndex]["CommandResponse"];
-      data = data["children"][0]["UserGetPricingResult"];
-      data = data["children"][0]["ProductType"];
-      // console.log('ping 1');
-      // console.log(JSON.stringify(data, null, 2));
-      data = data["children"];
-      // console.log('ping 2');
-      // console.log(JSON.stringify(data, null, 2));
-      // This means invalid TLD
-      if (data === undefined) return null;
-      data = data[0]["ProductCategory"];
-      // console.log('ping 3');
-      // console.log(JSON.stringify(data, null, 2));
-      data = data["children"][0]["Product"];
-      data = data["children"][0]["Price"];
-      const price = Number(data["Price"]);
-      return price;
-    }
-  } catch (e) {
-    return null;
-  }
+  const baseTldData = await prisma.tld_price_info.findUnique({
+    where: { name: tld },
+  });
+  if (!baseTldData) throw Error("TLD Data not found in DB");
+  const priceData = await prisma.tld_yearly_price_info.findFirst({
+    where: {
+      tld_price_id: baseTldData.id,
+      year: baseTldData.min_registration_year_count,
+    },
+  });
+  if (!priceData) throw Error("TLD Price Data not found in DB");
+  return {
+    name: baseTldData.name,
+    price: priceData.price,
+    time: priceData.year,
+  };
 };
 
 const obj = {
@@ -398,14 +344,23 @@ export const checkDomainAvailability = async ({
 };
 
 export const getDomainToPriceMap = async (domains: string[] | undefined) => {
-  const domainToPriceMap: { [key: string]: number } = {};
+  console.log(`getDomainToPriceMap called with domains = ${domains}`);
+  const domainToPriceMap: {
+    [key: string]: { name: string; price: number; time: number };
+  } = {};
   if (domains) {
-    for (let domain of domains) {
-      const price = await getTldPrice(domain.split(".")[1]);
+    for (const domain of domains) {
+      console.log(`Processing domain: ${domain}`);
+      const tld = domain.split(".")[1];
+      console.log(`Extracted TLD: ${tld}`);
+      const price = await getTldPrice(tld);
+      console.log(`Price for ${tld}: ${price}`);
       if (price !== null) {
         domainToPriceMap[domain] = price;
+        console.log(`Added ${domain} to domainToPriceMap`);
       }
     }
   }
+  console.log("Domain to price mapping:", domainToPriceMap);
   return domainToPriceMap;
 };
