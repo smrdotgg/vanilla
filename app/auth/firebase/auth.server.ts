@@ -26,9 +26,10 @@ const { getSession, commitSession, destroySession } =
   createCookieSessionStorage({
     cookie: {
       name: "fb:token",
-      expires: new Date(Date.now() + 60 * 60 * 24 * 5),
+      expires: new Date(Date.now() + 60 * 60 * 24 * 5 * 1000),
       httpOnly: true,
-      maxAge: 600,
+      maxAge: 60 * 60 * 24 * 5,
+      domain: env.NODE_ENV === "production" ? ".splitbox.io" : undefined,
       path: "/",
       sameSite: "lax",
       secrets: ["f3cr@z7"],
