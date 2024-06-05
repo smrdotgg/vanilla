@@ -13,3 +13,5 @@ cron/test.ts
 
 *.sqlite
 plans/
+
+pnpm-lock.yaml

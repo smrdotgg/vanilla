@@ -20,16 +20,13 @@ import {
 import clsx from "clsx";
 import { Provider } from "jotai";
 import { TRPCReactProvider } from "./server/trpc/react";
-import { LoaderFunctionArgs } from "@remix-run/node";
-import { getClientIPAddress } from "remix-utils/get-client-ip-address";
-import { env } from "./api";
+import {
+  LinksFunction,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // const ip = getClientIPAddress(request);
-  // console.log(`env = ${ip}`);
-  // if (env.MY_IP !== null && env.MY_IP !== undefined && env.MY_IP !== ip) {
-  //   throw new Response(null, { status: 404 });
-  // }
   const url = new URL(request.url);
   if (url.pathname == "/") {
     return redirect("/home");
@@ -39,7 +36,30 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     theme: getTheme(),
   };
 };
-
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Splitbox" },
+    {
+      property: "og:title",
+      content: "Very cool app",
+    },
+    {
+      name: "description",
+      content: "This app is the best",
+    },
+  ];
+};
+export const links: LinksFunction = () => {
+  return [
+    { rel: "icon", type: "image/svg+xml", href: "/icon_logo.svg" },
+    {
+      rel: "icon",
+      type: "image/svg+xml",
+      href: "/icon_logo_dark.svg",
+      media: "(prefers-color-scheme: dark)",
+    },
+  ];
+};
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>();
 
@@ -52,8 +72,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 function LayoutCore({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>();
-  // const theme = data?.theme ?? "light";
   const [theme] = useTheme();
+
   return (
     <html lang="en" className={`${clsx(theme)} font-sans`}>
       <head>

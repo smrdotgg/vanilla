@@ -1,4 +1,9 @@
-import { useFetcher, Link, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  useFetcher,
+  Link,
+  useActionData,
+  useLoaderData,
+} from "@remix-run/react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -21,10 +26,10 @@ import { auth } from "~/auth/firebase/auth";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loader,action } from "./route";
+import { loader, action } from "./route";
 
 export function Page() {
-const data = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
   const [errorState, setErrorState] = useState("");
   const actionResult = useActionData<typeof action>();
@@ -80,7 +85,6 @@ const data = useLoaderData<typeof loader>();
     <div className="flex h-screen *:m-auto">
       <div className="flex w-96 flex-col gap-3 align-bottom">
         <h1>Sign In Form</h1>
-
         <Form {...form}>
           <form
             onChange={() => console.log(form.getValues())}
@@ -130,8 +134,6 @@ const data = useLoaderData<typeof loader>();
   );
 }
 
-
-
 export function ContinueWithGoogleButton() {
   const fetcher = useFetcher();
 
@@ -171,4 +173,3 @@ const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
-
