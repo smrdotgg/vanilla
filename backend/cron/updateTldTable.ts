@@ -3,13 +3,14 @@ import { prisma } from "~/db/prisma";
 import SXTJ from "simple-xml-to-json";
 import { env } from "~/api";
 
-main();
+await main();
 
 export async function main() {
   await prisma.tld_price_info.deleteMany();
   await prisma.tld_yearly_price_info.deleteMany();
   await insertDomainMainData();
   await insertDomainPricingData();
+  return;
 }
 export async function insertDomainMainData() {
   const url = `${env.NAMECHEAP_API_URL}xml.response?ApiUser=${env.NAMECHEAP_API_USERNAME}&ApiKey=${env.NAMECHEAP_API_KEY}&UserName=${env.NAMECHEAP_API_USERNAME}&ClientIP=${env.CLIENT_IP}&Command=namecheap.domains.gettldlist`;
@@ -59,6 +60,7 @@ export async function insertDomainMainData() {
   } else {
     console.log("No data to insert into the database");
   }
+  return;
 }
 export async function insertDomainPricingData() {
   const url = `${env.NAMECHEAP_API_URL}xml.response?ApiUser=${env.NAMECHEAP_API_USERNAME}&ApiKey=${env.NAMECHEAP_API_KEY}&UserName=${env.NAMECHEAP_API_USERNAME}&ClientIP=${env.CLIENT_IP}&Command=namecheap.users.getPricing&ProductType=DOMAIN`;
@@ -102,29 +104,22 @@ export async function insertDomainPricingData() {
     for (const priceObject of productData.children) {
       dataList.push({
         duration: Number(priceObject.Price.Duration),
-        yourPrice: Number(priceObject.Price.YourPrice),
+        yourPrice: (priceObject.PricingType === "ABSOLUTE") ? Number(priceObject.Price.YourPrice) : Number(priceObject.Price.YourPrice) * Number(priceObject.Price.Duration),
       });
     }
     console.log("Number of price points for product: ", dataList.length);
 
     const errors = [];
-
-    for (const d of dataList) {
-      try {
-        await prisma.tld_yearly_price_info.create({
-          data: {
-            year: d.duration,
-            price: d.yourPrice,
-            tld_price_id: x.id,
-          },
-        });
-      } catch (e) {
-        errors.push({
+    try {
+      await prisma.tld_yearly_price_info.createMany({
+        data: dataList.map((d) => ({
           year: d.duration,
           price: d.yourPrice,
           tld_price_id: x.id,
-        });
-      }
+        })),
+      })
+    } catch (e) {
+      errors.push(...dataList);
     }
 
     if (errors.length > 0) {
@@ -133,5 +128,6 @@ export async function insertDomainPricingData() {
       console.log("Data inserted successfully for product: ", productName);
     }
   }
+  return;
 }
 

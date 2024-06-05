@@ -82,10 +82,7 @@ function SingleSearchResult({ index }: { index: number }) {
     >
       <p>{domain.Domain}</p>
       <p className="font-mono">
-        $
-        {domainToPriceMap[domain.Domain].price < 10
-          ? 10
-          : domainToPriceMap[domain.Domain].price}
+        ${domainToPriceMap[domain.Domain].price}
       </p>
     </div>
   );
