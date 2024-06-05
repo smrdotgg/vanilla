@@ -113,7 +113,7 @@ async function insertDomainPricingData() {
       await prisma.tld_yearly_price_info.createMany({
         data: dataList.map((d) => ({
           year: d.duration,
-          price: d.yourPrice,
+          price: d.yourPrice + 1,
           tld_price_id: x.id,
         })),
       })
