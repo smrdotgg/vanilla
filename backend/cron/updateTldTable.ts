@@ -103,7 +103,7 @@ async function insertDomainPricingData() {
     for (const priceObject of productData.children) {
       dataList.push({
         duration: Number(priceObject.Price.Duration),
-        yourPrice: (priceObject.PricingType === "ABSOLUTE") ? Number(priceObject.Price.YourPrice) : Number(priceObject.Price.YourPrice) * Number(priceObject.Price.Duration),
+        yourPrice: (priceObject.Price.YourPriceType === "ABSOLUTE") ? Number(priceObject.Price.YourPrice) : Number(priceObject.Price.YourPrice) * Number(priceObject.Price.Duration),
       });
     }
     console.log("Number of price points for product: ", dataList.length);
