@@ -20,6 +20,7 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+RUN npx prisma db push
 # Expose port and start the app
 EXPOSE 4000
 CMD ["npm", "run", "api:start"]
