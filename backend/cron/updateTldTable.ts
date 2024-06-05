@@ -3,7 +3,6 @@ import { prisma } from "~/db/prisma";
 import SXTJ from "simple-xml-to-json";
 import { env } from "~/api";
 
-
 export async function updateDomainPricesOnDatabase() {
   await prisma.tld_price_info.deleteMany();
   await prisma.tld_yearly_price_info.deleteMany();
@@ -101,9 +100,14 @@ async function insertDomainPricingData() {
 
     const dataList: { duration: number; yourPrice: number }[] = [];
     for (const priceObject of productData.children) {
+      const isAbsolute = priceObject.Price.YourPriceType === "ABSOLUTE";
+      console.log(`isAbsolute: ${isAbsolute}`);
       dataList.push({
         duration: Number(priceObject.Price.Duration),
-        yourPrice: (priceObject.Price.YourPriceType === "ABSOLUTE") ? Number(priceObject.Price.YourPrice) : Number(priceObject.Price.YourPrice) * Number(priceObject.Price.Duration),
+        yourPrice: isAbsolute
+          ? Number(priceObject.Price.YourPrice)
+          : Number(priceObject.Price.YourPrice) *
+            Number(priceObject.Price.Duration),
       });
     }
     console.log("Number of price points for product: ", dataList.length);
@@ -116,17 +120,19 @@ async function insertDomainPricingData() {
           price: d.yourPrice + 1,
           tld_price_id: x.id,
         })),
-      })
+      });
     } catch (e) {
       errors.push(...dataList);
     }
 
     if (errors.length > 0) {
-      console.error("Errors occurred while inserting data: ", JSON.stringify(errors.length, null, 2));
+      console.error(
+        "Errors occurred while inserting data: ",
+        JSON.stringify(errors.length, null, 2),
+      );
     } else {
       console.log("Data inserted successfully for product: ", productName);
     }
   }
   return;
 }
-
