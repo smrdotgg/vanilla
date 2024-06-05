@@ -55,8 +55,6 @@ export const env = createEnv({
     CONTABO_LOGIN_PASSWORD: z.string(),
     CONTABO_LOGIN_PASSWORD_ID: z.coerce.number(),
 
-
-    PLANETSCALE_URL: z.string().url(),
     DATABASE_NAME: z.string(),
     MY_IP: z.string().nullish(),
   },

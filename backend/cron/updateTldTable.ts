@@ -3,16 +3,15 @@ import { prisma } from "~/db/prisma";
 import SXTJ from "simple-xml-to-json";
 import { env } from "~/api";
 
-await main();
 
-export async function main() {
+export async function updateDomainPricesOnDatabase() {
   await prisma.tld_price_info.deleteMany();
   await prisma.tld_yearly_price_info.deleteMany();
   await insertDomainMainData();
   await insertDomainPricingData();
   return;
 }
-export async function insertDomainMainData() {
+async function insertDomainMainData() {
   const url = `${env.NAMECHEAP_API_URL}xml.response?ApiUser=${env.NAMECHEAP_API_USERNAME}&ApiKey=${env.NAMECHEAP_API_KEY}&UserName=${env.NAMECHEAP_API_USERNAME}&ClientIP=${env.CLIENT_IP}&Command=namecheap.domains.gettldlist`;
 
   const response = await fetch(url);
@@ -62,7 +61,7 @@ export async function insertDomainMainData() {
   }
   return;
 }
-export async function insertDomainPricingData() {
+async function insertDomainPricingData() {
   const url = `${env.NAMECHEAP_API_URL}xml.response?ApiUser=${env.NAMECHEAP_API_USERNAME}&ApiKey=${env.NAMECHEAP_API_KEY}&UserName=${env.NAMECHEAP_API_USERNAME}&ClientIP=${env.CLIENT_IP}&Command=namecheap.users.getPricing&ProductType=DOMAIN`;
 
   const response = await fetch(url);
