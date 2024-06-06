@@ -17,37 +17,35 @@ const globalForDb = globalThis as unknown as {
   conn: { [key: string]: LoaderResponse } | undefined;
 };
 
-
 export const loader = async (args: LoaderFunctionArgs) => {
   const query = new URL(args.request.url).searchParams.get("query") ?? "";
   console.log(`Query received: ${query}`);
 
-
   console.log(`Cache miss for query: ${query}. Fetching data...`);
-  const results = getData(args.request);
+  const results = await getData(args.request);
+  console.log(`results: ${JSON.stringify(results)}`);
+  const domains = results?.CommandResponse?.DomainCheckResults;
+  const domainNames = domains?.map((d) => d.Domain);
+  console.log("Domains: ", domains);
 
-  results.then((res) => console.log(`results: ${JSON.stringify(res)}`));
+  const domainPriceMap = await getDomainToPriceMap(domainNames);
 
-  const domains = results.then((results) => {
-    const domainList = results?.CommandResponse?.DomainCheckResults.map(
-      (d) => d.Domain,
-    );
-    console.log("Domains:", domainList);
-    return domainList;
-  });
-
-  const domainToPriceMap = domains.then((domains) => {
-    const domainPriceMap = getDomainToPriceMap(domains);
-    console.log("Domain to Price Map:", domainPriceMap);
-    return domainPriceMap;
-  });
-
-
+  const x: [string, { price: number; name: string; time: number }][] =
+    Object.entries(domainPriceMap).map(([name, proposedPrice]) => {
+      const premiumPrice = domains?.find(
+        (d) => d.Domain === name,
+      )?.PremiumRegistrationPrice;
+      if (Number(premiumPrice))
+        return [name, { ...proposedPrice, price: premiumPrice! }];
+      else return [name, proposedPrice];
+    });
+  const y = Object.fromEntries(x);
 
   return {
-    query: query,
-    results: await results,
-    domainToPriceMap: await domainToPriceMap,
+    query,
+    domains,
+    results,
+    domainPriceMap: y,
   };
 };
 

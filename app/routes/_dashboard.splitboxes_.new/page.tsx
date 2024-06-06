@@ -1,4 +1,10 @@
-import { Form as RemixForm, Link, useLoaderData } from "@remix-run/react";
+import {
+  Form as RemixForm,
+  Link,
+  useLoaderData,
+  useNavigation,
+  useFetcher,
+} from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -9,16 +15,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { formSchema, INTENTS } from "./types";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loader } from "./route";
-import { formSchema } from "./types";
-
 
 export const Page = () => {
-  const { previouslyCreatedSplitboxes } = useLoaderData<typeof loader>();
+  const {  previouslyCreatedSplitboxes } = useLoaderData<typeof loader>();
+  const { state } = useNavigation();
+  const { submit } = useFetcher();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -28,7 +35,9 @@ export const Page = () => {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    // console.log(values);
+    const data = { intent: INTENTS.CREATE_SPLITBOX, name: values.name };
+    submit(data, { method: "post", encType: "application/json" });
   }
 
   return (
@@ -67,22 +76,14 @@ export const Page = () => {
             <div></div>
             <div className="flex justify-end gap-2">
               <Button asChild variant="secondary" onClick={() => {}}>
-                <Link to="/splitboxes">Cancel</Link>
+                <Link to="/splitboxes">
+                  {state === "idle" ? "Cancel" : "Loading..."}
+                </Link>
               </Button>
               <Button type="submit">Submit</Button>
             </div>
           </RemixForm>
         </Form>
-        {/* </Form> */}
-        {/*     <Form> */}
-        {/*       <Input name="name" /> */}
-        {/*       <div className="flex justify-end gap-2"> */}
-        {/*         <Button asChild variant="secondary" onClick={() => {}}> */}
-        {/*           <Link to="/splitboxes">Cancel</Link> */}
-        {/*         </Button> */}
-        {/*         <Button onClick={() => {}}>Create</Button> */}
-        {/*       </div> */}
-        {/*     </Form> */}
       </div>
     </div>
   );

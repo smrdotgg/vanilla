@@ -69,9 +69,9 @@ model cart_item {
 }
 
 model contabo_token {
-  id                       Int    @id @default(autoincrement())
+  id                       Int      @id @default(autoincrement())
   token                    String
-  expires_at               Int
+  expires_at               DateTime
   refresh_token            String
   refresh_token_expires_at Int
 }
@@ -252,11 +252,16 @@ model sequence_step {
 }
 
 model splitbox {
-  id                             Int      @id @default(autoincrement())
+  id                             Int    @id @default(autoincrement())
   name                           String
-  compute_id_on_hosting_platform String   @unique(map: "splitbox_compute_id_on_hosting_platform_unique")
-  userId                         Int
-  domain                         domain[]
+  compute_id_on_hosting_platform String @unique(map: "splitbox_compute_id_on_hosting_platform_unique")
+
+  userId Int
+  user   user     @relation(fields: [userId], references: [id])
+  domain domain[]
+
+  workspace   workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
 }
 
 model user {
@@ -273,6 +278,7 @@ model user {
   domains                        domain[]
   carts                          cart[]
   campaigns                      campaign[]
+  splitbox                       splitbox[]
 }
 
 model workspace {
@@ -280,6 +286,7 @@ model workspace {
   name                String
   workspace_user_join workspace_user_join[]
   domain              domain[]
+  splitbox            splitbox[]
 }
 
 model workspace_user_join {

@@ -15,8 +15,6 @@ export const env = createEnv({
 
     BACKEND_URI: z.string(),
     BACKEND_PORT: z.coerce.number(),
-    SQLITE_URL: z.string(),
-    SQLITE_AUTHKEY: z.string().nullish(),
     CLIENT_IP: z.string(),
     // shared for dev and prod
     GOOGLE_CLIENT_ID: z.string(),
@@ -47,11 +45,11 @@ export const env = createEnv({
     POSTGRES_PORT: z.coerce.number(),
     POSTGRES_DB: z.string(),
     VERCEL_URL: z.string().nullish(),
-    NODE_ENV: z.enum(["development", "production"]),
+    NODE_ENV: z.enum(["development", "production"]).default("production"),
     CONTABO_CLIENT_ID: z.string(),
     CONTABO_CLIENT_SECRET: z.string(),
-    CONTABO_USERNAME: z.string(),
-    CONTABO_PASSWORD: z.string(),
+    CONTABO_API_USERNAME: z.string(),
+    CONTABO_API_PASSWORD: z.string(),
     CONTABO_LOGIN_PASSWORD: z.string(),
     CONTABO_LOGIN_PASSWORD_ID: z.coerce.number(),
 

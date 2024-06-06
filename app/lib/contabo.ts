@@ -1,5 +1,5 @@
 import { env } from "~/api";
-import { db } from "~/db/index.server";
+import { prisma } from "~/db/prisma";
 import { TB_contabo_token } from "~/db/schema.server";
 
 export interface ComputeManagerInterface {
@@ -18,10 +18,14 @@ async function createVPSInstance() {
   const uuid = crypto.randomUUID();
   const token = await getAccessToken();
 
+  console.log(`Creating VPS instance with UUID: ${uuid}`);
+
   const headers = new Headers();
   headers.append("x-request-id", uuid);
   headers.append("Authorization", `Bearer ${token}`);
   headers.append("Content-Type", "application/json");
+
+  console.log(`Sending request to create VPS instance with headers: ${JSON.stringify(headers)}`);
 
   return fetch("https://api.contabo.com/v1/compute/instances", {
     method: "POST",
@@ -32,12 +36,15 @@ async function createVPSInstance() {
     }),
   })
     .then((r) => r.json())
-    .then((data) => ({
-      id: `${data["_links"]["self"]}`.split("/v1/compute/instances/")[1],
-      data,
-    }));
+    .then((data) => {
+      console.log(`data: ${JSON.stringify(data)}`);
+      console.log(`VPS instance created with ID: ${data["_links"]["self"]}`);
+      return ({
+        id: `${data["_links"]["self"]}`.split("/v1/compute/instances/")[1],
+        data,
+      });
+    });
 }
-
 type ContaboAccessTokenResponse = {
   access_token: string;
   expires_in: number;
@@ -49,24 +56,24 @@ type ContaboAccessTokenResponse = {
   scope: string;
 };
 
-async function getAccessToken() {
-  const t = await db.select().from(TB_contabo_token);
+export async function getAccessToken() {
+  const t = await prisma.contabo_token.findMany();
   if (t.length > 0) {
-    const expiresAt = t[0].expiresAt;
+    const expiresAt = t[0].expires_at;
     const now = new Date(Date.now());
     const isExpired = expiresAt < now;
     if (!isExpired) {
       return t[0].token;
     } else {
-      await db.delete(TB_contabo_token);
+      await prisma.contabo_token.delete({ where: { id: t[0].id } });
     }
   }
 
   const fd = new URLSearchParams();
   fd.append("client_id", env.CONTABO_CLIENT_ID);
   fd.append("client_secret", env.CONTABO_CLIENT_SECRET);
-  fd.append("username", env.CONTABO_USERNAME);
-  fd.append("password", env.CONTABO_PASSWORD);
+  fd.append("username", env.CONTABO_API_USERNAME);
+  fd.append("password", env.CONTABO_API_PASSWORD);
   fd.append("grant_type", "password");
 
   const response = await fetch(
@@ -83,12 +90,6 @@ async function getAccessToken() {
     .then((js) => {
       console.log(JSON.stringify(js, null, 2));
       return js as ContaboAccessTokenResponse;
-    });
-    await db.insert(TB_contabo_token).values({
-      token: response.access_token,
-      expiresAt: new Date(Date.now() + (response.expires_in - 30) * 1000),
-      refreshToken: response.refresh_token,
-      refreshTokenExpiresAt: new Date(Date.now() + (response.refresh_expires_in - 30) * 1000),
     });
   return response.access_token;
 }

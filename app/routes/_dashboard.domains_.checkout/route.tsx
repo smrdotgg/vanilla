@@ -46,24 +46,35 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       // If a domain is found, get the list of domain names
       const domainNames = domainObjects.map((d) => d.Domain);
       // Retrieve pricing information for the found domain
-      const domainToPriceMap = await getDomainToPriceMap(domainNames);
+      const regularDomainPriceMap = await getDomainToPriceMap(domainNames);
+      const x: [string, { price: number; name: string; time: number }][] =
+        Object.entries(regularDomainPriceMap).map(([name, proposedPrice]) => {
+          const premiumPrice = domainObjects?.find(
+            (d) => d.Domain === name,
+          )?.PremiumRegistrationPrice;
+          if (Number(premiumPrice))
+            return [name, { ...proposedPrice, price: premiumPrice! }];
+          else return [name, proposedPrice];
+        });
+      const mergedDomainPriceMap = Object.fromEntries(x);
 
       return {
+
         available: domainObjects[0].Available,
-        price: domainToPriceMap[domainNames[0]],
+        price: mergedDomainPriceMap[domainNames[0]],
         name: domainObjects[0].Domain,
       };
     });
-      const cookieHeader = request.headers.get("Cookie");
-      const cookie =
-        (await COOKIES.selected_workspace_id.parse(cookieHeader)) || {};
-      console.log("Parsed cookie:", cookie);
+  const cookieHeader = request.headers.get("Cookie");
+  const cookie =
+    (await COOKIES.selected_workspace_id.parse(cookieHeader)) || {};
+  console.log("Parsed cookie:", cookie);
 
-      const selected_workspace_id = String(cookie.selected_workspace_id);
+  const selected_workspace_id = String(cookie.selected_workspace_id);
 
   // Return the domain data
   return {
-        selectedWorkspaceId: selected_workspace_id,
+    selectedWorkspaceId: selected_workspace_id,
     domainData: await domainData,
   };
 };

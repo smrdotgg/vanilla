@@ -23,7 +23,7 @@ export function ErrorBoundary() {
 }
 
 export function Page() {
-  const { domainToPriceMap, query, results } = useLoaderData<typeof loader>();
+  const { domains, domainPriceMap:domainToPriceMap, query, results } = useLoaderData<typeof loader>();
 
   const { state } = useNavigation();
   const isLoading = state !== "idle";
@@ -72,17 +72,17 @@ function SearchResults() {
 }
 
 function SingleSearchResult({ index }: { index: number }) {
-  const { domainToPriceMap, results } = useLoaderData<typeof loader>();
+  const { domainPriceMap, results } = useLoaderData<typeof loader>();
   const domains = results?.CommandResponse?.DomainCheckResults ?? [];
   const domain = domains[index];
 
   return (
     <div
-      className={`flex justify-between border border-gray-700 px-4 py-2 ${domain.Available ? "" : "cursor-not-allowed  text-gray-500"}`}
+      className={`flex justify-between border border-gray-700 px-4 py-2 ${domain.Available ? "" : "line-through cursor-not-allowed  text-gray-400"}`}
     >
       <p>{domain.Domain}</p>
       <p className="font-mono">
-        ${domainToPriceMap[domain.Domain].price}
+        ${domainPriceMap[domain.Domain].price}
       </p>
     </div>
   );

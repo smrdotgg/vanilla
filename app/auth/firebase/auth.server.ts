@@ -7,6 +7,7 @@ import admin from "firebase-admin";
 import { LOGIN_ROUTE } from "../contants";
 import { CleanDecodedIdToken } from "./types";
 import { env } from "~/api";
+import { prisma } from "~/db/prisma";
 
 if (Number(admin.apps?.length) === 0) {
   admin.initializeApp({
@@ -62,15 +63,8 @@ const validateSession = async (
 /**
  * Checks if the session associated with the provided request is valid.
  * Rediects otherwise.
- *
- * @param {Request} request - The request object containing the session information.
- * @returns {Promise<object>} A promise resolving to the decoded claims of the session if valid.
- * @throws {Error} If the session cookie is unavailable, invalid, or if any error occurs during verification.
- *
  */
-const validateSessionAndRedirectIfInvalid = async (
-  request: Request,
-): Promise<CleanDecodedIdToken> => {
+const validateSessionAndRedirectIfInvalid = async (request: Request) => {
   const cookieString = request.headers.get("cookie");
   const session = await getSession(cookieString);
 
@@ -81,6 +75,7 @@ const validateSessionAndRedirectIfInvalid = async (
     const decodedClaims = await admin
       .auth()
       .verifySessionCookie(session.get("idToken"), true /** checkRevoked */);
+
     return decodedClaims;
   } catch (error) {
     console.error("Error in validateSessionAndRedirectIfInvalid:", error);

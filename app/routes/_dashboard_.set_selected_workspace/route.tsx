@@ -1,7 +1,5 @@
 import { validateSessionAndRedirectIfInvalid } from "~/auth/firebase/auth.server";
-import {
-  ActionFunctionArgs,
-} from "@remix-run/node";
+import { ActionFunctionArgs } from "@remix-run/node";
 import { prisma } from "~/db/prisma";
 import { COOKIES } from "~/cookies/workspace";
 
@@ -33,3 +31,4 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     },
   });
 };
+
