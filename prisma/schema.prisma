@@ -20,12 +20,13 @@ generator client {
 model analytic_settings {
   id                 Int     @id @default(autoincrement())
   campaign_id        String? @unique(map: "analytic_settings_campaign_id_unique")
-  open_rate          Boolean @default(false)
-  reply_rate         Boolean @default(false)
-  opt_out_rate       Boolean @default(false)
-  opt_out_url        Boolean @default(false)
-  bounce_rate        Boolean @default(false)
-  click_through_rate Boolean @default(false)
+
+  open_rate          Boolean @default(false) // app  level
+  reply_rate         Boolean @default(false) // smtp level
+  opt_out_rate       Boolean @default(false) // app
+  opt_out_url        Boolean @default(false) 
+  bounce_rate        Boolean @default(false) // 
+  click_through_rate Boolean @default(false) // app level
 }
 
 model campaign {
@@ -40,8 +41,10 @@ model campaign {
   email_opt_out_event        email_opt_out_event[]
   sequence_break             sequence_break[]
   sequence_step              sequence_step[]
-  user                       user?                        @relation(fields: [userId], references: [id])
-  userId                     Int?
+  user                       user                         @relation(fields: [userId], references: [id])
+  userId                     Int
+  workspace                  workspace                    @relation(fields: [workspaceId], references: [id])
+  workspaceId                Int
 }
 
 model campaign_sender_email_link {
@@ -287,6 +290,7 @@ model workspace {
   workspace_user_join workspace_user_join[]
   domain              domain[]
   splitbox            splitbox[]
+  campaign            campaign[]
 }
 
 model workspace_user_join {

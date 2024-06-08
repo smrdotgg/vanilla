@@ -1,6 +1,7 @@
 import { env } from "~/api";
 import { prisma } from "~/db/prisma";
 import { TB_contabo_token } from "~/db/schema.server";
+import { Instance, Links } from "./contabo_types";
 
 export interface ComputeManagerInterface {
   createVPSInstance: () => Promise<{ id: string; data: unknown }>;
@@ -25,7 +26,9 @@ async function createVPSInstance() {
   headers.append("Authorization", `Bearer ${token}`);
   headers.append("Content-Type", "application/json");
 
-  console.log(`Sending request to create VPS instance with headers: ${JSON.stringify(headers)}`);
+  console.log(
+    `Sending request to create VPS instance with headers: ${JSON.stringify(headers)}`,
+  );
 
   return fetch("https://api.contabo.com/v1/compute/instances", {
     method: "POST",
@@ -39,10 +42,10 @@ async function createVPSInstance() {
     .then((data) => {
       console.log(`data: ${JSON.stringify(data)}`);
       console.log(`VPS instance created with ID: ${data["_links"]["self"]}`);
-      return ({
+      return {
         id: `${data["_links"]["self"]}`.split("/v1/compute/instances/")[1],
         data,
-      });
+      };
     });
 }
 type ContaboAccessTokenResponse = {
@@ -94,7 +97,10 @@ export async function getAccessToken() {
   return response.access_token;
 }
 
-async function getVPSInstanceData({ id }: { id: string }) {
+export async function getVPSInstanceData({ id }: { id: string }): Promise<{
+  data: Instance[];
+  _links: Links;
+}> {
   console.log("getVPSInstanceData", id);
   const uuid = crypto.randomUUID();
   const token = await getAccessToken();
