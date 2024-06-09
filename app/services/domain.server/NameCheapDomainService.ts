@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import SXTJ from "simple-xml-to-json";
 import {
   DomainServiceInterface,
   nameCheapBaseUrl,
@@ -81,11 +83,17 @@ export const NameCheapDomainService: DomainServiceInterface = {
     console.log("[NameCheapDomainService] Purchase response data:", data);
 
     console.log("TRYING TO CREATE WITH");
-    console.log(JSON.stringify({
-        workspace_id: Number(workspaceId),
-        name: data.Domain,
-        user_id: Number(userId),
-      }, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          workspace_id: Number(workspaceId),
+          name: data.Domain,
+          user_id: Number(userId),
+        },
+        null,
+        2,
+      ),
+    );
 
     // Creating domain in database...
     const createdDomain = await prisma.domain.create({
@@ -104,3 +112,177 @@ export const NameCheapDomainService: DomainServiceInterface = {
     return;
   },
 };
+
+export async function getDomainData({ name }: { name: string }) {
+  const apiData: { [key: string]: string | number | null } = {};
+
+  // literally just making TS happy
+  // const mapped = Object.entries(apiData).map(([k, v]) => [k, String(v)]);
+  const apiUrl = `${nameCheapBaseUrl}&Command=namecheap.domains.getinfo&DomainName=${name}`;
+  const response = await fetch(apiUrl);
+  const responseText = await response.text();
+  const successJson = SXTJ.convertXML(responseText) as {
+    ApiResponse: GetDomainDataApiResponse;
+  };
+  if (successJson.ApiResponse.children[0].Errors.children)
+    throw Error(
+      successJson.ApiResponse.children[0].Errors.children[0].Error.content,
+    );
+  return successJson;
+
+  console.log(
+    JSON.stringify(
+      successJson.ApiResponse.children[3].CommandResponse.children[0]
+        .DomainGetInfoResult.children[0].DomainDetails.children[1].ExpiredDate
+        .content,
+      null,
+      2,
+    ),
+  );
+}
+
+interface GetDomainDataApiResponse {
+  Status: string;
+  xmlns: string;
+  children: [
+    {
+      Errors: any;
+    },
+    {
+      Warnings: any;
+    },
+    {
+      RequestedCommand: {
+        content: string;
+      };
+    },
+    {
+      CommandResponse: {
+        Type: string;
+        children: [
+          {
+            DomainGetInfoResult: {
+              Status: string;
+              ID: string;
+              DomainName: string;
+              OwnerName: string;
+              IsOwner: string;
+              IsPremium: string;
+              children: [
+                {
+                  DomainDetails: {
+                    children: [
+                      {
+                        CreatedDate: {
+                          content: string;
+                        };
+                      },
+                      {
+                        ExpiredDate: {
+                          content: string;
+                        };
+                      },
+                      {
+                        NumYears: {
+                          content: string;
+                        };
+                      },
+                    ];
+                  };
+                },
+                {
+                  LockDetails: {};
+                },
+                {
+                  Whoisguard: {
+                    Enabled: string;
+                    children: [
+                      {
+                        ID: {
+                          content: string;
+                        };
+                      },
+                    ];
+                  };
+                },
+                {
+                  PremiumDnsSubscription: {
+                    children: [
+                      {
+                        UseAutoRenew: {
+                          content: string;
+                        };
+                      },
+                      {
+                        SubscriptionId: {
+                          content: string;
+                        };
+                      },
+                      {
+                        CreatedDate: {
+                          content: string;
+                        };
+                      },
+                      {
+                        ExpirationDate: {
+                          content: string;
+                        };
+                      },
+                      {
+                        IsActive: {
+                          content: string;
+                        };
+                      },
+                    ];
+                  };
+                },
+                {
+                  DnsDetails: {
+                    ProviderType: string;
+                    IsUsingOurDNS: string;
+                    HostCount: string;
+                    EmailType: string;
+                    DynamicDNSStatus: string;
+                    IsFailover: string;
+                    children: [
+                      {
+                        Nameserver: {
+                          content: string;
+                        };
+                      },
+                      {
+                        Nameserver: {
+                          content: string;
+                        };
+                      },
+                    ];
+                  };
+                },
+                {
+                  Modificationrights: {
+                    All: string;
+                  };
+                },
+              ];
+            };
+          },
+        ];
+      };
+    },
+    {
+      Server: {
+        content: string;
+      };
+    },
+    {
+      GMTTimeDifference: {
+        content: string;
+      };
+    },
+    {
+      ExecutionTime: {
+        content: string;
+      };
+    },
+  ];
+}

@@ -28,7 +28,10 @@ export const parsePurchaseResponse = async (bodyText: string) => {
   console.log("[parsePurchaseResponse] Parsed JSON response:", responseText);
 
   const successJson = SXTJ.convertXML(responseText);
-  console.log("[parsePurchaseResponse] Converted XML to JSON:", JSON.stringify(successJson, null, 2));
+  console.log(
+    "[parsePurchaseResponse] Converted XML to JSON:",
+    JSON.stringify(successJson, null, 2),
+  );
 
   const errorsObject = (successJson["ApiResponse"]["children"] as any[]).find(
     (o) => Object.hasOwn(o, "Errors"),
@@ -37,7 +40,9 @@ export const parsePurchaseResponse = async (bodyText: string) => {
 
   if (Object.keys(errorsObject["Errors"]).length !== 0) {
     console.log("[parsePurchaseResponse] Error occurred:", errorsObject);
-    throw Error("Got an error from Namecheap API " + JSON.stringify(errorsObject));
+    throw Error(
+      "Got an error from Namecheap API " + JSON.stringify(errorsObject),
+    );
   }
 
   const dataObject: {
@@ -50,12 +55,11 @@ export const parsePurchaseResponse = async (bodyText: string) => {
     WhoisguardEnable: `${boolean}`;
     FreePositiveSSL: `${boolean}`;
     NonRealTimeDomain: `${boolean}`;
-  } = ((successJson["ApiResponse"]["children"] as any[]).find((o) =>
+  } = (successJson["ApiResponse"]["children"] as any[]).find((o) =>
     Object.hasOwn(o, "CommandResponse"),
-  ))["CommandResponse"]["children"][0]["DomainCreateResult"];
+  )["CommandResponse"]["children"][0]["DomainCreateResult"];
 
   console.log("[parsePurchaseResponse] Parsed data object:", dataObject);
 
   return dataObject;
 };
-

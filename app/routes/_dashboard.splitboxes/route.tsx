@@ -9,7 +9,7 @@ import { prisma } from "~/db/prisma";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const data = await validateSessionAndRedirectIfInvalid(request);
-  const splitboxes = await prisma.splitbox.findMany({
+  const splitboxes = await prisma.vps.findMany({
     where: { user: { firebase_id: data.uid } },
   });
 

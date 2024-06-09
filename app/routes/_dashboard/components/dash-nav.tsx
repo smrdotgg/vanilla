@@ -92,26 +92,30 @@ export function DashLayout({
 
   const x = useNavigation();
 
-  const { selected_workspace_id} = useLoaderData<typeof loader>();
+  const { selected_workspace_id } = useLoaderData<typeof loader>();
   return (
     <div className="flex h-screen max-h-screen w-screen flex-col  overflow-hidden">
       {/* Top Bar */}
-      <div className="flex h-16 max-h-16 min-h-16 w-full items-center bg-gray-900 px-4 text-white">
-        <Link to="/">
-          <img
-            className="mr-auto"
-            alt="Splitbox Logo"
-            src={downloadsvg}
-            width={24}
-            height={24}
-          />
-        </Link>
-        <SlashDivide />
-        <WorkspaceSelect />
-      </div>
+      {/* <div className="flex h-16 max-h-16 min-h-16 w-full items-center bg-gray-900 px-4 text-white"> */}
+      {/*   <Link to="/"> */}
+      {/*     <img */}
+      {/*       className="mr-auto" */}
+      {/*       alt="Splitbox Logo" */}
+      {/*       src={downloadsvg} */}
+      {/*       width={24} */}
+      {/*       height={24} */}
+      {/*     /> */}
+      {/*   </Link> */}
+      {/*   <SlashDivide /> */}
+      {/*   <WorkspaceSelect /> */}
+      {/* </div> */}
       <div className="flex max-h-full flex-1 overflow-hidden">
         {/* Side Bar */}
         <div className=" flex h-full max-h-full w-64 flex-col justify-between overflow-hidden bg-gray-900 text-white">
+        <div className="py-2 px-2 flex *:m-auto">
+        {/* <div className="w-full h-10 bg-red-400"></div> */}
+          <WorkspaceSelect />
+        </div>
           <div className="flex h-full flex-col overflow-y-auto">
             {elements.map((e, i) => (
               <NavLink
@@ -129,10 +133,10 @@ export function DashLayout({
 
                   if (isActive) {
                     stateClasses =
-                      "border-r-2 border-r-black bg-white text-black";
+                      " bg-muted-foreground text-primary-foreground";
                   } else if (isPending) {
                     stateClasses =
-                      "cursor-wait bg-gray-600 text-black dark:text-white";
+                      "cursor-wait bg-gray-600 text-gray-500";
                   } else {
                     stateClasses =
                       "bg-gray-900 text-white transition duration-100 hover:bg-gray-900";
@@ -175,10 +179,8 @@ function SlashDivide() {
 }
 
 function WorkspaceSelect() {
-  const { user, selectedWorkspace } =
-    useLoaderData<typeof loader>();
+  const { user, selectedWorkspace } = useLoaderData<typeof loader>();
   const [showModal, setShowModal] = useState(false);
-
 
   const myWorkspaces = user.workspace_user_join_list.map((join) => ({
     name: join.workspace.name,
@@ -201,7 +203,7 @@ function WorkspaceSelect() {
       name="targetWorkspaceId"
       value={selectedWorkspace?.id.toString()}
     >
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-full border-none">
         <SelectValue placeholder="Select Workspace" />
       </SelectTrigger>
       <SelectContent>

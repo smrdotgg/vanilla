@@ -9,7 +9,7 @@ import { getUserWorkspaceIdFromCookie } from "~/cookies/workspace";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const data = await validateSessionAndRedirectIfInvalid(request);
-  const splitboxes = await prisma.splitbox.findMany({
+  const splitboxes = await prisma.vps.findMany({
     where: { user: { firebase_id: data.uid } },
   });
 
@@ -49,7 +49,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const data = await ComputeManager.createVPSInstance();
     console.log(`VPS instance created with ID: ${data.id}`);
 
-    await prisma.splitbox.create({
+    await prisma.vps.create({
       data: {
         name: name,
         workspaceId: Number(workspaceId),

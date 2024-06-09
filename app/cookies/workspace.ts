@@ -11,6 +11,6 @@ export const COOKIES = {
 export const getUserWorkspaceIdFromCookie = async ({ request }: { request: Request }) => {
   const cookieHeader = request.headers.get("Cookie");
   const cookie =
-    (await COOKIES.selected_workspace_id.parse(cookieHeader)) || {};
-  return String(cookie.selected_workspace_id);
+    (await COOKIES.selected_workspace_id.parse(cookieHeader))|| {};
+  return Number(String(cookie.selected_workspace_id));
 };

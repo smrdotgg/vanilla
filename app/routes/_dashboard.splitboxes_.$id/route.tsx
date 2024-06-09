@@ -7,7 +7,7 @@ import { getVPSInstanceData } from "~/lib/contabo";
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const userData = await validateSessionAndRedirectIfInvalid(request);
   const computeId = params["id"];
-  const computeObj = await prisma.splitbox.findFirst({
+  const computeObj = await prisma.vps.findFirst({
     where: {
       id: Number(computeId),
       workspace: {

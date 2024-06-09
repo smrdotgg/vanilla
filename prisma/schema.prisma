@@ -18,13 +18,13 @@ generator client {
 }
 
 model analytic_settings {
-  id                 Int     @id @default(autoincrement())
-  campaign_id        String? @unique(map: "analytic_settings_campaign_id_unique")
+  id          Int     @id @default(autoincrement())
+  campaign_id String? @unique(map: "analytic_settings_campaign_id_unique")
 
   open_rate          Boolean @default(false) // app  level
   reply_rate         Boolean @default(false) // smtp level
   opt_out_rate       Boolean @default(false) // app
-  opt_out_url        Boolean @default(false) 
+  opt_out_url        Boolean @default(false)
   bounce_rate        Boolean @default(false) // 
   click_through_rate Boolean @default(false) // app level
 }
@@ -88,17 +88,21 @@ model contact {
 }
 
 model domain {
-  id           Int       @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   user_id      Int
-  purchased_at DateTime  @default(now())
-  name         String    @unique(map: "domain_name_unique")
-  splitbox_id  Int?
-  splitbox     splitbox? @relation(fields: [splitbox_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  purchased_by user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchased_at DateTime @default(now())
+  name         String   @unique(map: "domain_name_unique")
+  purchased_by user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  vps_id Int? @map("splitbox_id")
+  vps    vps? @relation(fields: [vps_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   workspace_id Int
   workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   // workspace_id
+  mailbox      mailbox[]
+
+  deletedAt DateTime?
 }
 
 model domain_purchase_form_info {
@@ -254,7 +258,17 @@ model sequence_step {
   campaign               campaign                 @relation(fields: [campaign_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model splitbox {
+model mailbox {
+  id Int @id @default(autoincrement())
+
+  domain   domain @relation(fields: [domainId], references: [id])
+  domainId Int
+
+  username String
+  password String
+}
+
+model vps {
   id                             Int    @id @default(autoincrement())
   name                           String
   compute_id_on_hosting_platform String @unique(map: "splitbox_compute_id_on_hosting_platform_unique")
@@ -265,6 +279,10 @@ model splitbox {
 
   workspace   workspace @relation(fields: [workspaceId], references: [id])
   workspaceId Int
+
+  createdAt DateTime?
+
+  @@map("splitbox")
 }
 
 model user {
@@ -281,7 +299,7 @@ model user {
   domains                        domain[]
   carts                          cart[]
   campaigns                      campaign[]
-  splitbox                       splitbox[]
+  splitbox                       vps[]
 }
 
 model workspace {
@@ -289,7 +307,7 @@ model workspace {
   name                String
   workspace_user_join workspace_user_join[]
   domain              domain[]
-  splitbox            splitbox[]
+  splitbox            vps[]
   campaign            campaign[]
 }
 

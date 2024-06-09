@@ -5,7 +5,10 @@ import { Instance, Links } from "./contabo_types";
 
 export interface ComputeManagerInterface {
   createVPSInstance: () => Promise<{ id: string; data: unknown }>;
-  getVPSInstanceData: (params: { id: string }) => Promise<unknown>;
+  getVPSInstanceData: (params: { id: string }) => Promise<{
+    data: Instance[];
+    _links: Links;
+  }>;
 }
 
 const ContaboComputeManager: ComputeManagerInterface = {
@@ -113,6 +116,39 @@ export async function getVPSInstanceData({ id }: { id: string }): Promise<{
   return fetch(`https://api.contabo.com/v1/compute/instances/${id}`, {
     method: "GET",
     headers: headers,
+  }).then((r) => r.json());
+}
+
+export async function cancelInstance({ id }: { id: string }) {
+  console.log("getVPSInstanceData", id);
+  const uuid = crypto.randomUUID();
+  const token = await getAccessToken();
+
+  const headers = new Headers();
+  // headers.append("Content-Type", "application/json");
+  headers.append("x-request-id", uuid);
+  headers.append("Authorization", `Bearer ${token}`);
+
+  return fetch(`https://api.contabo.com/v1/compute/instances/${id}/cancel`, {
+    method: "POST",
+    headers: headers,
+  }).then((r) => r.json());
+}
+
+export async function reinstateIntance({ id }: { id: string }) {
+  console.log("getVPSInstanceData", id);
+  const uuid = crypto.randomUUID();
+  const token = await getAccessToken();
+
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+  headers.append("x-request-id", uuid);
+  headers.append("Authorization", `Bearer ${token}`);
+
+  return fetch(`https://api.contabo.com/v1/compute/instances/${id}`, {
+    method: "PUT",
+    headers: headers,
+    body: JSON.stringify({ imageId: "db1409d2-ed92-4f2f-978e-7b2fa4a1ec90" }),
   }).then((r) => r.json());
 }
 

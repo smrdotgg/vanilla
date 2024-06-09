@@ -38,6 +38,8 @@ const { getSession, commitSession, destroySession } =
     },
   });
 
+const cache: {[key: string]: CleanDecodedIdToken} = {}
+
 /**
  * Validates the session associated with the provided request.
  * @param {Request} request - The request object containing the session information.
@@ -47,13 +49,16 @@ const { getSession, commitSession, destroySession } =
 const validateSession = async (
   request: Request,
 ): Promise<CleanDecodedIdToken | undefined> => {
-  const session = await getSession(request.headers.get("cookie"));
+  const cookie = request.headers.get("cookie");
+  if (!!cookie && cache[cookie]  !== undefined) return cache[cookie];
+  const session = await getSession(cookie);
   try {
     // Verify the session cookie. In this case an additional check is added to detect
     // if the user's Firebase session was revoked, user deleted/disabled, etc.
     const decodedClaims = await admin
       .auth()
       .verifySessionCookie(session.get("idToken"), true /** checkRevoked */);
+    cache[cookie!] = decodedClaims;
     return decodedClaims;
   } catch (error) {
     return undefined;
