@@ -60,7 +60,7 @@
     "@tiptap/starter-kit": "^2.4.0",
     "@trpc/client": "^10.45.2",
     "@trpc/react-query": "^10.45.2",
-    "@trpc/server": "^11.0.0-rc.401",
+    "@trpc/server": "^10.45.2",
     "arctic": "^1.9.0",
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",
