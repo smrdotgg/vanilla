@@ -27,8 +27,6 @@ import {
   validateSession,
 } from "~/auth/firebase/auth.server";
 import { HOME_ROUTE } from "~/auth/contants";
-import { db } from "~/db/index.server";
-import { TB_users } from "~/db/schema.server";
 import { prisma } from "~/db/prisma";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

@@ -6,13 +6,11 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
-import { eq } from "drizzle-orm";
 import { ReactNode, useState } from "react";
 import { flushSync } from "react-dom";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { db } from "~/db/index.server";
 import { useAtomValue, atom } from "jotai";
 import {
   TB_analytic_settings,
@@ -44,49 +42,50 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     return redirect(`/campaigns/${params.id}/00_basics`);
   }
 
-  const campaignContacts = await db
-    .select()
-    .from(TB_binding_campaigns_contacts)
-    .where(eq(TB_binding_campaigns_contacts.campaignId, Number(params.id)));
+  // const campaignContacts = await db
+  //   .select()
+  //   .from(TB_binding_campaigns_contacts)
+  //   .where(eq(TB_binding_campaigns_contacts.campaignId, Number(params.id)));
+  //
+  // const campaign = await db
+  //   .select()
+  //   .from(TB_campaigns)
+  //   .where(eq(TB_campaigns.id, Number(params.id)));
+  //
+  // const url = new URL(request.url);
+  // const qParams = Object.fromEntries(url.searchParams);
+  // const result = {
+  //   pathname: url.pathname,
+  //   params: qParams,
+  // };
+  //
+  // const sequence = await db
+  //   .select()
+  //   .from(TB_sequence_steps)
+  //   .where(eq(TB_sequence_steps.campaignId, Number(params.id)));
+  //
+  // const senders = await db
+  //   .select()
+  //   .from(TB_campaign_sender_email_link)
+  //   .where(eq(TB_campaign_sender_email_link.campaignId, Number(params.id)));
+  //
+  // const analytics = await db
+  //   .select()
+  //   .from(TB_analytic_settings)
+  //   .where(eq(TB_analytic_settings.campaignId, Number(params.id)));
 
-  const campaign = await db
-    .select()
-    .from(TB_campaigns)
-    .where(eq(TB_campaigns.id, Number(params.id)));
-
-  const url = new URL(request.url);
-  const qParams = Object.fromEntries(url.searchParams);
-  const result = {
-    pathname: url.pathname,
-    params: qParams,
-  };
-
-  const sequence = await db
-    .select()
-    .from(TB_sequence_steps)
-    .where(eq(TB_sequence_steps.campaignId, Number(params.id)));
-
-  const senders = await db
-    .select()
-    .from(TB_campaign_sender_email_link)
-    .where(eq(TB_campaign_sender_email_link.campaignId, Number(params.id)));
-
-  const analytics = await db
-    .select()
-    .from(TB_analytic_settings)
-    .where(eq(TB_analytic_settings.campaignId, Number(params.id)));
-
-  return {
-    basics: Boolean(campaign[0].name),
-    campaign: campaign[0],
-    contacts: Boolean(campaignContacts.length),
-    sequence: Boolean(sequence.length),
-    schedule: false,
-    senders: Boolean(senders.length),
-    settings: Boolean(analytics.length),
-    launch: campaign[0].deadline != null,
-    result,
-  };
+  return null;
+  // return {
+  //   basics: Boolean(campaign[0].name),
+  //   campaign: campaign[0],
+  //   contacts: Boolean(campaignContacts.length),
+  //   sequence: Boolean(sequence.length),
+  //   schedule: false,
+  //   senders: Boolean(senders.length),
+  //   settings: Boolean(analytics.length),
+  //   launch: campaign[0].deadline != null,
+  //   result,
+  // };
 };
 
 export default function Page() {

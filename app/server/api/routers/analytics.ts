@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { TB_analytic_settings, TB_campaigns } from "~/db/schema.server";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 

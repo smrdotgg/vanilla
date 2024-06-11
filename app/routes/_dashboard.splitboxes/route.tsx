@@ -1,6 +1,5 @@
 import { Page } from "./page";
 import { eq } from "drizzle-orm";
-// import { db } from "~/db/index.server";
 import { TB_splitboxes } from "~/db/schema.server";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { ComputeManager } from "~/lib/contabo";

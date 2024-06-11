@@ -1,10 +1,4 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { eq } from "drizzle-orm";
-import { generateId } from "lucia";
-import { parseCookies, serializeCookie } from "oslo/cookie";
-import { db } from "~/db/index.server";
-import { TB_users } from "~/db/schema.server";
-import { getGoogleidWithAccesstoken } from "~/lib/get_google_data";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   return null;

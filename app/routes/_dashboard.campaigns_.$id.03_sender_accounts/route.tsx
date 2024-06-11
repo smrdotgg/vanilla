@@ -1,11 +1,4 @@
-import { db } from "~/db/index.server";
 import { ContactsPage } from "./page";
-import {
-  TB_campaign_sender_email_link,
-  TB_google_campaign_bridge,
-  TB_google_user_info,
-  TB_sender_emails,
-} from "~/db/schema.server";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { eq } from "drizzle-orm";
 import { senderEmailListSchema } from "./types";

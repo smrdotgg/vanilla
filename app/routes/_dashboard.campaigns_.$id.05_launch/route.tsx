@@ -2,13 +2,11 @@ import { PaperPlaneIcon } from "@radix-ui/react-icons";
 import { FaRegMessage } from "react-icons/fa6";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData, useNavigate, useParams } from "@remix-run/react";
-import { eq } from "drizzle-orm";
+// import { eq } from "drizzle-orm";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { db } from "~/db/index.server";
-import { TB_campaigns } from "~/db/schema.server";
 import { MdOutlineAccessAlarm } from "react-icons/md";
 import { api } from "~/server/trpc/react";
 
@@ -17,15 +15,16 @@ export const loader = async ({
   context,
   request,
 }: LoaderFunctionArgs) => {
-  const val = await db
-    .select()
-    .from(TB_campaigns)
-    .where(eq(TB_campaigns.id, params.id!))
-    .then((v) => v[0].deadline == null);
-  return {
-    x: true,
-    deadlineIsNull: val,
-  };
+return null;
+  // const val = await db
+  //   .select()
+  //   .from(TB_campaigns)
+  //   .where(eq(TB_campaigns.id, params.id!))
+  //   .then((v) => v[0].deadline == null);
+  // return {
+  //   x: true,
+  //   deadlineIsNull: val,
+  // };
 };
 
 export default function Page() {

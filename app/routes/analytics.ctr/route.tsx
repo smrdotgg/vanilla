@@ -1,5 +1,4 @@
 import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
-import { db } from "~/db/index.server";
 import { TB_email_link_click_event, TB_email_open_event } from "~/db/schema.server";
 
 export const loader = async ({request}: LoaderFunctionArgs) => {

@@ -4,7 +4,6 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 
 import { Button } from "~/components/ui/button";
 import { CiSquarePlus } from "react-icons/ci";
-import { db } from "~/db/index.server";
 import { TB_sequence_breaks, TB_sequence_steps } from "~/db/schema.server";
 import { eq } from "drizzle-orm";
 import { Link, useFetchers, useLoaderData, useParams } from "@remix-run/react";
@@ -39,23 +38,24 @@ import { useSetAtom } from "jotai";
 import { sequenceCTAAtom } from "../_dashboard.campaigns_.$id/route";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const campaignId = Number(params.id);
-  const sequenceSteps = await db
-    .select()
-    .from(TB_sequence_steps)
-    .where(eq(TB_sequence_steps.campaignId, campaignId));
-  const sequenceBreaks = await db
-    .select()
-    .from(TB_sequence_breaks)
-    .where(eq(TB_sequence_breaks.campaignId, campaignId));
-  const stepsObject = Object.fromEntries(sequenceSteps.map((s) => [s.id, s]));
-  const breaksObject = Object.fromEntries(sequenceBreaks.map((s) => [s.id, s]));
-  const combined = [
-    ...sequenceSteps.map((s) => ({ id: s.id, type: "step", index: s.index })),
-    ...sequenceBreaks.map((s) => ({ id: s.id, type: "break", index: s.index })),
-  ];
-  combined.sort((a, b) => a.index - b.index);
-  return { order: combined, steps: stepsObject, breaks: breaksObject };
+return null;
+  // const campaignId = Number(params.id);
+  // const sequenceSteps = await db
+  //   .select()
+  //   .from(TB_sequence_steps)
+  //   .where(eq(TB_sequence_steps.campaignId, campaignId));
+  // const sequenceBreaks = await db
+  //   .select()
+  //   .from(TB_sequence_breaks)
+  //   .where(eq(TB_sequence_breaks.campaignId, campaignId));
+  // const stepsObject = Object.fromEntries(sequenceSteps.map((s) => [s.id, s]));
+  // const breaksObject = Object.fromEntries(sequenceBreaks.map((s) => [s.id, s]));
+  // const combined = [
+  //   ...sequenceSteps.map((s) => ({ id: s.id, type: "step", index: s.index })),
+  //   ...sequenceBreaks.map((s) => ({ id: s.id, type: "break", index: s.index })),
+  // ];
+  // combined.sort((a, b) => a.index - b.index);
+  // return { order: combined, steps: stepsObject, breaks: breaksObject };
 };
 
 export default function ContactsPage() {

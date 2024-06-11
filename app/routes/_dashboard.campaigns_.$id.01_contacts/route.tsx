@@ -3,9 +3,6 @@ import {
   LoaderFunctionArgs,
   readableStreamToString,
 } from "@remix-run/node";
-import { eq } from "drizzle-orm";
-import { db } from "~/db/index.server";
-import { TB_binding_campaigns_contacts, TB_contacts } from "~/db/schema.server";
 import { contactListSchema } from "./types";
 import Page from "./page";
 import { api } from "~/server/trpc/server.server";

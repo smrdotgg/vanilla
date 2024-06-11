@@ -1,6 +1,5 @@
 import { env } from "~/api";
 import { prisma } from "~/db/prisma";
-import { TB_contabo_token } from "~/db/schema.server";
 import { Instance, Links } from "./contabo_types";
 
 export interface ComputeManagerInterface {

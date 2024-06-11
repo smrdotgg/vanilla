@@ -1,7 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Page } from "./page";
-import { db } from "~/db/index.server";
-import { TB_analytic_settings } from "~/db/schema.server";
 import { eq } from "drizzle-orm";
 
 export async function loader({ params }: LoaderFunctionArgs) {

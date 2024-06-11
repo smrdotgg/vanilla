@@ -1,7 +1,5 @@
 
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { db } from "~/db/index.server";
-import { TB_email_open_event } from "~/db/schema.server";
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
   const imageBuffer = await fetch('https://placehold.co/600x400/111/ddd').then(res => res.arrayBuffer());

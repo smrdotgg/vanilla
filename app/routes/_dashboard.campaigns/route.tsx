@@ -1,6 +1,5 @@
 import { LoaderFunctionArgs, defer, redirect, } from "@remix-run/node";
 
-// import { db } from "~/db/index.server";
 import {
   TB_binding_campaigns_contacts,
   TB_campaigns,

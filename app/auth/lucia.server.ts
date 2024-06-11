@@ -1,8 +1,6 @@
 // import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle";
 // // SQLiteUserTable,
 // // DrizzlePostgreSQLAdapter ,
-// import { db } from "~/db/index.server";
-// import { TB_sessions, TB_users } from "~/db/schema.server";
 // import { Google } from "arctic";
 // import { Lucia } from "lucia";
 // import { env } from "~/api";

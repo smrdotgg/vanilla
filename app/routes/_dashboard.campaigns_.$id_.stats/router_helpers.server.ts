@@ -1,15 +1,3 @@
-import { defer, LoaderFunctionArgs } from "@remix-run/node";
-import { Page } from "./page";
-import { db, DrizzleDb } from "~/db/index.server";
-import {
-  TB_binding_campaigns_contacts,
-  TB_campaigns,
-  TB_email_link_click_event,
-  TB_email_open_event,
-  TB_email_opt_out_event,
-  TB_sequence_steps,
-} from "~/db/schema.server";
-import { eq, and, sql } from "drizzle-orm";
 
 export const calculateBouncedSteps = ({
   db,

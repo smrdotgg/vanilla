@@ -5,9 +5,6 @@ import {
   redirect,
 } from "@remix-run/node";
 import { checkDomainAvailability } from "../_dashboard.domains_.search/helpers.server";
-import { db } from "~/db/index.server";
-import { TB_domainPurchaseDetails } from "~/db/schema.server";
-import { eq } from "drizzle-orm";
 import { INTENTS } from "./types";
 import { api } from "~/server/trpc/server.server";
 import { prisma } from "~/db/prisma";

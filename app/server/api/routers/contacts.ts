@@ -1,6 +1,5 @@
 import { count, eq, inArray, notInArray } from "drizzle-orm";
 import { z } from "zod";
-import { TB_campaigns, TB_contacts, } from "~/db/schema.server";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const contactsRouter = createTRPCRouter({

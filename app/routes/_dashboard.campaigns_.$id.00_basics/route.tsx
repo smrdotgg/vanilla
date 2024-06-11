@@ -4,8 +4,6 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Page } from "./page";
-import { db } from "~/db/index.server";
-import { TB_campaigns } from "~/db/schema.server";
 import { eq } from "drizzle-orm";
 
 export const loader = async (args: LoaderFunctionArgs) => {

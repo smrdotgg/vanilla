@@ -1,7 +1,5 @@
 import { LoaderFunctionArgs, defer } from "@remix-run/node";
 import { Page } from "./page";
-import { db } from "~/db/index.server";
-import { TB_analytic_settings, TB_campaigns } from "~/db/schema.server";
 import { eq } from "drizzle-orm";
 import {
   calculateBouncedSteps,

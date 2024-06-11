@@ -2,7 +2,6 @@
 // import { env } from "~/api";
 //
 // export default {
-//   schema: "./app/db/schema.server.ts",
 //   driver: "turso",
 //   dialect: "sqlite",
 //   dbCredentials: {
