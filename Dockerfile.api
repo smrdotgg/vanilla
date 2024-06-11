@@ -15,7 +15,8 @@ RUN bun --version
 
 # Install app dependencies
 COPY package*.json ./
-RUN bun install
+RUN npm install -g pnpm
+RUN pnpm install
 
 # Bundle app source
 COPY . .
