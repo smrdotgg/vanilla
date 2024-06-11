@@ -35,51 +35,51 @@ import { INTENTS } from "../types";
 import { flushSync } from "react-dom";
 
 type dashRoute =
-  | "/home"
-  | "/settings"
-  | "/contacts"
-  | "/campaigns"
-  | "/sender_accounts"
+  // | "/home"
+  // | "/settings"
+  // | "/contacts"
+  // | "/campaigns"
+  // | "/sender_accounts"
   | "/domains"
-  | "/splitboxes"
+  // | "/splitboxes"
   | "/mailboxes";
 
 const elements: { route: dashRoute; name: string; icon: IconType }[] = [
-  {
-    route: "/home",
-    name: "Home",
-    icon: FaHome,
-  },
-  {
-    route: "/settings",
-    name: "Settings",
-    icon: IoSettingsSharp,
-  },
-  {
-    route: "/contacts",
-    name: "Contacts",
-    icon: IoPersonSharp,
-  },
-  {
-    route: "/campaigns",
-    name: "Campaigns",
-    icon: HiClipboardDocument,
-  },
-  {
-    route: "/sender_accounts",
-    name: "Sender Accounts",
-    icon: IoIosPeople,
-  },
+  // {
+  //   route: "/home",
+  //   name: "Home",
+  //   icon: FaHome,
+  // },
+  // {
+  //   route: "/settings",
+  //   name: "Settings",
+  //   icon: IoSettingsSharp,
+  // },
+  // {
+  //   route: "/contacts",
+  //   name: "Contacts",
+  //   icon: IoPersonSharp,
+  // },
+  // {
+  //   route: "/campaigns",
+  //   name: "Campaigns",
+  //   icon: HiClipboardDocument,
+  // },
+  // {
+  //   route: "/sender_accounts",
+  //   name: "Sender Accounts",
+  //   icon: IoIosPeople,
+  // },
   {
     route: "/domains",
     name: "Domains",
     icon: TbWorld,
   },
-  {
-    route: "/splitboxes",
-    name: "Splitboxes",
-    icon: RxBorderSplit,
-  },
+  // {
+  //   route: "/splitboxes",
+  //   name: "Splitboxes",
+  //   icon: RxBorderSplit,
+  // },
   {
     route: "/mailboxes",
     name: "Mailboxes",
