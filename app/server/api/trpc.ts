@@ -13,7 +13,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { validateSession } from "~/auth/firebase/auth.server";
 // import { lucia } from "~/auth/lucia.server";
-import { db } from "~/db/index.server";
+// import { db } from "~/db/index.server";
 import { prisma } from "~/db/prisma";
 
 // import { getServerAuthSession } from "~/server/auth";
@@ -33,7 +33,7 @@ import { prisma } from "~/db/prisma";
  */
 export const createTRPCContext = async ({ req }: { req: Request }) => {
   const returnObject = {
-    db,
+    // db,
     prisma,
     req,
   };

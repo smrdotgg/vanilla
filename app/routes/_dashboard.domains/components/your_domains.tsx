@@ -7,8 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useLoaderData } from "@remix-run/react";
-import { loader } from "../route";
 import { Button } from "~/components/ui/button";
 import { MdDelete } from "react-icons/md";
 import { DeleteDomainDialog } from "./delete_domain_dialog";

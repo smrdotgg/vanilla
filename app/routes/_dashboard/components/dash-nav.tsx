@@ -9,6 +9,7 @@ import {
 } from "@remix-run/react";
 import { RxBorderSplit } from "react-icons/rx";
 import { GrInProgress } from "react-icons/gr";
+import { LuMailbox } from "react-icons/lu";
 import { FaHome } from "react-icons/fa";
 
 import { HiClipboardDocument } from "react-icons/hi2";
@@ -40,7 +41,8 @@ type dashRoute =
   | "/campaigns"
   | "/sender_accounts"
   | "/domains"
-  | "/splitboxes";
+  | "/splitboxes"
+  | "/mailboxes";
 
 const elements: { route: dashRoute; name: string; icon: IconType }[] = [
   {
@@ -77,6 +79,11 @@ const elements: { route: dashRoute; name: string; icon: IconType }[] = [
     route: "/splitboxes",
     name: "Splitboxes",
     icon: RxBorderSplit,
+  },
+  {
+    route: "/mailboxes",
+    name: "Mailboxes",
+    icon: LuMailbox,
   },
 ];
 

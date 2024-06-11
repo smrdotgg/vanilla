@@ -50,6 +50,7 @@ export const env = createEnv({
     CONTABO_CLIENT_SECRET: z.string(),
     CONTABO_API_USERNAME: z.string(),
     CONTABO_API_PASSWORD: z.string(),
+    CONTABO_LOGIN_USERNAME: z.string(),
     CONTABO_LOGIN_PASSWORD: z.string(),
     CONTABO_LOGIN_PASSWORD_ID: z.coerce.number(),
 

@@ -258,14 +258,25 @@ model sequence_step {
   campaign               campaign                 @relation(fields: [campaign_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
+enum MailBoxStatus {
+  PENDING @map("INIT")
+  ADDED
+}
+
 model mailbox {
   id Int @id @default(autoincrement())
 
   domain   domain @relation(fields: [domainId], references: [id])
   domainId Int
 
+  firstName String
+  lastName  String
+
   username String
   password String
+  status   MailBoxStatus @default(PENDING)
+
+  deletedAt DateTime?
 }
 
 model vps {
@@ -279,6 +290,8 @@ model vps {
 
   workspace   workspace @relation(fields: [workspaceId], references: [id])
   workspaceId Int
+
+  ipv6Enabled Boolean @default(false)
 
   createdAt DateTime?
 
