@@ -13,7 +13,7 @@ RUN bun --version
 
 # Install app dependencies
 COPY package*.json ./
-RUN npm install
+RUN bun install
 
 # Build the app
 COPY . .
