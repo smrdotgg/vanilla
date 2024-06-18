@@ -8,7 +8,7 @@ export function setupCrons() {
     await updateDomainPricesOnDatabase();
   });
 
-  schedule("0 0 0 * * *", async () => {
+  schedule("0 0 * * * *", async () => {
     const pendingMailboxes = await prisma.mailbox.findMany({
       where: { status: "PENDING" },
     });

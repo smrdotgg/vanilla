@@ -15,6 +15,7 @@ import { setIpv4ReverseDNS } from "backend/utils/bot/ipv4";
 import { setIpv6ReverseDNS } from "backend/utils/bot/ipv6";
 import { setHosts } from "backend/utils/namecheap/setHosts";
 import { mailbox, domain } from "@prisma/client";
+import { sleep } from "~/lib/time";
 
 export const mailboxRoute = new Hono();
 
@@ -97,6 +98,8 @@ export async function setupMailboxes({ mailboxIds }: { mailboxIds: number[] }) {
       console.log("Emailwiz not initiated, starting setup...");
       await tieVPSAndDomain({ mailbox, contaboData });
       console.log("VPS and domain tied.");
+
+      await sleep(10 * 60 * 1000);
 
       await initializeEmailwiz({ mailbox, contaboData });
       console.log("Emailwiz initialized.");
