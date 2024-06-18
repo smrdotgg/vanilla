@@ -16,6 +16,7 @@ export const NameCheapDomainService: DomainServiceInterface = {
     const detail = await prisma.domain_purchase_form_info.findFirst({
       where: { user_old: { id: Number(userId) } },
     });
+
     console.log("[NameCheapDomainService] User detail:", detail);
 
     if (detail === null) throw Error("User Detail info not found");

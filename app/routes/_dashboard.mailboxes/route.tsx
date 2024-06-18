@@ -11,7 +11,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { userWorkspaceId } = await validateWorkspaceAndRedirectIfInvalid({
     request,
   });
-  console.log(JSON.stringify(await getVPSInstanceData({id: "201921275"}), null, 2))
           
 const workspace = await prisma.workspace.findUnique({
         where: { id: Number(userWorkspaceId) },

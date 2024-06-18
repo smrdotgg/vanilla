@@ -37,7 +37,7 @@ async function createVPSInstance() {
     headers: headers,
     body: JSON.stringify({
       period: 1,
-      rootPassword: env.CONTABO_LOGIN_PASSWORD_ID,
+      rootPassword: env.CONTABO_VPS_LOGIN_PASSWORD_ID,
     }),
   })
     .then((r) => r.json())
@@ -68,6 +68,7 @@ export async function getAccessToken() {
     const now = new Date(Date.now());
     const isExpired = expiresAt < now;
     if (!isExpired) {
+      console.log("[CONTABO ACCESS TOKEN] cache hit");
       return t[0].token;
     } else {
       await prisma.contabo_token.delete({ where: { id: t[0].id } });
@@ -93,8 +94,10 @@ export async function getAccessToken() {
   )
     .then((r) => r.json())
     .then((js) => {
-      console.log(JSON.stringify(js, null, 2));
-      return js as ContaboAccessTokenResponse;
+      js = js as ContaboAccessTokenResponse;
+      if (js.access_token.length)
+        console.log("[CONTABO ACCESS TOKEN] cache miss ");
+      return js;
     });
   return response.access_token;
 }

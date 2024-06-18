@@ -1,10 +1,11 @@
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { IoMail } from "react-icons/io5";
 import { TbWorld } from "react-icons/tb";
 import { TopBar } from "./components/top_bar";
 import { loader } from "./route";
 import { Summary } from "../_dashboard.domains/components/summary";
 import { YourMailboxes } from "./components/your_mailboxes";
+import { Button } from "~/components/ui/button";
 
 export default function Page() {
   const { domains, mailboxes } = useLoaderData<typeof loader>();
@@ -35,7 +36,14 @@ export default function Page() {
       />
       <div className="pt-6"></div>
       <div className="">
-        <p className="my-4 text-xl font-bold">Your Domains</p>
+        <div className="flex w-full justify-between">
+          <p className="my-4 text-xl font-bold">Your Mailboxes</p>
+          <Button asChild variant="secondary">
+            <Link target="_blank" to="download">
+              Download
+            </Link>
+          </Button>
+        </div>
         <YourMailboxes
           rows={mailboxes.map((m) => ({
             fullName: m.firstName + " " + m.lastName,

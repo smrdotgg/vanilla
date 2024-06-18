@@ -4,6 +4,7 @@ import { config } from "dotenv";
 
 const isServer = typeof process !== "undefined";
 
+
 if (typeof process !== "undefined") {
   config();
 }
@@ -46,13 +47,19 @@ export const env = createEnv({
     POSTGRES_DB: z.string(),
     VERCEL_URL: z.string().nullish(),
     NODE_ENV: z.enum(["development", "production"]).default("production"),
+
     CONTABO_CLIENT_ID: z.string(),
     CONTABO_CLIENT_SECRET: z.string(),
+
     CONTABO_API_USERNAME: z.string(),
     CONTABO_API_PASSWORD: z.string(),
-    CONTABO_LOGIN_USERNAME: z.string(),
-    CONTABO_LOGIN_PASSWORD: z.string(),
-    CONTABO_LOGIN_PASSWORD_ID: z.coerce.number(),
+    CONTABO_ACCOUNT_USERNAME: z.string(),
+    CONTABO_ACCOUNT_PASSWORD: z.string(),
+
+    CONTABO_VPS_LOGIN_USERNAME: z.string(),
+    CONTABO_VPS_LOGIN_PASSWORD: z.string(),
+    CONTABO_VPS_LOGIN_PASSWORD_ID: z.coerce.number(),
+
 
     DATABASE_NAME: z.string(),
     MY_IP: z.string().nullish(),
