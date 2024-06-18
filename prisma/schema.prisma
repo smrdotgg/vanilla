@@ -108,49 +108,19 @@ model domain {
 }
 
 model domain_purchase_form_info {
-  id                            Int     @id @default(autoincrement())
-  user_id                       Int     @unique(map: "domain_purchase_form_info_user_id_unique")
-  registrant_first_name         String?
-  registrant_last_name          String?
-  registrant_address_1          String?
-  registrant_city               String?
-  registrant_state_province     String?
-  registrant_postal_code        String?
-  registrant_country            String?
-  registrant_email_address      String?
-  registrant_phone_country_code String?
-  registrant_phone_number       String?
-  tech_first_name               String?
-  tech_last_name                String?
-  tech_address_1                String?
-  tech_city                     String?
-  tech_state_province           String?
-  tech_postal_code              String?
-  tech_country                  String?
-  tech_email_address            String?
-  tech_phone_country_code       String?
-  tech_phone_number             String?
-  admin_first_name              String?
-  admin_last_name               String?
-  admin_address_1               String?
-  admin_city                    String?
-  admin_state_province          String?
-  admin_postal_code             String?
-  admin_country                 String?
-  admin_email_address           String?
-  admin_phone_country_code      String?
-  admin_phone_number            String?
-  billing_first_name            String?
-  billing_last_name             String?
-  billing_address_1             String?
-  billing_city                  String?
-  billing_state_province        String?
-  billing_postal_code           String?
-  billing_country               String?
-  billing_email_address         String?
-  billing_phone_country_code    String?
-  billing_phone_number          String?
-  user_old                      user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id             Int     @id @default(autoincrement())
+  user_id        Int     @unique(map: "domain_purchase_form_info_user_id_unique")
+  first_name     String? @map("registrant_first_name")
+  last_name      String? @map("registrant_last_name")
+  address        String? @map("registrant_address_1")
+  city           String? @map("registrant_city")
+  state_province String? @map("registrant_state_province")
+  postal_code    String? @map("registrant_postal_code")
+  country        String? @map("registrant_country")
+  email_address  String? @map("registrant_email_address")
+  phone_code     String? @map("registrant_phone_country_code")
+  phone_number   String? @map("registrant_phone_number")
+  user_old       user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model email_bounce_event {
