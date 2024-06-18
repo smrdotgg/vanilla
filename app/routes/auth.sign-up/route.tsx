@@ -101,7 +101,7 @@ export default function Page() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input type="password" {...field} />
                   </FormControl>
                   <FormDescription>Your account password.</FormDescription>
                   <FormMessage />
@@ -115,7 +115,7 @@ export default function Page() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input type="password" {...field} />
                   </FormControl>
                   <FormDescription>
                     Confirm your account password
