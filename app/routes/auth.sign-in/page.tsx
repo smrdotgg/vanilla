@@ -112,7 +112,7 @@ export function Page() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormDescription>Your account password.</FormDescription>
                   <FormMessage />
