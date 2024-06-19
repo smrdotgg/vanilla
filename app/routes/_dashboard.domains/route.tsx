@@ -16,14 +16,15 @@ import {
 import { getDomainData } from "~/services/domain.server/NameCheapDomainService";
 import { INTENTS } from "./types";
 import { validateWorkspaceAndRedirectIfInvalid } from "~/auth/workspace";
-
 export async function loader({ request }: LoaderFunctionArgs) {
-  console.log("Loader function started");
+  console.log('Loader function started');
 
   let userWorkspaceId = await getUserWorkspaceIdFromCookie({ request });
   console.log(`User workspace ID: ${userWorkspaceId}`);
 
   const session = await validateSessionAndRedirectIfInvalid(request);
+  console.log('Session validated');
+
   const user = await prisma.user.findFirst({
     select: {
       id: true,
@@ -33,20 +34,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
     where: { firebase_id: { equals: session.uid } },
   });
+  console.log('User data retrieved:', user);
+
   const cookieHeader = request.headers.get("Cookie");
+  console.log('Cookie header:', cookieHeader);
 
   const cookie =
     (await COOKIES.selected_workspace_id.parse(cookieHeader)) || {};
+  console.log('Parsed cookie:', cookie);
 
   if (!userWorkspaceId && userWorkspaceId !== 0) {
+    console.log('No workspace ID found, checking user workspace join list');
     if (user!.workspace_user_join_list.length === 0) {
+      console.log('No workspaces found, redirecting to create workspace');
       return redirect("/create_workspace");
     }
     userWorkspaceId = user!.workspace_user_join_list.at(0)!.workspace_id;
     cookie.selected_workspace_id =
       user!.workspace_user_join_list.at(0)!.workspace_id;
+    console.log('Updated workspace ID:', userWorkspaceId);
   }
 
+  console.log('Retrieving workspace data');
   const workspaceData = await prisma.workspace.findUnique({
     where: { id: Number(userWorkspaceId) },
     include: {
@@ -56,8 +65,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     },
   });
-  const data = { data: workspaceData };
+  console.log('Workspace data retrieved:', workspaceData);
 
+  const data = { data: workspaceData };
+  console.log('Data object created:', data);
+
+  console.log('Retrieving domain data');
   const domainData = await Promise.all(
     data.data!.domain.map(async (d) => {
       console.log(`Processing domain: ${d.name}`);
@@ -88,7 +101,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   console.log("Compute instances retrieved:", computeInstances);
 
   console.log("Returning data");
-  return json(
+  const response = json(
     { data: domainData, computeInstances },
     {
       headers: {
@@ -96,7 +109,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     },
   );
+  console.log('Response created:', response);
+  return response;
 }
+
 export { Page as default };
 
 export async function action({ request }: ActionFunctionArgs) {

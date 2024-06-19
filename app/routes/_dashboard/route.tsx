@@ -14,7 +14,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const cookieHeader = request.headers.get("Cookie");
   const cookie =
     (await COOKIES.selected_workspace_id.parse(cookieHeader)) || {};
-  console.log(`Cookie = ${JSON.stringify(cookie)}`);
   const session = await validateSessionAndRedirectIfInvalid(request).then(
     async (session) => {
       let user = await prisma.user.findFirst({
@@ -42,20 +41,24 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         });
       }
 
+      if (user!.workspace_user_join_list.length === 0){
+        return redirect("/create_workspace");
+      }
+
       const selectedWorkspaceJoinDataFromCookie =
         user?.workspace_user_join_list.find(
           (wj) => String(wj.workspace_id) === cookie.selected_workspace_id,
         );
-      const selectedWorkspace =
+      const selectedWorkspaceJoin =
         selectedWorkspaceJoinDataFromCookie ??
         user?.workspace_user_join_list.at(0);
       if (selectedWorkspaceJoinDataFromCookie === undefined) {
-        cookie.selected_workspace_id = String(selectedWorkspace?.id);
+        cookie.selected_workspace_id = String(selectedWorkspaceJoin?.workspace_id);
       }
 
       return {
         user,
-        selectedWorkspace,
+        selectedWorkspace: selectedWorkspaceJoin,
         selected_workspace_id: cookie.selected_workspace_id,
       };
     },

@@ -204,11 +204,12 @@ function WorkspaceSelect() {
   };
 
   return (
+  <>
     <Select
       disabled={state !== "idle"}
       onValueChange={onChange}
       name="targetWorkspaceId"
-      value={selectedWorkspace?.id.toString()}
+      value={selectedWorkspace?.workspace_id.toString()}
     >
       <SelectTrigger className="w-full border-none">
         <SelectValue placeholder="Select Workspace" />
@@ -229,5 +230,6 @@ function WorkspaceSelect() {
         </Button>
       </SelectContent>
     </Select>
+    </>
   );
 }
