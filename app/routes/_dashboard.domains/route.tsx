@@ -1,8 +1,13 @@
 import Page from "./page";
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  json,
+  redirect,
+} from "@remix-run/node";
 import { validateSessionAndRedirectIfInvalid } from "~/auth/firebase/auth.server";
 import { prisma } from "~/db/prisma";
-import { getUserWorkspaceIdFromCookie } from "~/cookies/workspace";
+import { COOKIES, getUserWorkspaceIdFromCookie } from "~/cookies/workspace";
 import {
   ComputeManager,
   cancelInstance,
@@ -13,29 +18,62 @@ import { INTENTS } from "./types";
 import { validateWorkspaceAndRedirectIfInvalid } from "~/auth/workspace";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const userWorkspaceId = await getUserWorkspaceIdFromCookie({ request });
+  console.log("Loader function started");
 
-  const data = await validateSessionAndRedirectIfInvalid(request).then(
-    async () => ({
-      data: await prisma.workspace.findUnique({
-        where: { id: Number(userWorkspaceId) },
-        include: {
-          domain: {
-            where: { deletedAt: null },
-            include: { mailbox: true, vps: true },
-          },
-        },
-      }),
+  let userWorkspaceId = await getUserWorkspaceIdFromCookie({ request });
+  console.log(`User workspace ID: ${userWorkspaceId}`);
+
+  const session = await validateSessionAndRedirectIfInvalid(request);
+  const user = await prisma.user.findFirst({
+    select: {
+      id: true,
+      firebase_id: true,
+      workspace_user_join_list: { include: { workspace: true } },
+      email: true,
+    },
+    where: { firebase_id: { equals: session.uid } },
+  });
+  const cookieHeader = request.headers.get("Cookie");
+
+  const cookie =
+    (await COOKIES.selected_workspace_id.parse(cookieHeader)) || {};
+
+  if (!userWorkspaceId && userWorkspaceId !== 0) {
+    if (user!.workspace_user_join_list.length === 0) {
+      return redirect("/create_workspace");
+    }
+    userWorkspaceId = user!.workspace_user_join_list.at(0)!.workspace_id;
+    cookie.selected_workspace_id =
+      user!.workspace_user_join_list.at(0)!.workspace_id;
+  }
+
+  const workspaceData = await prisma.workspace.findUnique({
+    where: { id: Number(userWorkspaceId) },
+    include: {
+      domain: {
+        where: { deletedAt: null },
+        include: { mailbox: true, vps: true },
+      },
+    },
+  });
+  const data = { data: workspaceData };
+
+  const domainData = await Promise.all(
+    data.data!.domain.map(async (d) => {
+      console.log(`Processing domain: ${d.name}`);
+      const domainInfo = await getDomainData({ name: d.name });
+      console.log(`Domain info retrieved: ${domainInfo}`);
+      const expiresAt =
+        domainInfo.ApiResponse.children[3].CommandResponse.children[0]
+          .DomainGetInfoResult.children[0].DomainDetails.children[1].ExpiredDate
+          .content;
+      console.log(`Expires at: ${expiresAt}`);
+      return { ...d, expiresAt };
     }),
   );
-  const domainData = await Promise.all(
-    data.data!.domain.map(async (d) => ({
-      ...d,
-      expiresAt: (await getDomainData({ name: d.name })).ApiResponse.children[3]
-        .CommandResponse.children[0].DomainGetInfoResult.children[0]
-        .DomainDetails.children[1].ExpiredDate.content,
-    })),
-  );
+  console.log("Domain data retrieved:", domainData);
+
+  console.log("Retrieving compute instances");
   const computeInstances = await Promise.all(
     data
       .data!.domain.map((d) => d.vps)
@@ -47,10 +85,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
         }).then((r) => r.data[0]),
       ),
   );
+  console.log("Compute instances retrieved:", computeInstances);
 
-  return { data: domainData, computeInstances };
+  console.log("Returning data");
+  return json(
+    { data: domainData, computeInstances },
+    {
+      headers: {
+        "Set-Cookie": await COOKIES.selected_workspace_id.serialize(cookie),
+      },
+    },
+  );
 }
-
 export { Page as default };
 
 export async function action({ request }: ActionFunctionArgs) {
