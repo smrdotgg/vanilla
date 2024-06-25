@@ -242,7 +242,7 @@ model mailbox {
   domainId Int
 
   firstName String
-  lastName  String
+  lastName  String?
 
   username String
   password String

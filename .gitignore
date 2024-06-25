@@ -1,17 +1,5 @@
 node_modules
-swap-pane
 
 /.cache
 /build
-/public/build
-.env*
-
-bun.lockb
-
-cron/test.ts
-.vercel/
-
-*.sqlite
-plans/
-
-pnpm-lock.yaml
+.env
