@@ -133,6 +133,32 @@ model email_bounce_event {
   sequence_step    sequence_step? @relation(fields: [sequence_step_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
+enum DomainTransferStatus {
+  ERROR
+  UNKNOWN
+  SUCCESS
+  QUEUED  @map("INIT")
+}
+
+model domain_transfer {
+  id         Int                  @id @default(autoincrement())
+  name       String
+  status     DomainTransferStatus @default(QUEUED)
+  created_at DateTime             @default(now())
+
+  note String?
+
+  transfer_id String @unique()
+
+  workspace   workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
+
+  creator user @relation(fields: [userId], references: [id])
+  userId  Int
+
+  deletedAt DateTime?
+}
+
 model email_link_click_event {
   id            Int            @id @default(autoincrement())
   target_email  String
@@ -290,6 +316,7 @@ model user {
   carts                          cart[]
   campaigns                      campaign[]
   splitbox                       vps[]
+  domainTransfers                domain_transfer[]
 }
 
 model workspace {
@@ -300,6 +327,7 @@ model workspace {
   splitbox            vps[]
   campaign            campaign[]
   mailbox             mailbox[]
+  domainTransfers     domain_transfer[]
 }
 
 model workspace_user_join {

@@ -11,8 +11,6 @@ import { Page } from "./page";
 import { INTENTS } from "./types";
 import { domainUserInfoZodSchema } from "./components/user_info_form";
 
-
-
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const session = await workspaceGuard({ request, params });
   const domain = new URL(request.url).searchParams.get("domain");
@@ -21,18 +19,22 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       `/app/${session.workspaceMembership.workspace_id}/domains/search`
     );
   }
-  const domainIsAvailable =
+  const availabilityResponse = (
     await NameCheapDomainService.checkDomainNameAvailability({
       domains: [domain!],
     })
-      .then((results) =>
-        results?.CommandResponse?.DomainCheckResults.filter(
-          (value) => value.Domain.toLowerCase() === domain?.toLowerCase()
-        ).map((d) => d.Available)
-      )
-      .then(
-        (domains) => domains !== undefined && domains?.length > 0 && domains[0]
-      );
+  )[0]; //.then(results => results.filter(r => r.Domain.toLowerCase() === domain!))
+  if (availabilityResponse.Domain.toLowerCase() !== domain)
+    throw Error("Domain not found");
+
+  // .then((results) =>
+  //   results?.ApiResponse.children[3].CommandResponse.children.filter(
+  //     (value) => value.Domain.toLowerCase() === domain?.toLowerCase()
+  //   ).map((d) => d.Available)
+  // )
+  // .then(
+  //   (domains) => domains !== undefined && domains?.length > 0 && domains[0]
+  // );
 
   const userPurchaseDetails = await prisma.domain_purchase_form_info.findFirst({
     where: {
@@ -44,7 +46,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   return {
     userPurchaseDetails: userPurchaseDetails,
-    domainIsAvailable,
+    domainIsAvailable: availabilityResponse.Available,
     domain,
     workspaceId: session.workspaceMembership.workspace_id,
   };
@@ -64,8 +66,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
       create: { ...data, user_id: session.user.id },
       update: data,
     });
-    return redirect(`/app/${session.workspaceMembership.workspace_id}/domains/checkout?domain=${domain}`);
+    return redirect(
+      `/app/${session.workspaceMembership.workspace_id}/domains/checkout?domain=${domain}`
+    );
   }
   return null;
 }
-

@@ -31,8 +31,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
     await NameCheapDomainService.checkDomainNameAvailability({
       domains: [data],
     }).then((r) => ({
-      availability: r.CommandResponse?.DomainCheckResults[0].Available,
-      name: r.CommandResponse?.DomainCheckResults[0].Domain,
+      name: r[0].Domain, //.ApiResponse.children[3].CommandResponse.children[0].Domain,
+      availability: r[0].Available, //.ApiResponse.children[3].CommandResponse.children[0].Available,
     }));
 
   if (name === undefined || availability === undefined) {

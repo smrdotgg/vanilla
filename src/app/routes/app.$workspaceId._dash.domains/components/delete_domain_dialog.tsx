@@ -21,6 +21,7 @@ export function DeleteDomainDialog({
   children: ReactNode;
 }) {
   const { submit } = useFetcher();
+  // return <>hi</>
 
   return (
     <Dialog>

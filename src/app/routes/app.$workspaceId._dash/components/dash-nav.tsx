@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-// import { ModeToggle } from "~/components/ui/mode-toggle";
+import { ModeToggle } from "~/components/ui/mode-toggle";
 import { Button } from "~/components/ui/button";
 import { INTENTS } from "../types";
 import { flushSync } from "react-dom";
@@ -168,7 +168,7 @@ export function DashLayout({
           </div>
           <div className="pt-2"></div>
           <AccountTile />
-          {/* <ModeToggle /> */}
+          <ModeToggle />
         </div>
         {/* Main Content */}
         <div className="flex max-h-full flex-1 overflow-y-auto ">
@@ -246,7 +246,6 @@ function ProgressBar() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (progress === 75) return;
-      console.log(progress);
       const remaining = 100 - progress;
       const newStep = remaining / 20;
       let newVal = progress + newStep;

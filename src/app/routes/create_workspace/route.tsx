@@ -30,14 +30,20 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (!user) return redirect("/auth/sign-in");
   return null;
 };
-
 export async function action({ request }: ActionFunctionArgs) {
-  const { user, firebaseData } = await getUserData({ request });
-  if (!user) return redirect("/auth/sign-in");
+  let { user, firebaseData } = await getUserData({ request });
+
+
+  if (!user) {
+    return redirect("/auth/sign-in");
+  }
 
   const formData = await request.formData();
+
   const name = String(formData.get("name"));
+
   const parseResult = nameSchema.safeParse(name);
+
   if (!parseResult.success) {
     return {
       ok: false,
@@ -60,6 +66,10 @@ export async function action({ request }: ActionFunctionArgs) {
       },
     },
   });
+
+  // refresh user data after workspace creation
+  user = (await getUserData({ request })).user!;
+
   return redirectUserToWorkspace({ user, request });
 }
 

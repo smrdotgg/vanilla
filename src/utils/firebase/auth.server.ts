@@ -37,7 +37,7 @@ const { getSession, commitSession, destroySession } =
     },
   });
 
-const cache: {[key: string]: CleanDecodedIdToken} = {}
+const cache: { [key: string]: CleanDecodedIdToken } = {};
 
 /**
  * Validates the session associated with the provided request.
@@ -46,18 +46,22 @@ const cache: {[key: string]: CleanDecodedIdToken} = {}
  * or undefined if the session is invalid or unavailable.
  */
 const validateSession = async (
-  request: Request,
+  request: Request
 ): Promise<CleanDecodedIdToken | undefined> => {
   const cookie = request.headers.get("cookie") ?? "";
-  if (cache[cookie!]) return cache[cookie!];
   const session = await getSession(cookie);
+  if (env.NODE_ENV === "development" && cache[JSON.stringify(session)!]) {
+    console.log("firebase cache hit");
+    return cache[JSON.stringify(session)!];
+  }
+  console.log("firebase cache miss");
   try {
     // Verify the session cookie. In this case an additional check is added to detect
     // if the user's Firebase session was revoked, user deleted/disabled, etc.
     const decodedClaims = await admin
       .auth()
       .verifySessionCookie(session.get("idToken"), true /** checkRevoked */);
-    cache[cookie!] = decodedClaims;
+    cache[JSON.stringify(session)!] = decodedClaims;
     return decodedClaims;
   } catch (error) {
     return undefined;
@@ -101,7 +105,7 @@ const validateSessionAndRedirectIfInvalid = async (request: Request) => {
 const setCookieAndRedirect = async (
   request: Request,
   sessionCookie: string,
-  redirectTo = "/",
+  redirectTo = "/"
 ) => {
   const session = await getSession(request.headers.get("cookie"));
   session.set("idToken", sessionCookie);
@@ -133,11 +137,10 @@ const sessionLogin = async ({
   idToken: string;
   redirectTo: string;
 }) => {
-
   try {
     // admin.app().auth().verifyIdToken(idToken);
     // getAuth().verifyIdToken(idToken);
-     await admin.auth().verifyIdToken(idToken, true);
+    await admin.auth().verifyIdToken(idToken, true);
 
     return admin
       .auth()
@@ -155,7 +158,7 @@ const sessionLogin = async ({
           return {
             error: `sessionLogin error!: ${error.message}`,
           };
-        },
+        }
       );
   } catch (error) {
     console.error("Error in sessionLogin:", error);

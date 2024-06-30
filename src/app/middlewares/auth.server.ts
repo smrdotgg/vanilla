@@ -24,7 +24,6 @@ export const workspaceGuard = async ({
   request: Request;
   params: Params<string>;
 }) => {
-  console.log("Auth Guard: Starting authentication process");
 
   try {
     const { firebaseData, user } = await getUserData({ request });
@@ -52,7 +51,6 @@ export const workspaceGuard = async ({
       throw await redirectUserToWorkspace({ user, request });
     }
 
-    console.log("Auth Guard: Authentication successful");
     return {
       user,
       firebaseData,

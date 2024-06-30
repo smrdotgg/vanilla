@@ -16,7 +16,7 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   optimizeDeps: {
-    exclude: [ "firebase-admin"],
+    exclude: [ "firebase-admin", "node-ssh"],
   },
   resolve: {
     alias: {

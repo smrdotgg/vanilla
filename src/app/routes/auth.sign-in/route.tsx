@@ -76,6 +76,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       redirectTo: HOME_ROUTE,
     });
   } else if (intent === INTENTS.loginWithEmailAndPassword) {
+    console.log(`intent == ${INTENTS.loginWithEmailAndPassword}`);
     const email = String(formData["email"]);
     const password = String(formData["password"]);
     let user: User;
@@ -95,6 +96,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }
       return { ok: false, error: errorMessage };
     }
+    console.log("ping 3");
 
     const idToken = await user.getIdToken();
     return await sessionLogin({

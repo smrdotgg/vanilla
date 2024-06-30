@@ -5,6 +5,7 @@ import { loader } from "./route";
 import { Summary } from "./components/summary";
 import { YourDomains } from "./components/your_domains";
 import { TopBar } from "./components/top_bar";
+import { PendingTransfers } from "./components/transfers";
 import { INTENTS } from "./types";
 
 export default function Page() {
@@ -49,6 +50,7 @@ export default function Page() {
         ]}
       />
       <div className="pt-6"></div>
+      <PendingTransfers />
       <div className="">
         <p className="my-4 text-xl font-bold">Your Domains</p>
         <YourDomains

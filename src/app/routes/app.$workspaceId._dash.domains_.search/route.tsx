@@ -3,11 +3,14 @@ import { NameCheapDomainService } from "~/sdks/namecheap";
 import { prisma } from "~/utils/db";
 import { Page } from "./page";
 import { workspaceGuard } from "~/app/middlewares/auth.server";
+import { topDomains } from "~/sdks/namecheap/tlds";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { workspaceMembership } = await workspaceGuard(args);
   const query = new URL(args.request.url).searchParams.get("query") ?? "";
-  const results = await NameCheapDomainService.domainSearch({ query });
+  const results = await NameCheapDomainService.checkDomainNameAvailability({
+    domains: query.includes(".") ? [query] : topDomains.map(td => `${query}${td}`),
+  });
   const priceList = results
     ? await prisma.tld_yearly_price_info.findMany({
         include: { tld_price_info: true },
