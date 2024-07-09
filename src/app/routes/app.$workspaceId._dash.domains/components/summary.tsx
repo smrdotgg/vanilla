@@ -8,7 +8,7 @@ type SummaryProps = SummaryCellProps[];
 export function Summary({ data }: { data: SummaryProps }) {
   return (
     <div className="flex">
-      <div className="flex border border-gray-200 dark:border-gray-700">
+      <div className="flex border border-gray-200 dark:border-gray-700 rounded-lg">
         {data.map((datum, index) => (
           <div key={index} className="flex">
             <SummaryCell
@@ -53,7 +53,7 @@ function SummaryCell(props: {
         <p className="text-2xl font-semibold">{props.digit.toString()}</p>
         <p className="text-xs text-gray-500">{props.label}</p>
       </div>
-      <Button asChild variant="outline" className="h-6 w-6 rounded-none p-0">
+      <Button asChild variant="outline" className="h-6 w-6  p-0">
         <Link to={props.addHref} className="">
           <IoAdd className="" />
         </Link>

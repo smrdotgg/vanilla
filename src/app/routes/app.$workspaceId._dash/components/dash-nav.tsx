@@ -71,6 +71,7 @@ export function DashLayout({
           <div className="py-2 px-2 flex *:m-auto">
             <WorkspaceSelect />
           </div>
+          {/* <div className="h-[1px] my-2 bg-gray-100 w-full"></div> */}
           <div className="flex h-full flex-col overflow-y-auto justify-between">
             <div>
               {topDashElements.map((e, i) => (
@@ -84,7 +85,7 @@ export function DashLayout({
                       flushSync(() => setLoading(""));
                     }
 
-                    const baseClasses = "flex min-h-8";
+                    const baseClasses = "flex min-h-8 rounded m-1";
                     let stateClasses = "";
 
                     if (isActive) {
@@ -179,6 +180,7 @@ export function DashLayout({
   );
 }
 function AccountTile(){
+return <></>;
   return <>account tile</>
 }
 
@@ -201,14 +203,16 @@ function WorkspaceSelect() {
   };
 
   return (
-    <>
+    <div className="flex flex-col w-full p-1">
+      <p className="text-xs">Selected Workspace</p>
+      <div className="pt-[.2rem]"></div>
       <Select
         disabled={state !== "idle"}
         onValueChange={onChange}
         name="targetWorkspaceId"
         value={workspaceMembership?.workspace_id.toString()}
       >
-        <SelectTrigger className="w-full border-none">
+        <SelectTrigger className="w-full border border-gray-600">
           <SelectValue placeholder="Select Workspace" />
         </SelectTrigger>
         <SelectContent>
@@ -227,7 +231,7 @@ function WorkspaceSelect() {
           </Button>
         </SelectContent>
       </Select>
-    </>
+    </div>
   );
 }
 

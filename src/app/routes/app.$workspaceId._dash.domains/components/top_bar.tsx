@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
-import { TransferDomainDialog } from "./transfer_domain_dialog";
+import { DNSTransferDialog } from "./dns_transfer_dialog";
 
 export function TopBar() {
   return (
@@ -12,7 +12,8 @@ export function TopBar() {
         </p>
       </div>
       <div className="flex justify-end gap-2">
-      <TransferDomainDialog />
+      <DNSTransferDialog />
+      {/* <TransferDomainDialog /> */}
       <Button asChild variant={"default"}>
         <Link to="search">Purchase new Domain</Link>
       </Button>

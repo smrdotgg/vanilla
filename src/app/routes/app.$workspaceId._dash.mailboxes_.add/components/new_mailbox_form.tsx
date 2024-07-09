@@ -47,12 +47,12 @@ export function NewMailboxTinyForm({
     <div className="flex max-w-[52rem] flex-col dark:border-white dark:bg-gray-950 bg-gray-50 p-5 *:mx-auto">
       <div className="mb-2 ml-0 flex w-[50rem] justify-between">
         <p className="text-xl font-bold">Mailbox #{index + 1}</p>
-        <Button
+        {forms.length > 1 && <Button
           variant={"ghost"}
           onClick={() => setForms(forms.filter((f, i) => i !== index))}
         >
           <LuX className="text-red-500" />
-        </Button>
+        </Button>}
       </div>
       <div className="pt-2"></div>
       <Form {...form}>
@@ -85,7 +85,7 @@ export function NewMailboxTinyForm({
                     )
                   )
                 }
-                value={data.lastName}
+                value={data.lastName ?? ""}
               />
               <ErrorDisplay errors={error?.formErrors.fieldErrors.lastName} />
             </div>

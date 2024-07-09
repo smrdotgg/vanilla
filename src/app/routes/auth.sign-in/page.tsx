@@ -28,7 +28,6 @@ export function Page() {
     email: string;
     password: string;
   }) => {
-
     fetcher.submit(
       { ...formData, intent: INTENTS.loginWithEmailAndPassword },
       { method: "post", encType: "application/json" }
@@ -105,7 +104,10 @@ function ContinueWithGoogleButton() {
         console.log("Google sign-in successful. Getting ID token...");
         const idToken = await res.user.getIdToken();
         console.log("ID token retrieved. Submitting to fetcher...");
-        fetcher.submit({ idToken: idToken }, { method: "post" });
+        fetcher.submit(
+          { idToken: idToken, intent: INTENTS.continueWithGoogle },
+          { method: "post", encType: "application/json" }
+        );
       })
       .catch((err) => {
         console.error("Error during Google sign-in:", err);
@@ -113,11 +115,7 @@ function ContinueWithGoogleButton() {
   };
 
   return (
-    <button
-      className="ui button"
-      type="button"
-      onClick={signInWithGoogle}
-    >
+    <button className="ui button" type="button" onClick={signInWithGoogle}>
       <i className="icon google"></i>
       Login with Google
     </button>

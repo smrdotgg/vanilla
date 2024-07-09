@@ -132,11 +132,23 @@ const sessionLogin = async ({
   request,
   idToken,
   redirectTo,
+  retryCount = 0,
+  error,
 }: {
   request: Request;
   idToken: string;
   redirectTo: string;
+  retryCount?: number;
+  error?: string;
 }) => {
+  console.log(`[sessionLogin] retry count ${retryCount}`);
+  if (retryCount === 3) {
+    console.error("Error in sessionLogin:", error);
+    return {
+      error: String(error),
+    };
+  }
+
   try {
     // admin.app().auth().verifyIdToken(idToken);
     // getAuth().verifyIdToken(idToken);
@@ -161,6 +173,14 @@ const sessionLogin = async ({
         }
       );
   } catch (error) {
+    return sessionLogin({
+      error: String(error),
+      request,
+      redirectTo,
+      idToken,
+      retryCount: retryCount + 1,
+    });
+
     console.error("Error in sessionLogin:", error);
     return {
       error: String(error),

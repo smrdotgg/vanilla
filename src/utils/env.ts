@@ -7,6 +7,23 @@ const isServer = typeof process !== "undefined";
 if (typeof process !== "undefined") {
   config();
 }
+const jsonStringSchema = z.string().refine(
+  (val) => {
+    try {
+      // Try to parse the string as JSON and check if it's an array of strings
+      const parsed = JSON.parse(val);
+      return (
+        Array.isArray(parsed) &&
+        parsed.every((item) => typeof item === "string")
+      );
+    } catch {
+      return false;
+    }
+  },
+  {
+    message: "Invalid JSON array of strings",
+  }
+);
 
 export const env = createEnv({
   server: {
@@ -71,6 +88,19 @@ export const env = createEnv({
     DOMAIN_PURCHASE_POSTAL_CODE: z.string(),
     DOMAIN_PURCHASE_EMAIL_ADDRESS: z.string(),
     DOMAIN_PURCHASE_STATE_PROVICE: z.string(),
+
+    DNS_SIMPLE_EMAIL: z.string(),
+    DNS_SIMPLE_PASSWORD: z.string(),
+
+    DNS_LIST: jsonStringSchema,
+
+    DNSIMPLE_ACCESS_TOKEN: z.string(),
+    DNSIMPLE_ACCOUNT_KEY: z.coerce.number(),
+    DNSIMPLE_BASE_URL: z.string().url(),
+
+    CLOUDNS_ID: z.string(),
+    CLOUDNS_PASS: z.string(),
+    CLOUDNS_BASE_URL: z.string().url(),
   },
 
   /**

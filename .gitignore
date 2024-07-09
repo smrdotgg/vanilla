@@ -1,4 +1,5 @@
 node_modules
+x.ts
 
 /.cache
 /build

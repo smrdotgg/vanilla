@@ -14,7 +14,7 @@ export const DevErrorComponent = ({ error }: { error: unknown }) => {
     return (
       <div>
         <h1>Error</h1>
-        <p>{error.message}</p>
+        <code>{error.message}</code>
         <p>The stack trace is:</p>
         <pre>{error.stack}</pre>
       </div>

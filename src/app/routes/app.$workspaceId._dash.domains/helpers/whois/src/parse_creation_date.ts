@@ -1,3 +1,5 @@
+import { SUPPORTED_DOMAINS } from "../index.server";
+
 export const parseWhoisResponse = ({
   tld,
   lines,
@@ -5,7 +7,7 @@ export const parseWhoisResponse = ({
   tld: string;
   lines: string[];
 }) => {
-  if (["com", "net", "club", "io"].includes(tld.toLowerCase())) {
+  if (SUPPORTED_DOMAINS.includes(tld.toLowerCase())) {
     const creationDateLine = lines.find((line) =>
       line.trim().startsWith("Creation Date:")
     );

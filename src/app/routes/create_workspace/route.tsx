@@ -104,7 +104,7 @@ export default function Page() {
                 type="submit"
                 variant="outline"
               >
-                <Link to="/home">Cancel</Link>
+                <Link to="/">Cancel</Link>
               </Button>
               <Button
                 disabled={isLoading}

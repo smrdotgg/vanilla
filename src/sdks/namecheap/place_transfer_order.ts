@@ -9,9 +9,8 @@ export const placeTransferOrder = async ({
   domain: string;
   eppCode: string;
 }) => {
-  const apiUrl = `${nameCheapBaseUrl}&Command=namecheap.domains.transfer.create&Years=1&DomainName=${domain}&EPPCode=${btoa(
-    eppCode
-  )}`;
+  const apiUrl = `${nameCheapBaseUrl}&Command=namecheap.domains.transfer.create&Years=1&DomainName=${domain}&EPPCode=base64:${btoa(eppCode)}`;
+  console.log(apiUrl);
   const response = await fetch(apiUrl);
 
   if (!response.ok) {
@@ -20,8 +19,10 @@ export const placeTransferOrder = async ({
     throw Error("API request failed");
   }
   // console.log(await response.text());
+  const responseText = await response.text();
+  console.log(responseText);
   const responseBody = SXTJ.convertXML(
-    await response.text()
+    responseText
   ) as NamecheapApiResponse<TransferResponse>;
 
   if (responseBody.ApiResponse.children[0].Errors.children)
@@ -29,19 +30,22 @@ export const placeTransferOrder = async ({
       responseBody.ApiResponse.children[0].Errors.children[0].Error.content
     );
 
-  return responseBody.ApiResponse.children[3].CommandResponse.children[0].DomainTransferCreateResult;
+  return responseBody.ApiResponse.children[3].CommandResponse.children[0]
+    .DomainTransferCreateResult;
 };
-type TransferResponse = [{
-  DomainTransferCreateResult: {
-    DomainName: string;
-    Transfer: `${boolean}`;
-    TransferID: string;
-    StatusID: string;
-    OrderID: string;
-    TransactionID: string;
-    ChargedAmount: string;
-    StatusCode: string;
-  };
-}];
+type TransferResponse = [
+  {
+    DomainTransferCreateResult: {
+      DomainName: string;
+      Transfer: `${boolean}`;
+      TransferID: string;
+      StatusID: string;
+      OrderID: string;
+      TransactionID: string;
+      ChargedAmount: string;
+      StatusCode: string;
+    };
+  }
+];
 
 // await placeTransferOrder({ domain: "steliade.com", eppCode: "abc" });

@@ -8,7 +8,7 @@ const getWhoisInfo = async (domain: string) => {
   return response.stdout!.toString().split("\n");
 };
 
-const SUPPORTED_DOMAINS = ["com", "net", "edu", "club"];
+export const SUPPORTED_DOMAINS = ["com", "net", "edu", "club"];
 export const checkDomainTransferability = async ({
   domain,
 }: {
@@ -27,7 +27,30 @@ export const checkDomainTransferability = async ({
       message: `We do not support TLD .${tld}`,
     };
 
-  const lines = await getWhoisInfo(domain);
+  let lines: string[];
+  try {
+    lines = await getWhoisInfo(domain);
+  } catch (e) {
+    return {
+      isTransferable: false,
+      message: "Server Error",
+    };
+  }
+
+  const firstLine = lines.find((l) => Boolean(l.trim()))?.toLowerCase();
+  const domainIsRegistered =
+    firstLine &&
+    !firstLine.includes("domain not found") &&
+    !firstLine.includes("no match") &&
+    !firstLine.includes("no data found") &&
+    !firstLine.includes("no match for domain");
+
+  if (!domainIsRegistered) {
+    return {
+      isTransferable: false,
+      message: "Domain has not been registered. Purchase instead.",
+    };
+  }
   const {
     containsClientTransferProhibited,
     containsServerTransferProhibited,

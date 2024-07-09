@@ -46,7 +46,7 @@ export const Page = () => {
         <YourMailboxes
           rows={mailboxes.map((m) => ({
             fullName: m.firstName + " " + (m.lastName ?? ""),
-            address: m.username + "@" + m.domain.name,
+            address: (m.username && m.domainName) ? m.username + "@" + m.domainName : "N/A",
             domainId: String(m.id),
             status: m.status,
           }))}

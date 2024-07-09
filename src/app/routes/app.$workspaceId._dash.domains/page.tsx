@@ -9,7 +9,8 @@ import { PendingTransfers } from "./components/transfers";
 import { INTENTS } from "./types";
 
 export default function Page() {
-  const { domains, workspaceMembership } = useLoaderData<typeof loader>();
+  const { workingDnsDomains, domains, workspaceMembership } =
+    useLoaderData<typeof loader>();
 
   const fetchers = useFetchers();
 
@@ -54,12 +55,21 @@ export default function Page() {
       <div className="">
         <p className="my-4 text-xl font-bold">Your Domains</p>
         <YourDomains
-          rows={filteredDomains.map((d) => ({
-            name: d.name,
-            parsedExpiryDate: d.expiresAt,
-            domainId: d.id.toString(),
-            mailboxCount: d.mailbox.length,
-          }))}
+          rows={[
+            ...workingDnsDomains.map((d) => ({
+              name: d.name,
+              domainId: `DNS_DOMAIN_${d.id.toString()}`,
+              mailboxCount: d.mailboxCount,
+              domainType: "dns" as const,
+            })),
+            ...filteredDomains.map((d) => ({
+              name: d.name,
+              parsedExpiryDate: d.expiresAt,
+              domainId: `PLATFORM_DOMAIN_${d.id.toString()}`,
+              mailboxCount: d.mailbox.length,
+              domainType: "platform" as const,
+            })),
+          ]}
         />
       </div>
     </div>

@@ -94,6 +94,8 @@ model domain {
   name         String   @unique(map: "domain_name_unique")
   purchased_by user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+
+
   vps_id Int? @map("splitbox_id")
   vps    vps? @relation(fields: [vps_id], references: [id], onDelete: SetNull, onUpdate: SetNull)
 
@@ -140,23 +142,57 @@ enum DomainTransferStatus {
   QUEUED  @map("INIT")
 }
 
-model domain_transfer {
-  id         Int                  @id @default(autoincrement())
-  name       String
-  status     DomainTransferStatus @default(QUEUED)
-  created_at DateTime             @default(now())
+model domain_dns_transfer {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  createdAt  DateTime  @default(now())
+  canceledAt DateTime?
 
   note String?
 
-  transfer_id String @unique()
+  success   Boolean @default(false)
 
+  workspace workspace @relation(fields: [workspaceId], references: [id])
+  user      user      @relation(fields: [userId], references: [id])
+
+  userId      Int
+  workspaceId Int
+}
+
+model domain_transfer {
+  id         Int      @id @default(autoincrement())
+  name       String
+  created_at DateTime @default(now())
+
+  note String?
+
+  namecheap_transfer namecheap_transfer[]
+
+  // transfer_id String? @unique() // TODO: remove this in favor of list
+
+  code String?
+
+  deletedAt   DateTime?
   workspace   workspace @relation(fields: [workspaceId], references: [id])
   workspaceId Int
 
   creator user @relation(fields: [userId], references: [id])
   userId  Int
+}
 
-  deletedAt DateTime?
+model namecheap_transfer {
+  id          Int    @id @default(autoincrement())
+  namecheapId String @unique()
+
+  success Boolean @default(false)
+
+  statusCode String?
+
+  createdAt DateTime @default(now())
+
+  domainTransfer    domain_transfer @relation(fields: [domain_transferId], references: [id])
+  domain_transferId Int
 }
 
 model email_link_click_event {
@@ -264,8 +300,12 @@ enum MailBoxStatus {
 model mailbox {
   id Int @id @default(autoincrement())
 
-  domain   domain @relation(fields: [domainId], references: [id])
-  domainId Int
+  domain   domain? @relation(fields: [domainId], references: [id])
+  domainId Int?
+
+  domainName String?
+
+
 
   firstName String
   lastName  String?
@@ -317,6 +357,7 @@ model user {
   campaigns                      campaign[]
   splitbox                       vps[]
   domainTransfers                domain_transfer[]
+  domain_dns_transfer            domain_dns_transfer[]
 }
 
 model workspace {
@@ -328,6 +369,7 @@ model workspace {
   campaign            campaign[]
   mailbox             mailbox[]
   domainTransfers     domain_transfer[]
+  domain_dns_transfer domain_dns_transfer[]
 }
 
 model workspace_user_join {

@@ -15,8 +15,10 @@ type RowData = {
   domainId: string;
   name: string;
   mailboxCount: number;
-  parsedExpiryDate: string;
+  parsedExpiryDate?: string;
+  domainType: DomainType;
 };
+type DomainType = "platform" | "dns";
 
 export function YourDomains({ rows }: { rows: RowData[] }) {
   return (
@@ -35,7 +37,12 @@ export function YourDomains({ rows }: { rows: RowData[] }) {
           <TableRow key={index}>
             <TableCell className="font-medium w-80">{row.name}</TableCell>
             <TableCell>{row.mailboxCount}</TableCell>
-            <TableCell>{row.parsedExpiryDate}</TableCell>
+            {row.parsedExpiryDate && (
+              <TableCell>{row.parsedExpiryDate}</TableCell>
+            )}
+            {!row.parsedExpiryDate && (
+              <TableCell className="text-gray-500">N/A</TableCell>
+            )}
             <TableCell className="text-right">
               <DeleteDomainDialog domainId={String(row.domainId)}>
                 <Button variant={"ghost"} className="py-0">
