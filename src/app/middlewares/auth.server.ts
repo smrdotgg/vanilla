@@ -17,6 +17,33 @@ export const getUserData = async ({ request }: { request: Request }) => {
   return { firebaseData, user };
 };
 
+export const adminGuard = async ({ request }: { request: Request }) => {
+  try {
+    const { firebaseData, user } = await getUserData({ request });
+
+    if (firebaseData === undefined) {
+      console.error("Auth Guard: Firebase data is undefined");
+      throw Error("Auth Error");
+    }
+    if (user === null) {
+      console.error("Auth Guard: User not found");
+      throw Error("User Not Found ");
+    }
+    
+    if (user.role !== "ADMIN") {
+      console.error("Auth Guard: User is not an admin");
+      throw redirect(LOGIN_ROUTE);
+    }
+
+    return {
+      user,
+      firebaseData,
+    };
+  } catch (e) {
+    console.error("Auth Guard: Authentication failed", e);
+    throw redirect(LOGIN_ROUTE);
+  }
+};
 export const workspaceGuard = async ({
   request,
   params,
@@ -24,7 +51,6 @@ export const workspaceGuard = async ({
   request: Request;
   params: Params<string>;
 }) => {
-
   try {
     const { firebaseData, user } = await getUserData({ request });
 

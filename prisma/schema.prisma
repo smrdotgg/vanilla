@@ -94,8 +94,6 @@ model domain {
   name         String   @unique(map: "domain_name_unique")
   purchased_by user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-
-
   vps_id Int? @map("splitbox_id")
   vps    vps? @relation(fields: [vps_id], references: [id], onDelete: SetNull, onUpdate: SetNull)
 
@@ -151,7 +149,7 @@ model domain_dns_transfer {
 
   note String?
 
-  success   Boolean @default(false)
+  success Boolean @default(false)
 
   workspace workspace @relation(fields: [workspaceId], references: [id])
   user      user      @relation(fields: [userId], references: [id])
@@ -305,8 +303,6 @@ model mailbox {
 
   domainName String?
 
-
-
   firstName String
   lastName  String?
 
@@ -341,15 +337,26 @@ model vps {
   @@map("splitbox")
 }
 
+enum userType {
+  USER
+  ADMIN
+}
+
 model user {
-  id                             Int                         @id @default(autoincrement())
-  email                          String?
-  email_verified                 Boolean
-  firebase_id                    String                      @unique()
-  oauth_provider                 String
-  password                       String?
-  created_at                     DateTime                    @default(now())
-  updated_at                     DateTime                    @default(now())
+  id             Int     @id @default(autoincrement())
+  email          String?
+  email_verified Boolean
+  firebase_id    String  @unique()
+
+  first_name String?
+  last_name  String?
+
+  oauth_provider String
+  password       String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
   workspace_user_join_list       workspace_user_join[]
   domain_purchase_form_info_list domain_purchase_form_info[]
   domains                        domain[]
@@ -358,6 +365,8 @@ model user {
   splitbox                       vps[]
   domainTransfers                domain_transfer[]
   domain_dns_transfer            domain_dns_transfer[]
+
+  role userType @default(USER)
 }
 
 model workspace {

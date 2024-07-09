@@ -1,17 +1,13 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
-import { redirectUserToWorkspace } from "../route_utils/redirect_to_workspace";
-import { getUserData } from "../middlewares/auth.server";
+import { redirectUserToWorkspace } from "../../route_utils/redirect_to_workspace";
+import { getUserData } from "../../middlewares/auth.server";
 import { prisma } from "~/utils/db";
 import { env } from "~/utils/env";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
-  if (
-    url.pathname === "/" ||
-    url.pathname === "/app" ||
-    url.pathname === "/app/"
-  ) {
+  if (url.pathname === "/app" || url.pathname === "/app/") {
     const { firebaseData, user } = await getUserData({ request });
     if (user) {
       return redirectUserToWorkspace({ request, user });
@@ -35,7 +31,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
   return null;
 };
-
 export default function Page() {
   return <Outlet />;
 }

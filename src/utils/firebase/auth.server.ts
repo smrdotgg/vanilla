@@ -216,10 +216,15 @@ const sessionLogout = async (request: Request) => {
       return { error: error?.message };
     });
 };
+
+const getFirebaseUser = async (idToken: string) =>
+  admin.auth().getUser(idToken);
+
 export {
   sessionLogin,
   sessionLogout,
   validateSession,
   getUserInfoFromIdToken,
   validateSessionAndRedirectIfInvalid,
+  getFirebaseUser,
 };

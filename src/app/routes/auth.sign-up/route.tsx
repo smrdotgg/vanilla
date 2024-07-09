@@ -161,7 +161,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const idToken = String(formData.get("idToken"));
   try {
     const data = await getUserInfoFromIdToken(idToken);
-    // data.
     await prisma.user.create({
       data: {
         oauth_provider: data.firebase.sign_in_provider,
