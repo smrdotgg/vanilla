@@ -14,9 +14,9 @@ export function TopBar() {
       <div className="flex justify-end gap-2">
       <DNSTransferDialog />
       {/* <TransferDomainDialog /> */}
-      <Button asChild variant={"default"}>
-        <Link to="search">Purchase new Domain</Link>
-      </Button>
+      {/* <Button asChild variant={"default"}> */}
+      {/*   <Link to="search">Purchase new Domain</Link> */}
+      {/* </Button> */}
       </div>
     </div>
   );
