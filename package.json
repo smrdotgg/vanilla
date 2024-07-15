@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "app:build": "tsc && remix vite:build",
+    "app:start": "remix-serve ./build/server/index.js --port 3000",
     "app:dev": "remix vite:dev --port 3000 --host",
     "api:dev": "tsx watch src/backend/index.ts",
     "api:start": "tsx src/backend/index.ts",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc"
   },
   "dependencies": {
