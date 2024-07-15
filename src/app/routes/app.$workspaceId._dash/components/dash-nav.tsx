@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-import { ModeToggle } from "~/components/ui/mode-toggle";
 import { Button } from "~/components/ui/button";
 import { INTENTS } from "../types";
 import { flushSync } from "react-dom";
@@ -131,8 +130,7 @@ export function DashLayout({
                     } else if (!isPending && loading === e.route) {
                       flushSync(() => setLoading(""));
                     }
-
-                    const baseClasses = "flex min-h-8";
+                    const baseClasses = "flex min-h-8 rounded m-1";
                     let stateClasses = "";
 
                     if (isActive) {
@@ -169,7 +167,6 @@ export function DashLayout({
           </div>
           <div className="pt-2"></div>
           <AccountTile />
-          <ModeToggle />
         </div>
         {/* Main Content */}
         <div className="flex max-h-full flex-1 overflow-y-auto ">

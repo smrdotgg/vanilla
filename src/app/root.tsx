@@ -23,6 +23,7 @@ import {
   MetaFunction,
 } from "@remix-run/node";
 import { env } from "~/utils/env";
+import { BACKUP_THEME } from "./client_random/constants";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -58,11 +59,9 @@ export const links: LinksFunction = () => {
 };
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>();
-  const backupTheme =
-    env.PUBLIC_ENV === "development" ? Theme.LIGHT : Theme.LIGHT;
 
   return (
-    <Providers theme={data?.theme ?? backupTheme}>
+    <Providers theme={data?.theme ?? BACKUP_THEME}>
       <LayoutCore>{children}</LayoutCore>
     </Providers>
   );
