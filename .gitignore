@@ -4,3 +4,5 @@ x.ts
 /.cache
 /build
 .env
+
+./*.sh
