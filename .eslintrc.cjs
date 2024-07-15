@@ -3,6 +3,7 @@
  * It relies on recommended configs out of the box for simplicity, but you can
  * and should modify this configuration to best suit your team's needs.
  */
+
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
@@ -18,14 +19,10 @@ module.exports = {
     commonjs: true,
     es6: true,
   },
+  ignorePatterns: ["!**/.server", "!**/.client"],
 
   // Base config
   extends: ["eslint:recommended"],
-
-  rules: {
-    // If you want to disable no-unused-vars for the entire project (JS and JSX files)
-    "no-unused-vars": "off",
-  },
 
   overrides: [
     // React
@@ -51,9 +48,9 @@ module.exports = {
           typescript: {},
         },
       },
-      rules: {
-        // Add or modify rules specific to React/JSX here if needed
-      },
+  rules: {
+    "prefer-const": "off", // Add this line to disable the "use const instead of let" rule
+  },
     },
 
     // Typescript
@@ -77,11 +74,9 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
       ],
-      rules: {
-        // Disabling TypeScript-specific rule for unused variables
-        "@typescript-eslint/no-unused-vars": "off",
-        // Add or modify other TypeScript-specific rules as needed
-      },
+  rules: {
+    "prefer-const": "off", // Add this line to disable the "use const instead of let" rule
+  },
     },
 
     // Node
@@ -90,10 +85,6 @@ module.exports = {
       env: {
         node: true,
       },
-      rules: {
-        // Rules specific to Node.js configuration files can go here
-      },
     },
   ],
 };
-

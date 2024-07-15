@@ -94,13 +94,9 @@ model domain {
   name         String   @unique(map: "domain_name_unique")
   purchased_by user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  vps_id Int? @map("splitbox_id")
-  vps    vps? @relation(fields: [vps_id], references: [id], onDelete: SetNull, onUpdate: SetNull)
-
   workspace_id Int
   workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   // workspace_id
-  mailbox      mailbox[]
 
   ipv6 String?
 
@@ -131,6 +127,66 @@ model email_bounce_event {
   name             String
   sec              String
   sequence_step    sequence_step? @relation(fields: [sequence_step_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum DomainTransferStatus {
+  ERROR
+  UNKNOWN
+  SUCCESS
+  QUEUED  @map("INIT")
+}
+
+model domain_dns_transfer {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  createdAt  DateTime  @default(now())
+  canceledAt DateTime?
+
+  note String?
+
+  success Boolean @default(false)
+
+  workspace workspace @relation(fields: [workspaceId], references: [id])
+  user      user      @relation(fields: [userId], references: [id])
+
+  userId      Int
+  workspaceId Int
+}
+
+model domain_transfer {
+  id         Int      @id @default(autoincrement())
+  name       String
+  created_at DateTime @default(now())
+
+  note String?
+
+  namecheap_transfer namecheap_transfer[]
+
+  // transfer_id String? @unique() // TODO: remove this in favor of list
+
+  code String?
+
+  deletedAt   DateTime?
+  workspace   workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
+
+  creator user @relation(fields: [userId], references: [id])
+  userId  Int
+}
+
+model namecheap_transfer {
+  id          Int    @id @default(autoincrement())
+  namecheapId String @unique()
+
+  success Boolean @default(false)
+
+  statusCode String?
+
+  createdAt DateTime @default(now())
+
+  domainTransfer    domain_transfer @relation(fields: [domain_transferId], references: [id])
+  domain_transferId Int
 }
 
 model email_link_click_event {
@@ -238,11 +294,11 @@ enum MailBoxStatus {
 model mailbox {
   id Int @id @default(autoincrement())
 
-  domain   domain @relation(fields: [domainId], references: [id])
-  domainId Int
+
+  domainName String
 
   firstName String
-  lastName  String
+  lastName  String?
 
   username String
   password String
@@ -259,9 +315,10 @@ model vps {
   name                           String
   compute_id_on_hosting_platform String @unique(map: "splitbox_compute_id_on_hosting_platform_unique")
 
+  domain String?
+
   userId Int?
-  user   user?    @relation(fields: [userId], references: [id])
-  domain domain[]
+  user   user? @relation(fields: [userId], references: [id])
 
   workspace   workspace? @relation(fields: [workspaceId], references: [id])
   workspaceId Int?
@@ -270,26 +327,43 @@ model vps {
 
   emailwizInitiated Boolean @default(false)
 
-  createdAt DateTime?
+  createdAt      DateTime?
+  expirationDate DateTime?
 
   @@map("splitbox")
 }
 
+enum userType {
+  USER
+  ADMIN
+}
+
 model user {
-  id                             Int                         @id @default(autoincrement())
-  email                          String?
-  email_verified                 Boolean
-  firebase_id                    String                      @unique()
-  oauth_provider                 String
-  password                       String?
-  created_at                     DateTime                    @default(now())
-  updated_at                     DateTime                    @default(now())
+  id             Int     @id @default(autoincrement())
+  email          String?
+  email_verified Boolean
+  firebase_id    String  @unique()
+
+  first_name String?
+  last_name  String?
+
+  oauth_provider String
+  password       String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  deleted_at DateTime?
+
   workspace_user_join_list       workspace_user_join[]
   domain_purchase_form_info_list domain_purchase_form_info[]
   domains                        domain[]
   carts                          cart[]
   campaigns                      campaign[]
   splitbox                       vps[]
+  domainTransfers                domain_transfer[]
+  domain_dns_transfer            domain_dns_transfer[]
+
+  role userType @default(USER)
 }
 
 model workspace {
@@ -300,6 +374,8 @@ model workspace {
   splitbox            vps[]
   campaign            campaign[]
   mailbox             mailbox[]
+  domainTransfers     domain_transfer[]
+  domain_dns_transfer domain_dns_transfer[]
 }
 
 model workspace_user_join {
