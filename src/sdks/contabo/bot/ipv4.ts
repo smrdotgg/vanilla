@@ -1,5 +1,5 @@
 import { HTTPResponse, launch, Locator } from "puppeteer";
-import { consoleLog } from "~/utils/console_log";
+import { consoleError, consoleLog } from "~/utils/console_log";
 
 export async function setReverseDNS({
   devMode = { headless: false, slowMo: undefined },
@@ -17,6 +17,7 @@ export async function setReverseDNS({
   timeout?: number;
 }) {
   consoleLog(`called with args: ${JSON.stringify({ devMode, username, password, ipv4, targetUrl, timeout }, null, 2)}`);
+  try{
 
 
 
@@ -222,6 +223,9 @@ export async function setReverseDNS({
   }
 
   await browser.close();
+  } catch(e){
+    consoleError("ERROR IN setReverseDNS", e);
+  }
 }
 
 export {};
