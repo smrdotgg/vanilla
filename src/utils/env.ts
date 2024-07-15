@@ -101,6 +101,8 @@ export const env = createEnv({
     CLOUDNS_ID: z.string(),
     CLOUDNS_PASS: z.string(),
     CLOUDNS_BASE_URL: z.string().url(),
+
+    CONSOLE_LOGS: z.coerce.boolean().nullish(),
   },
 
   /**

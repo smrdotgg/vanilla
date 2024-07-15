@@ -94,7 +94,7 @@ function LayoutCore({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Providers({
+export function Providers({
   children,
   theme,
 }: {

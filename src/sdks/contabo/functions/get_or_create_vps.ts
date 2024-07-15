@@ -2,27 +2,30 @@ import { prisma } from "~/utils/db";
 import { Instance, Links } from "../types";
 import { env } from "~/utils/env";
 import { getAccessToken } from "../helpers/get_access_token";
+import { consoleLog } from "~/utils/console_log";
 
 export async function getOrCreateVPSAndGetId({
   mailboxId,
 }: {
   mailboxId: number;
 }) {
-  const mailboxWithVPS = await prisma.mailbox.findFirst({
+  const mailbox = (await prisma.mailbox.findFirst({
     where: { id: mailboxId },
-    include: { domain: { include: { vps: true } } },
-  });
-
+  }))!;
   const existingVPS =
-    mailboxWithVPS?.domain.vps ??
     (await prisma.vps.findFirst({
-      where: { domain: { none: {} } },
+      where: { domain: mailbox.domainName },
+    })) ??
+    (await prisma.vps.findFirst({
+      where: { OR: [{ domain: { equals: null } }, { domain: { equals: "" } }] },
     }));
+
   let vpsContaboId: string;
-  if (existingVPS !== null) {
+  if (existingVPS){// !== null) {
+    consoleLog(`Found existing VPS`);
     await prisma.vps.update({
       data: {
-        domain: { connect: { id: mailboxWithVPS!.domain.id } },
+        domain: mailbox.domainName,
       },
       where: {
         id: existingVPS.id,
@@ -30,10 +33,11 @@ export async function getOrCreateVPSAndGetId({
     });
     vpsContaboId = existingVPS.compute_id_on_hosting_platform;
   } else {
+    consoleLog(`Creating VPS`);
     vpsContaboId = await createVPSInstance().then((d) => d.id);
     await prisma.vps.create({
       data: {
-        domain: { connect: { id: mailboxWithVPS!.domain.id } },
+        domain: mailbox.domainName,
         compute_id_on_hosting_platform: vpsContaboId,
         name: crypto.randomUUID(),
       },
@@ -46,43 +50,40 @@ async function createVPSInstance() {
   const uuid = crypto.randomUUID();
   const token = await getAccessToken();
 
-  console.log(`Creating VPS instance with UUID: ${uuid}`);
+  consoleLog(`Creating VPS instance with UUID: ${uuid}`);
 
   const headers = new Headers();
   headers.append("x-request-id", uuid);
   headers.append("Authorization", `Bearer ${token}`);
   headers.append("Content-Type", "application/json");
 
-  console.log(
+  consoleLog(
     `Sending request to create VPS instance with headers: ${JSON.stringify(
       headers
     )}`
   );
 
-  return fetch("https://api.contabo.com/v1/compute/instances", {
+  const response = await fetch("https://api.contabo.com/v1/compute/instances", {
     method: "POST",
     headers: headers,
     body: JSON.stringify({
       period: 1,
       rootPassword: env.CONTABO_VPS_LOGIN_PASSWORD_ID,
     }),
-  })
-    .then((r) => r.json())
-    .then((data) => {
-      console.log(`data: ${JSON.stringify(data)}`);
-      console.log(`VPS instance created with ID: ${data["_links"]["self"]}`);
-      return {
-        id: `${data["_links"]["self"]}`.split("/v1/compute/instances/")[1],
-        data,
-      };
-    });
+  });
+  const responseJson = await response.json();
+  consoleLog(`data: ${JSON.stringify(responseJson)}`);
+  return {
+    id: `${responseJson["_links"]["self"]}`.split("/v1/compute/instances/")[1],
+    data: responseJson,
+  };
 }
 
 export async function getVPSInstanceData({ id }: { id: string }): Promise<{
   data: Instance[];
   _links: Links;
 }> {
-  console.log("getVPSInstanceData", id);
+  consoleLog("getVPSInstanceData", id);
   const uuid = crypto.randomUUID();
   const token = await getAccessToken();
 
@@ -91,9 +92,14 @@ export async function getVPSInstanceData({ id }: { id: string }): Promise<{
   headers.append("x-request-id", uuid);
   headers.append("Authorization", `Bearer ${token}`);
 
-  return fetch(`https://api.contabo.com/v1/compute/instances/${id}`, {
-    method: "GET",
-    headers: headers,
-  }).then((r) => r.json());
+  const response = await fetch(
+    `https://api.contabo.com/v1/compute/instances/${id}`,
+    {
+      method: "GET",
+      headers: headers,
+    }
+  );
+  const responseJson = await response.json();
+  consoleLog("resonse json", JSON.stringify(responseJson, null, 2));
+  return responseJson;
 }
-

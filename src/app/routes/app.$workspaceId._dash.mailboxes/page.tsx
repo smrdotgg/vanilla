@@ -8,7 +8,7 @@ import { YourMailboxes } from "./components/your_mailboxes";
 import { loader } from "./route";
 
 export const Page = () => {
-  const { workspaceMembership, domains, mailboxes } =
+  const { workspaceId, domains, mailboxes } =
     useLoaderData<typeof loader>();
 
   return (
@@ -23,13 +23,13 @@ export const Page = () => {
             label: domains.length === 1 ? "Domain" : "Domains",
             icon: TbWorld,
             digit: domains.length,
-            addHref: `/app/${workspaceMembership.workspace_id}/domains/search`,
+            addHref: `/app/${workspaceId}/domains/search`,
           },
           {
             label: mailboxes.length === 1 ? "Mailbox" : "Mailboxes",
             icon: IoMail,
             digit: mailboxes.length,
-            addHref: `/app/${workspaceMembership.workspace_id}/mailboxes/add`,
+            addHref: `/app/${workspaceId}/mailboxes/add`,
           },
         ]}
       />

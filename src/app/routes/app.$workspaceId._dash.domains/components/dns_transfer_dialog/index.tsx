@@ -10,7 +10,7 @@ import { DNSTransferDialog_FormPage } from "./pages/form";
 
 export function DNSTransferDialog() {
   const [open, setOpen] = useState(false);
-  const [page, setPage] = useState<"initial" | "transferForm">("initial");
+  const [page, setPage] = useState<"initial" | "transferForm">("transferForm");
 
   const fetcher = useFetcher<typeof action>();
   useEffect(() => {
@@ -20,7 +20,7 @@ export function DNSTransferDialog() {
   }, [fetcher]);
 
   useEffect(() => {
-    if (open) setPage("initial");
+    if (open) setPage("transferForm");
   }, [open]);
 
   return (

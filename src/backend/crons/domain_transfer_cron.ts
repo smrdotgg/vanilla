@@ -12,9 +12,6 @@ export const domainTransferCron = async () => {
   });
   console.log(`Found ${transfersToBeHandled.length} transfers to be handled`);
 
-  // const errorCodes = ["-4", "-22", "-202"];
-  // const waitCodes = ["-1", "-5", "-2"];
-
   for (const transferDatabaseObject of transfersToBeHandled) {
     console.log(
       `Processing transferDatabaseObject for ${transferDatabaseObject.name}`

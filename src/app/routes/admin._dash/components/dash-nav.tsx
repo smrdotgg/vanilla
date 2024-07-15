@@ -1,6 +1,6 @@
 import { NavLink, useNavigation } from "@remix-run/react";
 import { GrInProgress } from "react-icons/gr";
-import { LuBuilding, LuComputer, LuServer, LuUsers } from "react-icons/lu";
+import { LuBuilding, LuServer, LuUsers } from "react-icons/lu";
 
 import type { IconType } from "react-icons/lib";
 import { useEffect, useState } from "react";
@@ -54,7 +54,10 @@ export function AdminDashLayout({
     <div className="flex h-screen max-h-screen w-screen flex-col  overflow-hidden">
       <FakeLoading />
       <div className="flex max-h-full flex-1 overflow-hidden">
-        <div className=" flex h-full max-h-full w-64 flex-col justify-between overflow-hidden bg-red-100 dark:bg-red-950 text-white">
+        <div className=" flex h-full max-h-full w-64 flex-col justify-between overflow-hidden  font-mono  ">
+          <p className="text-center py-2 select-none font-mono text-3xl uppercase">
+            splitbox admin
+          </p>
           <div className="flex h-full flex-col overflow-y-auto justify-between">
             <div>
               {topDashElements.map((e, i) => (
@@ -68,17 +71,30 @@ export function AdminDashLayout({
                       flushSync(() => setLoading(""));
                     }
 
-                    const baseClasses =
-                      "flex min-h-8 rounded m-1 border border-gray-500";
+                    let baseClasses =
+                      "flex min-h-8 rounded m-1 border border-gray-300 dark:border-gray-800 text-black";
                     let stateClasses = "";
 
                     if (isActive) {
-                      stateClasses = " bg-primary text-primary-foreground";
+                      stateClasses =
+                        "bg-muted text-primary border-gray-800 dark:border-gray-500";
                     } else if (isPending) {
-                      stateClasses = "cursor-wait bg-text-600 text-gray-500";
+                      stateClasses =
+                        "bg-muted cursor-wait bg-text-600 text-muted dark:bg-muted-foreground ";
                     } else {
                       stateClasses =
-                        "bg-pink-950 text-white border border-white transition duration-100 ";
+                        "bg-card   text-muted-foreground dark:text-muted dark:bg-muted-foreground";
+                    }
+                    stateClasses = "";
+                    baseClasses =
+                      "flex min-h-8 rounded m-1 border-transparent  ";
+                    if (isActive) {
+                      stateClasses = "bg-muted border-none";
+                    } else if (isPending) {
+                      stateClasses = "border-muted ";
+                    } else {
+                      stateClasses =
+                        "text-muted-foreground hover:text-foreground border-none";
                     }
 
                     return `${baseClasses} ${stateClasses}`;
@@ -87,7 +103,7 @@ export function AdminDashLayout({
                 >
                   {loading == e.route ? (
                     <div className="flex h-full w-full items-center px-3">
-                      <GrInProgress className="h-8 min-w-4 spin-in-0" size={16} />
+                      <GrInProgress className="h-8 min-w-4 " size={16} />
                       <div className="pl-2"></div>
 
                       <p>{e.name}</p>
@@ -152,8 +168,9 @@ export function AdminDashLayout({
           </div>
           <div className="pt-2"></div>
           <AccountTile />
-          <ModeToggle />
+          <ModeToggle className="text-white" />
         </div>
+        <div className="bg-muted-foreground mx-2 w-[1px] h-full"></div>
         {/* Main Content */}
         <div className="flex max-h-full flex-1 overflow-y-auto ">
           {children}

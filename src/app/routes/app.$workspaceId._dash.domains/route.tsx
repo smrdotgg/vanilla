@@ -7,38 +7,18 @@ import { NameCheapDomainService } from "~/sdks/namecheap";
 import { ErrorBoundary } from "./error";
 import { checkDomainTransferability } from "./helpers/whois/index.server";
 import { z } from "zod";
+import { DnsimpleService } from "~/sdks/dnsimple";
+// import { env } from "~/utils/env";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const { user, workspaceMembership } = await workspaceGuard({
+  const { workspaceMembership } = await workspaceGuard({
     request,
     params,
-  });
-  const domains = await prisma.domain
-    .findMany({
-      where: { workspace_id: workspaceMembership.id, deletedAt: null },
-      include: { mailbox: true },
-    })
-    .then(
-      async (domains) =>
-        await Promise.all(
-          domains.map(async (domain) => ({
-            ...domain,
-            expiresAt: (
-              await NameCheapDomainService.getDomainData({ name: domain.name })
-            ).ApiResponse.children[3].CommandResponse.children[0]
-              .DomainGetInfoResult.children[0].DomainDetails.children[1]
-              .ExpiredDate.content,
-          }))
-        )
-    );
-  const pendingTransfers = await prisma.domain_transfer.findMany({
-    where: { workspaceId: workspaceMembership.workspace_id, deletedAt: null },
   });
 
   const dnsDomains = await prisma.domain_dns_transfer.findMany({
     where: { workspaceId: workspaceMembership.workspace_id, canceledAt: null },
   });
-  const dnsPendingTransfers = dnsDomains.filter((obj) => !obj.success);
   const workingDnsDomains = dnsDomains.filter((obj) => obj.success);
 
   const workingDnsDomainsWithMailboxCount = await Promise.all(
@@ -49,13 +29,33 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       return { ...d, mailboxCount };
     })
   );
+  const mailboxes = await prisma.mailbox.findMany({
+    where: { workspaceId: workspaceMembership.workspace_id, deletedAt: null },
+  });
+
+  const dnsPendingTransfers = dnsDomains.filter((obj) => !obj.success);
+
+  const parsedDndPendingTransfers: ((typeof dnsPendingTransfers)[0] & {
+    dnsUrls: undefined | string[];
+  })[] = [];
+  for (const pendingTransfer of dnsPendingTransfers) {
+    const x = await DnsimpleService.getZone({ domain: pendingTransfer.name });
+    if (x) {
+      const allRecords = await DnsimpleService.getDomainRecords({
+        domain: pendingTransfer.name,
+      });
+      const dnsRecords = allRecords.filter((record) => record.type === "NS");
+      parsedDndPendingTransfers.push({
+        ...pendingTransfer,
+        dnsUrls: dnsRecords.map((record) => record.record),
+      });
+    }
+  }
 
   return {
-    user,
-    domains,
-    pendingTransfers,
+    mailboxes,
     workspaceMembership,
-    dnsPendingTransfers,
+    dnsPendingTransfers:parsedDndPendingTransfers,
     workingDnsDomains: workingDnsDomainsWithMailboxCount,
   };
 };
@@ -167,6 +167,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     const { error, data } = z
       .string()
       .min(1)
+      .refine((x) => x.split(".").length === 2, { message: "Invalid domain" })
+      .refine((x) => !x.endsWith("."), { message: "Invalid domain" })
       .array()
       .safeParse(
         [...Array(inputCount).keys()].map((i) =>
@@ -188,13 +190,21 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       return { ok: false, message: JSON.stringify(errors) };
     }
 
-    await prisma.domain_dns_transfer.createMany({
-      data: data.map((d) => ({
-        name: d,
+    const domain = data[0].trim().toLowerCase();
+    const addDomainResponse = await DnsimpleService.addZone({ domain });
+    const checkDomainResponse = await DnsimpleService.getZone({ domain });
+    if (addDomainResponse.status === "Failed" || !checkDomainResponse) {
+      return { ok: false, message: "Failed to add domain" };
+    }
+
+    await prisma.domain_dns_transfer.create({
+      data: {
+        name: domain,
         workspaceId: Number(session.workspaceMembership.workspace_id),
         userId: session.user.id,
-      })),
+      },
     });
+
     return { ok: true, message: null };
   } else if (intent === INTENTS.deleteDomainViaDNS) {
     const domainId = String(body.get("domainDnsTransferId"));
@@ -221,3 +231,6 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   }
   throw Error("Unknown Intent");
 };
+function countChar(str: string, char: string) {
+  return (str.match(new RegExp(char, "g")) || []).length;
+}

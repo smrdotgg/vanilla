@@ -3,7 +3,6 @@ import { adminGuard } from "~/app/middlewares/auth.server";
 import { AdminDashLayout } from "./components/dash-nav";
 import { Outlet } from "@remix-run/react";
 
-
 export const loader = async (args: LoaderFunctionArgs) => {
   await adminGuard(args);
   return null;
@@ -11,13 +10,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 const Page = () => {
   return (
-    <>
-    <div className="admin">
-      <AdminDashLayout >
+    <div className="admin font-mono">
+      <AdminDashLayout>
         <Outlet />
       </AdminDashLayout>
     </div>
-    </>
   );
 };
 

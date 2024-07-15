@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Dialog,
   DialogContent,
@@ -9,112 +8,87 @@ import {
   DialogClose,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { RiQuestionLine } from "react-icons/ri";
 
-import { useFetcher } from "@remix-run/react";
+import { ReactNode } from "react";
+import { LuCopy } from "react-icons/lu";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import { INTENTS } from "../types";
-import { Input } from "~/components/ui/input";
-import { action } from "../route";
-import { useEffect, useState } from "react";
 
-export function TransferDomainDialog() {
-  const [open, setOpen] = useState(false);
-  const fetcher = useFetcher<typeof action>();
-  useEffect(() => {
-    if (fetcher.data?.ok) {
-      setOpen(false);
-    }
-  }, [fetcher]);
-
-  const loading = fetcher.state !== "idle";
-
+export function TransferDomainDNSListDialog({
+  children,
+  domainName,
+  dnsList,
+}: {
+  domainName: string;
+  dnsList: string[];
+  children: ReactNode;
+}) {
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button onClick={() => setOpen(true)} variant={"secondary"}>
-          Transfer In
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className=" flex  flex-col w-96">
         <DialogHeader>
-          <DialogTitle>Transfer In Domain</DialogTitle>
+          <DialogTitle>Transfer In Domain </DialogTitle>
           <DialogDescription>
-            Enter the domain you want to transfer in:
+            <span className="font-mono">{domainName}</span>
           </DialogDescription>
         </DialogHeader>
 
-        <fetcher.Form
-          aria-disabled={loading}
-          method="post"
-          className="flex flex-col gap-4"
-        >
-          <input hidden={true} name="intent" value={INTENTS.transferInDomain} />
-          <Input
-            name="domain"
-            placeholder="my-external-domain.com"
-            autoComplete="off"
-            required
-          />
-          <div className="flex w-full">
-            <Input
-              name="code"
-              placeholder="Authorization Code"
-            autoComplete="off"
-              className="w-full"
-              required
-            />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="flex *:m-auto bg-secondary size-9">
-                  <RiQuestionLine />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-72">
-                  <p>
-                    A domain authorization code (also referred to as an Auth
-                    Code or EPP Code) provides an extra level of security for
-                    domain name registration. This code is unique to each domain
-                    name and is assigned by the registrar at the time of
-                    registration.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+        <DNSTransferCopy dnsList={dnsList} domainName={domainName} />
 
-          <DialogFooter className="flex   sm:justify-between">
-            <p className=" text-start text-red-400 my-auto">
-              {(fetcher.data as any)?.message ?? <>&nbsp;</>}
-            </p>
-            <div className="flex">
-              <DialogClose asChild>
-                <Button disabled={loading} type="button" variant="secondary">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <div className="pl-2"></div>
-              {/* <Button onClick={() => { */}
-              {/*   const fd = new FormData(); */}
-              {/*   fd.append("intent", INTENTS.transferInDomain); */}
-              {/*   fd.append("code", "abc"); */}
-              {/*   fd.append("domain", "splitbox.club"); */}
-              {/*   fetcher.submit(fd, {method: "post"}); */}
-              {/* }}> */}
-              {/*   {loading ? "Submitting..." : "Submit"} */}
-              {/* </Button> */}
-              <Button disabled={loading} type="submit">
-                {loading ? "Submitting..." : "Submit"}
-              </Button>
-            </div>
-          </DialogFooter>
-        </fetcher.Form>
+        <DialogFooter className="flex sm:justify-end">
+          <div className="flex">
+            <DialogClose asChild>
+              <Button type="button">OK</Button>
+            </DialogClose>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// TODO: format copy
+function DNSTransferCopy({
+  domainName,
+  dnsList,
+}: {
+  dnsList: string[];
+  domainName:string;
+}) {
+  return (
+    <div className="max-w-full  flex flex-col gap-4">
+      <p>Set your DNS servers at your domain to the following:</p>
+      <div className="bg-secondary p-4">
+        <div className=" flex justify-between">
+          <ul>
+            {dnsList.map((dns) => (
+              <li key={dns} className=" font-mono">
+                {dns}
+              </li>
+            ))}
+          </ul>
+          <Button
+            variant={"ghost"}
+            onClick={async () => {
+              const text = dnsList.join("\n");
+              await navigator.clipboard.writeText(text);
+              toast("Copied to clipboard");
+            }}
+          >
+            <LuCopy />
+          </Button>
+        </div>
+      </div>
+      <p>
+        Once you have set your DNS servers, you will be able to use{" "}
+        <span className="bg-secondary font-mono ">{domainName}</span> in SplitBox.
+      </p>
+      <p>
+        Please note that it might take up to 48 hours for the effect to take
+        place and for you to gain access to{" "}
+        <span className="font-mono bg-secondary px-1">{domainName}</span>.
+      </p>
+    </div>
   );
 }

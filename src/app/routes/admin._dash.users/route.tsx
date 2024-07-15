@@ -2,6 +2,7 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { adminGuard } from "~/app/middlewares/auth.server";
 import { prisma } from "~/utils/db";
 import { UsersTable } from "./components/users_table";
+import { sleep } from "~/utils/sleep";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   await adminGuard(args);

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { action } from "../../../route";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { LuDelete } from "react-icons/lu";
+import { LuDelete, LuLoader } from "react-icons/lu";
 import {
   DialogDescription,
   DialogFooter,
@@ -12,6 +12,7 @@ import {
 } from "~/components/ui/dialog";
 import { INTENTS } from "../../../types";
 import { toast } from "sonner";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 export function DNSTransferDialog_FormPage({
   open,
@@ -58,19 +59,19 @@ export function DNSTransferDialog_FormPage({
             Enter all the domains you want to transfer in:
           </DialogDescription>
         </DialogHeader>
-        <Button
-          type="button"
-          variant={"secondary"}
-          onClick={() => setInputStates([...inputStates, ""])}
-        >
-          Add
-        </Button>
+        {/* <Button */}
+        {/*   type="button" */}
+        {/*   variant={"secondary"} */}
+        {/*   onClick={() => setInputStates([...inputStates, ""])} */}
+        {/* > */}
+        {/*   Add */}
+        {/* </Button> */}
       </div>
       <fetcher.Form method="post">
         <input name="intent" hidden value={INTENTS.transferDomainViaDNS} />
         <input name="inputCount" hidden value={String(inputStates.length)} />
         <div className="flex justify-end *:my-auto"></div>
-        <div className="mt-4"></div>
+        <div className="mt-2"></div>
         <div className="flex flex-col gap-3 w-full">
           {inputStates.map((formState, index) => (
             <div key={index} className="w-full flex gap-3">
@@ -119,15 +120,17 @@ export function DNSTransferDialog_FormPage({
             </div>
           ))}
         </div>
-        <div className="pt-4"></div>
+        <div className="pt-10"></div>
         <DialogFooter className="flex">
           <div className="w-full flex justify-between *:my-auto">
-            {/* {Boolean(error) ? <p>{error}</p> : <p>&nbsp;</p>} */}
-            <div className="flex justify-end gap-2">
-              <Button disabled={loading} variant="secondary">
-                Cancel
-              </Button>
-              <Button disabled={loading}>
+            <div className="flex w-full justify-end gap-2">
+              <DialogClose asChild>
+                <Button disabled={loading} type="button" variant="secondary">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button disabled={loading} type="submit">
+                {loading && <LuLoader className="animate-spin mr-2" />}{" "}
                 {loading ? "Submitting..." : "Submit"}
               </Button>
             </div>

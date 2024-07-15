@@ -6,11 +6,11 @@
   "scripts": {
     "app:build": "tsc && remix vite:build",
     "app:dev": "remix vite:dev --port 3000 --host",
+    "api:dev": "tsx watch src/backend/index.ts",
+    "api:start": "tsx src/backend/index.ts",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
-    "typecheck": "tsc",
-    "api:dev": "tsx watch src/backend/index.ts",
-    "api:start": "tsx src/backend/index.ts"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@hono/node-server": "^1.11.4",
@@ -41,6 +41,7 @@
     "@types/object-hash": "^3.0.6",
     "@types/shell-escape": "^0.2.3",
     "@types/whois-json": "^2.0.4",
+    "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dnsimple": "^7.4.0",
@@ -48,6 +49,7 @@
     "firebase-admin": "^12.2.0",
     "hono": "^4.4.7",
     "isbot": "^4.1.0",
+    "jotai": "^2.9.0",
     "lucide-react": "^0.396.0",
     "next-themes": "^0.3.0",
     "node-cron": "^3.0.3",

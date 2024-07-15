@@ -12,6 +12,7 @@ import { Button } from "~/components/ui/button";
 import { LuTrash } from "react-icons/lu";
 import { DeleteDialog } from "~/components/custom/delete-modal";
 import { INTENTS } from "../types";
+import { TransferDomainDNSListDialog } from "./transfer_domain_dialog";
 
 export function PendingTransfers() {
   const { dnsPendingTransfers } = useLoaderData<typeof loader>();
@@ -43,26 +44,57 @@ export function PendingTransfers() {
           <TableRow>
             <TableHead className="w-[100px]">Domain</TableHead>
             <TableHead>Notes</TableHead>
+            <TableHead>Nameservers</TableHead>
             <TableHead className="flex justify-end">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {dnsPendingTransfers.map((row, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium w-80">{row.name}</TableCell>
-              <TableCell className={row.note ? "" : "text-gray-500"}>
-                {row.success ? "YES":"NO"}
-                {row.note ?? "No notes"}
-              </TableCell>
-              <TableCell>
-                <RowActions index={index} />
-              </TableCell>
-            </TableRow>
-          ))}
+          {dnsPendingTransfers.map((row, index) => {
+            const coreComponent = (
+              <TableRow key={!!row.dnsUrls ? null : index}>
+                <TableCell className="font-medium w-80">{row.name}</TableCell>
+                <TableCell className={row.note ? "" : "text-gray-500"}>
+                  {row.success ? "YES" : "NO"}
+                  {row.note ?? "No notes"}
+                </TableCell>
+                <TableCell>
+                  {!!row.dnsUrls &&
+                    truncateString({
+                      str: row.dnsUrls.join(", "),
+                      maxLength: 50,
+                    })}
+                  {!row.dnsUrls && "No Nameservers"}
+                </TableCell>
+                <TableCell>
+                  <RowActions index={index} />
+                </TableCell>
+              </TableRow>
+            );
+            if (row.dnsUrls)
+              return (
+                <TransferDomainDNSListDialog
+                  dnsList={row.dnsUrls}
+                  key={index}
+                  domainName={row.name}
+                >
+                  {coreComponent}
+                </TransferDomainDNSListDialog>
+              );
+            return coreComponent;
+          })}
         </TableBody>
       </Table>
     </div>
   );
+}
+function truncateString({
+  str,
+  maxLength,
+}: {
+  str: string;
+  maxLength: number;
+}): string {
+  return str.length > maxLength ? str.substring(0, maxLength) + "..." : str;
 }
 
 function RowActions({ index }: { index: number }) {
@@ -72,11 +104,6 @@ function RowActions({ index }: { index: number }) {
   const { id } = dnsPendingTransfers[index];
   return (
     <div className="flex justify-end">
-      {/* <ResubmitTransferDomainDialog transferId={dnsPendingTransfers[index].id}> */}
-      {/*   <Button variant={"ghost"} className="text-sm" title="Resubmit"> */}
-      {/*     <LuCornerDownLeft className="size-4" /> */}
-      {/*   </Button> */}
-      {/* </ResubmitTransferDomainDialog> */}
       <DeleteDialog
         action={() => {
           const fd = new FormData();

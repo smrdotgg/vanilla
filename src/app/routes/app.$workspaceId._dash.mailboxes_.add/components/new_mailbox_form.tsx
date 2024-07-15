@@ -15,7 +15,7 @@ import { Form, FormControl, FormLabel } from "@/components/ui/form";
 
 export const TinyFormSchema = z.object({
   firstName: z.string().min(2).max(50),
-  lastName: z.string().min(2).max(50).nullish(),
+  lastName: z.string().nullish(),//.min(2).max(50).nullish(),
   username: z.string().min(2).max(50),
   domain: z.string().min(1),
 });

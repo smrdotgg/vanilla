@@ -1,31 +1,16 @@
-import { useFetchers, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { IoMail } from "react-icons/io5";
+
 import { TbWorld } from "react-icons/tb";
 import { loader } from "./route";
 import { Summary } from "./components/summary";
 import { YourDomains } from "./components/your_domains";
 import { TopBar } from "./components/top_bar";
 import { PendingTransfers } from "./components/transfers";
-import { INTENTS } from "./types";
 
 export default function Page() {
-  const { workingDnsDomains, domains, workspaceMembership } =
+  const { workingDnsDomains, mailboxes, workspaceMembership } =
     useLoaderData<typeof loader>();
-
-  const fetchers = useFetchers();
-
-  const domainsBeingDeleted = fetchers.filter(
-    (fetcher) => fetcher.formData?.get("intent") === INTENTS.deleteDomain
-  );
-
-  const filteredDomains = domains.filter(
-    (domain) =>
-      !domainsBeingDeleted.find(
-        (dbd) => dbd.formData?.get("domainId") === String(domain.id)
-      )
-  );
-
-  const mailboxes = filteredDomains.map((d) => d.mailbox).flat(); //.flat();
 
   return (
     <div className="flex w-full flex-col p-6 ">
@@ -36,10 +21,10 @@ export default function Page() {
       <Summary
         data={[
           {
-            label: filteredDomains.length === 1 ? "Domain" : "Domains",
+            label: workingDnsDomains.length === 1 ? "Domain" : "Domains",
             icon: TbWorld,
 
-            digit: filteredDomains.length,
+            digit: workingDnsDomains.length,
             addHref: `/app/${workspaceMembership.workspace_id}/domains/search`,
           },
           {
@@ -55,21 +40,12 @@ export default function Page() {
       <div className="">
         <p className="my-4 text-xl font-bold">Your Domains</p>
         <YourDomains
-          rows={[
-            ...workingDnsDomains.map((d) => ({
-              name: d.name,
-              domainId: `DNS_DOMAIN_${d.id.toString()}`,
-              mailboxCount: d.mailboxCount,
-              domainType: "dns" as const,
-            })),
-            ...filteredDomains.map((d) => ({
-              name: d.name,
-              parsedExpiryDate: d.expiresAt,
-              domainId: `PLATFORM_DOMAIN_${d.id.toString()}`,
-              mailboxCount: d.mailbox.length,
-              domainType: "platform" as const,
-            })),
-          ]}
+          rows={workingDnsDomains.map((d) => ({
+            name: d.name,
+            domainId: `DNS_DOMAIN_${d.id.toString()}`,
+            mailboxCount: d.mailboxCount,
+            domainType: "dns" as const,
+          }))}
         />
       </div>
     </div>

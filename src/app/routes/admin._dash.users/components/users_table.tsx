@@ -53,7 +53,7 @@ export const UsersTable = () => {
               <TableCell className="w-16">{row.id}</TableCell>
               <TableCell>{row.first_name ?? "N/A"}</TableCell>
               <TableCell>{row.last_name ?? "N/A"}</TableCell>
-              <TableCell className={row.email ? "text-gray-500" : ""}>
+              <TableCell className={row.email ? "": "text-gray-500" }>
                 {row.email ?? "N/A"}
               </TableCell>
               <TableCell className="font-medium w-80">

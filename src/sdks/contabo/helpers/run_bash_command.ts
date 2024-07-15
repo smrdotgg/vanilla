@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Config as NodeSSHConfig, NodeSSH } from "node-ssh";
+import { consoleLog } from "~/utils/console_log";
 
 export async function runBashCommands(
   props: NodeSSHConfig & {
@@ -15,12 +16,12 @@ export async function runBashCommands(
   const bashCommands = props.bashCommands as string[];//.map(c => `sudo ${c}`);
 
 
-  console.log("Starting to run bash commands");
-  bashCommands.map((bc) => console.log(bc));
+  consoleLog("Starting to run bash commands");
+  bashCommands.map((bc) => consoleLog(bc));
   while (retryCount <= maxRetries) {
     try {
       const ssh = new NodeSSH();
-      console.log("Connecting via SSH");
+      consoleLog("Connecting via SSH");
       await ssh.connect(props);
       if (props.scriptMode) {
         await ssh.execCommand(`echo "#!/bin/bash" > script.sh `);
@@ -29,29 +30,29 @@ export async function runBashCommands(
         }
         const { code, signal, stderr, stdout } =
           await ssh.execCommand(`bash ./script.sh`);
-        console.log(
+        consoleLog(
           `Command result - stdout: ${stdout}, stderr: ${stderr}, code: ${code}, signal: ${signal}`,
         );
         responses.push(stdout);
       } else {
         for (const bc of bashCommands) {
-          console.log(`Executing command: ${bc}`);
+          consoleLog(`Executing command: ${bc}`);
           const { code, signal, stderr, stdout } = await ssh.execCommand(bc);
-          console.log(
+          consoleLog(
             `Command result - stdout: ${stdout}, stderr: ${stderr}, code: ${code}, signal: ${signal}`,
           );
           responses.push(stdout);
         }
       }
       ssh.dispose();
-      console.log("SSH session disposed");
+      consoleLog("SSH session disposed");
       return responses; // success, exit the retry loop
     } catch (e: any) {
       retryCount++;
-      console.log(`Error encountered: ${e.message}`);
+      consoleLog(`Error encountered: ${e.message}`);
 
       if (retryCount <= maxRetries) {
-        console.log(
+        consoleLog(
           `Retry ${retryCount} of ${maxRetries} in ${retryDelay}ms...`,
         );
         await new Promise((resolve) => setTimeout(resolve, retryDelay));

@@ -1,70 +1,70 @@
-import { domain, mailbox } from "@prisma/client";
+import { mailbox } from "@prisma/client";
 import { ContaboService } from "~/sdks/contabo";
 import { setReverseDNS } from "~/sdks/contabo/bot/ipv4";
 
 import { runBashCommands } from "~/sdks/contabo/helpers/run_bash_command";
 import { setHosts } from "~/sdks/namecheap/functions/set_hosts";
+import { consoleLog } from "~/utils/console_log";
 import { prisma } from "~/utils/db";
 import { env } from "~/utils/env";
 import { sleep } from "~/utils/sleep";
 
 export async function setupMailboxesCron() {
-  const pendingMailboxes = await prisma.mailbox.findMany({
+  const mailboxes = await prisma.mailbox.findMany({
     where: {
-      status: "PENDING",
+      // status: "PENDING",
+      deletedAt: null,
     },
   });
-  await setupMailboxes({ mailboxIds: pendingMailboxes.map((m) => m.id) });
-}
-async function setupMailboxes({ mailboxIds }: { mailboxIds: number[] }) {
-  console.log(
-    `Setup mailboxes started for mailbox IDs: ${mailboxIds.join(", ")}`
-  );
 
-  const mailboxes = await prisma.mailbox.findMany({
-    where: { id: { in: mailboxIds } },
-    include: { domain: { include: { vps: true } } },
-  });
-
-  console.log(`Found ${mailboxes.length} mailboxes`);
+  consoleLog(`Found ${mailboxes.length} mailboxes`);
 
   for (const mailbox of mailboxes) {
-    console.log(`Processing mailbox ${mailbox.id}`);
-    if (!mailbox.domainName) {
-      console.log(`Mailbox ${mailbox.id} has no domain, skipping`);
-      continue;
-    }
+    consoleLog(
+      `Processing mailbox [${mailbox.id}], ${mailbox.firstName}${
+        mailbox.lastName ? ` ${mailbox.lastName}` : ""
+      }, ${mailbox.username}@${mailbox.domainName}`
+    );
+    const domainName = mailbox.domainName.trim().toLowerCase();
 
-    if (mailbox.status === "ADDED") {
-      console.log(`Mailbox ${mailbox.id} is already added, skipping`);
+    const domainStatus = await prisma.domain_dns_transfer.findFirst({
+      where: {
+        name: domainName,
+      },
+    });
+    const domainIsValid = domainStatus?.success === true;
+    if (!domainIsValid) {
+      consoleLog(`Domain ${domainName} is not valid`);
+      if (domainStatus === null) {
+        consoleLog(`Domain ${domainName} not found in database`);
+      } else if (domainStatus!.success === false) {
+        consoleLog(`Domain is not configured properly: ${domainStatus!.note}`);
+      }
       continue;
+    } else {
+      consoleLog(`Domain ${domainName} is valid`);
     }
 
     const vpsContaboId = await ContaboService.getOrCreateVPSAndGetId({
       mailboxId: mailbox.id,
     });
 
-    console.log(`Got VPS Contabo ID: ${vpsContaboId}`);
+    consoleLog(`Got VPS Contabo ID: ${vpsContaboId}`);
 
     const contaboData = await ContaboService.getVPSInstanceData({
       id: String(vpsContaboId),
     });
 
-    console.log(`Got Contabo data: ${JSON.stringify(contaboData)}`);
+    consoleLog(`Got Contabo data: ${JSON.stringify(contaboData, null, 2)}`);
 
-    const vpsDataFromDB = await prisma.vps.findFirst({
+    const vpsDataFromDB = (await prisma.vps.findFirst({
       where: { compute_id_on_hosting_platform: vpsContaboId },
-    });
+    }))!;
 
-    if (vpsDataFromDB === null) {
-      console.error(`VPS data not found in database for mailbox ${mailbox.id}`);
-      throw Error("VPS data not found in database.");
-    }
-
-    console.log(`Found VPS data in database: ${JSON.stringify(vpsDataFromDB)}`);
+    consoleLog(`Found VPS data in database: ${JSON.stringify(vpsDataFromDB)}`);
 
     if (!vpsDataFromDB.ipv6Enabled) {
-      console.log(`Enabling IPv6 for VPS ${vpsContaboId}`);
+      consoleLog(`Enabling IPv6 for VPS ${vpsContaboId}`);
       await ContaboService.enableIpv6({
         host: contaboData.data[0].ipConfig.v4.ip,
         username: env.CONTABO_VPS_LOGIN_USERNAME,
@@ -72,61 +72,54 @@ async function setupMailboxes({ mailboxIds }: { mailboxIds: number[] }) {
         port: 22,
       });
 
-      console.log(
-        `Updated VPS data in database: ${JSON.stringify(vpsDataFromDB)}`
-      );
       await prisma.vps.update({
         where: { id: vpsDataFromDB.id },
         data: { ipv6Enabled: true },
       });
+      consoleLog(
+        `Updated VPS data in database: ${JSON.stringify(vpsDataFromDB)}`
+      );
+
     }
 
     if (!vpsDataFromDB.emailwizInitiated) {
-      console.log(`Initializing Emailwiz for mailbox ${mailbox.id}`);
+      consoleLog(`Initializing Emailwiz for mailbox ${mailbox.id}`);
       await tieVPSAndDomain({
         mailbox: { ...mailbox, domainName: mailbox.domainName! },
         contaboData,
       });
 
-      console.log(`Sleeping for 10 minutes...`);
-      await sleep(10 * 60 * 1000);
+      consoleLog(`Sleeping for 1 minutes...`);
+      await sleep(1 * 60 * 1000);
 
-      console.log(`Initializing Emailwiz for mailbox ${mailbox.id}`);
+      consoleLog(`Initializing Emailwiz for mailbox ${mailbox.id}`);
       await initializeEmailwiz({ mailbox, contaboData });
 
-      console.log(`Posting Emailwiz pointers for mailbox ${mailbox.id}`);
+      consoleLog(`Posting Emailwiz pointers for mailbox ${mailbox.id}`);
       await postEmailwizPointers({
         mailbox: { ...mailbox, domainName: mailbox.domainName! },
         contaboData,
       });
 
-      console.log(
-        `Updated domain data in database: ${JSON.stringify(mailbox.domainId)}`
-      );
-
-      await prisma.domain.update({
-        where: { id: mailbox.domainId },
-        data: { vps_id: vpsDataFromDB.id },
-      });
-
-      console.log(
+      consoleLog(
         `Updated VPS data in database: ${JSON.stringify(vpsDataFromDB)}`
       );
       await prisma.vps.update({
         where: { id: vpsDataFromDB.id },
         data: { emailwizInitiated: true },
       });
+
     }
 
     if (mailbox.status === "PENDING") {
-      console.log(`Adding user to VPS for mailbox ${mailbox.id}`);
+      consoleLog(`Adding user to VPS for mailbox ${mailbox.id}`);
       await addUserToVPS({
         ip: contaboData.data[0].ipConfig.v4.ip,
         password: mailbox.password,
         username: mailbox.username,
       });
 
-      console.log(`Updated mailbox status to ADDED for mailbox ${mailbox.id}`);
+      consoleLog(`Updated mailbox status to ADDED for mailbox ${mailbox.id}`);
       await prisma.mailbox.update({
         where: { id: mailbox.id },
         data: { status: "ADDED" },
@@ -134,16 +127,23 @@ async function setupMailboxes({ mailboxIds }: { mailboxIds: number[] }) {
     }
   }
 
-  console.log(`Setup mailboxes completed`);
+  consoleLog(`Setup mailboxes completed`);
 }
 
-export async function postEmailwizPointers({
+//*******************************************************************//
+//*******************************************************************//
+//********************** HELPER FUNCTIONS ************************** //
+//*******************************************************************//
+//*******************************************************************//
+async function postEmailwizPointers({
   contaboData,
   mailbox,
 }: {
   contaboData: Awaited<ReturnType<typeof ContaboService.getVPSInstanceData>>;
   mailbox: mailbox & { domainName: string };
 }) {
+  consoleLog(`Posting Email Wizard pointers for ${mailbox.domainName}`);
+
   const response = await runBashCommands({
     bashCommands: ["sudo cat /root/dns_emailwizard"],
     timeout: 3600 * 1000,
@@ -153,16 +153,22 @@ export async function postEmailwizPointers({
     host: contaboData.data[0].ipConfig.v4.ip,
     scriptMode: true,
   });
+  consoleLog(`Received response from bash command`);
+
   const dnsDataList = response[0].split("\n");
-  const txtRecords = dnsDataList
+  const rawTxtRecords = dnsDataList
     .filter((_, index) => index !== 0 && index !== dnsDataList.length - 1)
-    .map((txtRecordString) => txtRecordString.split("\t"))
-    .map((txtRecordMapping) => ({
-      recordType: "TXT",
-      hostName: txtRecordMapping[0].split(mailbox.domainName)[0],
-      address: encodeURIComponent(txtRecordMapping[2]),
-      ttl: "60",
-    }));
+    .map((txtRecordString) => txtRecordString.split("\t"));
+  console.log(`Raw TXT records: ${rawTxtRecords}`);
+  const txtRecords = rawTxtRecords.map((txtRecordMapping) => ({
+    recordType: "TXT",
+    hostName: txtRecordMapping[0].split(mailbox.domainName)[0],
+    // address: encodeURIComponent(txtRecordMapping[2]),
+    address: txtRecordMapping[2],
+    ttl: "60",
+  }));
+  consoleLog(`Extracted TXT records: ${txtRecords.length}`);
+
   const mxRecord = [
     {
       address: "mail." + mailbox.domainName,
@@ -174,6 +180,7 @@ export async function postEmailwizPointers({
     },
   ];
 
+  consoleLog(`Setting hosts for ${mailbox.domainName}`);
   await setHosts({
     domain: mailbox.domainName,
     hosts: [
@@ -211,6 +218,7 @@ export async function postEmailwizPointers({
       ...mxRecord,
     ],
   });
+  consoleLog(`Hosts set successfully for ${mailbox.domainName}`);
 }
 
 export async function addUserToVPS({
@@ -236,32 +244,27 @@ export async function addUserToVPS({
   });
 }
 
-function swapLast({ data, lastVal }: { data: string; lastVal: string }) {
-  return data.slice(0, data.length - 1) + lastVal; //.map((d, i) =>;
-}
-
-const script = ({ domain }: { domain: string }) => [
-  `echo "postfix postfix/mailname string ${domain}" | sudo debconf-set-selections`,
-  `echo "postfix postfix/main_mailer_type string 'Internet Site'" | sudo debconf-set-selections`,
-  "sudo apt install git unzip -y",
-  "git clone https://github.com/LukeSmithxyz/emailwiz.git",
-  "cd emailwiz",
-  "sudo chmod +x ./*.sh",
-  "sudo ./emailwiz.sh",
-  "cd ..",
-  "cat dns_emailwizard",
-];
-
 export async function initializeEmailwiz({
   contaboData,
   mailbox,
 }: {
   contaboData: Awaited<ReturnType<typeof ContaboService.getVPSInstanceData>>;
-  mailbox: mailbox & { domain: domain };
+  mailbox: mailbox;
 }) {
+  const script = ({ domain }: { domain: string }) => [
+    `echo "postfix postfix/mailname string ${domain}" | sudo debconf-set-selections`,
+    `echo "postfix postfix/main_mailer_type string 'Internet Site'" | sudo debconf-set-selections`,
+    "sudo apt install git unzip -y",
+    "git clone https://github.com/LukeSmithxyz/emailwiz.git",
+    "cd emailwiz",
+    "sudo chmod +x ./*.sh",
+    "sudo ./emailwiz.sh",
+    "cd ..",
+    "cat dns_emailwizard",
+  ];
   await runBashCommands({
     bashCommands: script({
-      domain: mailbox.domain.name,
+      domain: mailbox.domainName,
     }),
     timeout: 3600 * 1000,
     username: env.CONTABO_VPS_LOGIN_USERNAME,
@@ -272,6 +275,14 @@ export async function initializeEmailwiz({
   });
 }
 
+function swapLast({ data, lastVal }: { data: string; lastVal: string }) {
+  if (!data.length) throw new Error("data is empty");
+  const splitted = data.split("");
+  splitted.pop();
+  splitted.push(lastVal);
+  return splitted.join("");
+}
+
 export async function tieVPSAndDomain({
   contaboData,
   mailbox,
@@ -279,13 +290,14 @@ export async function tieVPSAndDomain({
   contaboData: Awaited<ReturnType<typeof ContaboService.getVPSInstanceData>>;
   mailbox: mailbox & { domainName: string };
 }) {
+  consoleLog("Tying VPS and domain", mailbox.domainName);
   await setReverseDNS({
     ipv4: contaboData.data[0].ipConfig.v4.ip,
     username: env.CONTABO_ACCOUNT_USERNAME,
     password: env.CONTABO_ACCOUNT_PASSWORD,
     targetUrl: mailbox.domainName,
   });
-
+  consoleLog("Tying VPS and domain done [ipv4]", mailbox.domainName);
   await setReverseDNS({
     ipv4: swapLast({
       data: contaboData.data[0].ipConfig.v6.ip,
@@ -295,6 +307,7 @@ export async function tieVPSAndDomain({
     password: env.CONTABO_ACCOUNT_PASSWORD,
     targetUrl: mailbox.domainName,
   });
+  consoleLog("Tying VPS and domain done [ipv6]", mailbox.domainName);
 
   await setHosts({
     domain: mailbox.domainName,
