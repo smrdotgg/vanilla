@@ -1,8 +1,10 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { adminGuard } from "~/app/middlewares/auth.server";
 import { prisma } from "~/utils/db";
 import { UsersTable } from "./components/users_table";
 import { sleep } from "~/utils/sleep";
+import { INTENTS } from "./types";
+import { deleteUser } from "~/utils/firebase/auth.server";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   await adminGuard(args);
@@ -22,3 +24,43 @@ const Page = () => {
 };
 
 export default Page;
+
+
+export const action = async (args: ActionFunctionArgs) => {
+  const session = await adminGuard(args);
+  const formData = await args.request.formData();
+  const intent = String(formData.get("intent"));
+  if (intent === INTENTS.deleteUser) {
+    const userId = String(formData.get("userId"));
+    const user = await prisma.user.findFirst({
+      where: { id: Number(userId) },
+    });
+
+    if (!user) return { ok: false, error: "User not found" };
+
+    // await deleteUser({ userId: user.firebase_id });
+    await prisma.user.update({
+      where: { id: Number(userId) },
+      data: { deleted_at: new Date() },
+    });
+
+    return { ok: true };
+  } else if (intent === INTENTS.restoreUser) {
+    const userId = String(formData.get("userId"));
+    const user = await prisma.user.findFirst({
+      where: { id: Number(userId) },
+    });
+
+    if (!user) return { ok: false, error: "User not found" };
+
+    // await deleteUser({ userId: user.firebase_id });
+    await prisma.user.update({
+      where: { id: Number(userId) },
+      data: { deleted_at: null },
+    });
+
+    return { ok: true };
+  }
+  throw Error("not implemented");
+  // const intent = args.request.headers.get("x-intent");
+};

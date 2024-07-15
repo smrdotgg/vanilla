@@ -10,7 +10,7 @@ export const getUserData = async ({ request }: { request: Request }) => {
 
   const user = firebaseData
     ? await prisma.user.findFirst({
-        where: { firebase_id: firebaseData.uid },
+        where: { firebase_id: firebaseData.uid , deleted_at: null},
         include: { workspace_user_join_list: { include: { workspace: true } } },
       })
     : null;

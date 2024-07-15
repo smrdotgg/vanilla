@@ -352,6 +352,7 @@ model user {
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
+  deleted_at DateTime?
 
   workspace_user_join_list       workspace_user_join[]
   domain_purchase_form_info_list domain_purchase_form_info[]
