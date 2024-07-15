@@ -4,16 +4,28 @@ import { prisma } from "~/utils/db";
 import { validateSession } from "~/utils/firebase/auth.server";
 import { redirectUserToWorkspace } from "../route_utils/redirect_to_workspace";
 import { Params } from "@remix-run/react";
+import { env } from "~/utils/env";
 
 export const getUserData = async ({ request }: { request: Request }) => {
   const firebaseData = await validateSession(request);
 
   const user = firebaseData
     ? await prisma.user.findFirst({
-        where: { firebase_id: firebaseData.uid , deleted_at: null},
+        where: { firebase_id: firebaseData.uid, deleted_at: null },
         include: { workspace_user_join_list: { include: { workspace: true } } },
       })
     : null;
+  if (firebaseData && !user && env.FIREBASE_USER_AMEND) {
+    await prisma.user.create({
+      data: {
+        firebase_id: firebaseData!.uid,
+        email: firebaseData?.email,
+        oauth_provider: firebaseData.firebase.sign_in_provider,
+        email_verified: firebaseData.email_verified ?? false,
+      },
+    });
+  }
+
   return { firebaseData, user };
 };
 
@@ -29,7 +41,7 @@ export const adminGuard = async ({ request }: { request: Request }) => {
       console.error("Auth Guard: User not found");
       throw Error("User Not Found ");
     }
-    
+
     if (user.role !== "ADMIN") {
       console.error("Auth Guard: User is not an admin");
       throw redirect(LOGIN_ROUTE);

@@ -103,6 +103,8 @@ export const env = createEnv({
     CLOUDNS_BASE_URL: z.string().url(),
 
     CONSOLE_LOGS: z.coerce.boolean().nullish(),
+
+    FIREBASE_USER_AMEND: z.coerce.boolean().nullish(),
   },
 
   /**
