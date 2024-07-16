@@ -26,7 +26,18 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       const mailboxCount = await prisma.mailbox.count({
         where: { domainName: d.name },
       });
-      return { ...d, mailboxCount };
+      let rootCnameRecord: string | undefined;
+      const x = await DnsimpleService.getZone({ domain: d.name });
+      if (x) {
+        const allRecords = await DnsimpleService.getDomainRecords({
+          domain: d.name,
+        });
+        rootCnameRecord = allRecords
+          .filter((record) => record.type === "WR")
+          .at(0)?.record;
+      }
+
+      return { ...d, mailboxCount, rootCnameRecord };
     })
   );
   const mailboxes = await prisma.mailbox.findMany({
@@ -45,6 +56,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
         domain: pendingTransfer.name,
       });
       const dnsRecords = allRecords.filter((record) => record.type === "NS");
+
       parsedDndPendingTransfers.push({
         ...pendingTransfer,
         dnsUrls: dnsRecords.map((record) => record.record),
@@ -55,7 +67,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return {
     mailboxes,
     workspaceMembership,
-    dnsPendingTransfers:parsedDndPendingTransfers,
+    dnsPendingTransfers: parsedDndPendingTransfers,
     workingDnsDomains: workingDnsDomainsWithMailboxCount,
   };
 };
@@ -228,6 +240,64 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       });
     }
     return { ok: true, message: null };
+  } else if (intent === INTENTS.addRedirectForDomain) {
+    const domainName = String(body.get("domainName")).trim().toLowerCase();
+    console.log(`Domain name: ${domainName}`);
+
+    let redirectTo = String(body.get("targetUrl"));
+    console.log(`Redirect to: ${redirectTo}`);
+    // if (redirectTo.startsWith("https://"))
+    //   redirectTo = redirectTo.split("https://")[1];
+    // if (redirectTo.startsWith("http://"))
+    //   redirectTo = redirectTo.split("http://")[1];
+
+    const domain = await prisma.domain_dns_transfer.findFirst({
+      where: {
+        name: domainName.trim().toLowerCase(),
+        workspaceId: Number(session.workspaceMembership.workspace_id),
+      },
+    });
+
+    if (!domain) {
+      console.error("Domain not found");
+      return { ok: false, message: "Domain not found" };
+    }
+
+    const records = await DnsimpleService.getDomainRecords({
+      domain: domainName,
+    });
+    console.log(`Records: ${records.length}`);
+
+    const targetRecords = records
+      .filter((r) => r.host === "")
+      .filter((r) => r.type.toUpperCase() === "WR")
+      .map((r) => r.id);
+    console.log(`Target records: ${targetRecords.length}`);
+
+    for (const targetRecordId of targetRecords) {
+      await DnsimpleService.deleteRecord({
+        domain: domainName,
+        recordId: targetRecordId,
+      });
+      console.log(`Deleted record: ${targetRecordId}`);
+    }
+
+    if (redirectTo) {
+      const response = await DnsimpleService.addRecord({
+        record: {
+          ttl: "60",
+          recordType: "WR",
+          address: redirectTo,
+          hostName: "",
+          redirect_type: "301",
+          frame: "0",
+        },
+        domain: domainName,
+      });
+    }
+
+    return { ok: true, message: null };
+    console.log("Operation completed successfully");
   }
   throw Error("Unknown Intent");
 };
