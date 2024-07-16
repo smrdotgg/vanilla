@@ -5,7 +5,6 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -26,9 +25,8 @@ import { DeleteDomainDialog } from "./delete_domain_dialog";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { loader, action } from "../route";
 import { Badge } from "~/components/ui/badge";
-import { useEffect, useState } from "react";
 import { INTENTS } from "../types";
-import { toast } from "sonner";
+import { PopoverClose } from "@radix-ui/react-popover";
 
 type RowData = {
   domainId: string;
@@ -101,20 +99,13 @@ function PopoverWrapper({
   domainName: string;
   data: String | null;
 }) {
-  const [open, setOpen] = useState(false);
   const fetcher = useFetcher<typeof action>();
-
-  useEffect(() => {
-    if (fetcher.data?.ok) {
-      toast.success("Domain deleted successfully");
-    }
-  }, [fetcher]);
 
   return (
     <TableCell className={` ${domainRowWidth}`}>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover>
         <PopoverTrigger>
-          <DomainRedirectCell domainRowWidth={domainRowWidth} data={data} />
+          <DomainRedirectCell domainRowWidth={domainRowWidth} data={fetcher.state=== 'idle' ? data : "Loading..."} />
         </PopoverTrigger>
         <PopoverContent className="w-80">
           <fetcher.Form method="post">
@@ -155,7 +146,6 @@ function PopoverWrapper({
               <div className="grid gap-2">
                 <div className="grid grid-cols-3 items-center gap-4">
                   <Input
-                    
                     defaultValue={data ? String(data) : undefined}
                     id="targetUrl"
                     name="targetUrl"
@@ -168,10 +158,12 @@ function PopoverWrapper({
                 </div>
               </div>
               <div className="flex justify-end gap-2">
-                <Button onClick={() => setOpen(false)} variant={"secondary"}>
-                  Cancel
-                </Button>
-                <Button type="submit">Save</Button>
+                <PopoverClose asChild>
+                  <Button variant={"secondary"}>Cancel</Button>
+                </PopoverClose>
+                <PopoverClose asChild>
+                  <Button type="submit">Save</Button>
+                </PopoverClose>
               </div>
             </div>
           </fetcher.Form>
