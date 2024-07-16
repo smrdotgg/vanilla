@@ -5,6 +5,7 @@ export const INTENTS = {
     deleteTransfer: "deleteTransfer",
     resubmitTransfer: "resubmitTransfer",
     transferDomainViaDNS: "transferDomainViaDNS",
-    deleteDomainViaDNS: "deleteDomainViaDNS"
+    deleteDomainViaDNS: "deleteDomainViaDNS",
+    addRedirectForDomain: "addRedirectForDomain",
 } as const;
 

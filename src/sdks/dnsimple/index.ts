@@ -1,13 +1,22 @@
 import { env } from "~/utils/env";
 import { consoleLog } from "~/utils/console_log";
 
-type Host = {
-  hostName: string;
-  recordType: string;
-  address: string;
-  ttl: string;
-  [key: string]: string;
-};
+type Host =
+  | {
+      hostName: string;
+      recordType: string;
+      address: string;
+      ttl: string;
+      [key: string]: string;
+    }
+  | {
+      hostName: string;
+      recordType: "WR";
+      address: string;
+      ttl: string;
+      frame: 0 | 1; // int
+      redirect_type: 301 | 302; // int
+    };
 
 type DNSRecords = {
   [key: string]: {
@@ -66,12 +75,42 @@ const deleteRecord = ({
     `${env.CLOUDNS_BASE_URL}/dns/delete-record.json?auth-id=${env.CLOUDNS_ID}&auth-password=${env.CLOUDNS_PASS}&record-id=${recordId}&domain-name=${domain}`
   );
 
-const addRecord = ({ domain, record }: { domain: string; record: Host }) =>
-  fetch(
-    `${env.CLOUDNS_BASE_URL}/dns/add-record.json?auth-id=${env.CLOUDNS_ID}&auth-password=${env.CLOUDNS_PASS}&domain-name=${domain}&record-type=${record.recordType}&host=${record.hostName}&record=${record.address}&ttl=${record.ttl}&priority=10`
-  )
+const addRecord = ({ domain, record }: { domain: string; record: Host }) => {
+  console.log(`Adding record: ${JSON.stringify(record, null, 2)}`);
+  const url = `${env.CLOUDNS_BASE_URL}/dns/add-record.json?auth-id=${env.CLOUDNS_ID}&auth-password=${env.CLOUDNS_PASS}&domain-name=${domain}&record-type=${record.recordType}&host=${record.hostName}&record=${record.address}&ttl=${record.ttl}&priority=10`;
+  console.log(url);
+  return fetch(url)
     .then((r) => r.json())
+    .then((r) => {
+      console.log(r);
+      return r;
+    })
     .then((r) => r.data as { id: number } | undefined);
+};
+
+// const addRecord = ({ domain, record }: { domain: string; record: Host }) => {
+//   const url = `${env.CLOUDNS_BASE_URL}/dns/add-record.json?auth-id=${
+//     env.CLOUDNS_ID
+//   }&auth-password=${env.CLOUDNS_PASS}&domain-name=${domain}&record-type=${
+//     record.recordType
+//   }&host=${record.hostName}&record=${record.address}&ttl=${
+//     record.ttl
+//   }&priority=10${
+//     record.recordType !== "WR"
+//       ? ""
+//       : `&frame=${record.frame}&redirect-type=${record.redirect_type}`
+//   }`;
+//
+//   console.log(`URL`);
+//   console.log(url);
+//   return fetch(url)
+//     .then((r) => r.json())
+//     .then((r) => {
+//       console.log(r);
+//       return r;
+//     })
+//     .then((r) => r.data as { id: number } | undefined);
+// };
 
 export const DnsimpleService = {
   getDomainRecords,

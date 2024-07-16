@@ -39,14 +39,7 @@ export default function Page() {
       <PendingTransfers />
       <div className="">
         <p className="my-4 text-xl font-bold">Your Domains</p>
-        <YourDomains
-          rows={workingDnsDomains.map((d) => ({
-            name: d.name,
-            domainId: `DNS_DOMAIN_${d.id.toString()}`,
-            mailboxCount: d.mailboxCount,
-            domainType: "dns" as const,
-          }))}
-        />
+        <YourDomains />
       </div>
     </div>
   );
