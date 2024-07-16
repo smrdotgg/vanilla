@@ -57,7 +57,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       });
       const dnsRecords = allRecords.filter((record) => record.type === "NS");
 
-
       parsedDndPendingTransfers.push({
         ...pendingTransfer,
         dnsUrls: dnsRecords.map((record) => record.record),
@@ -251,10 +250,6 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     //   redirectTo = redirectTo.split("https://")[1];
     // if (redirectTo.startsWith("http://"))
     //   redirectTo = redirectTo.split("http://")[1];
-    if (!redirectTo) {
-      console.error("Redirect URL is required");
-      return { ok: false, message: "Redirect URL is required" };
-    }
 
     const domain = await prisma.domain_dns_transfer.findFirst({
       where: {
@@ -287,17 +282,19 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       console.log(`Deleted record: ${targetRecordId}`);
     }
 
-    const response = await DnsimpleService.addRecord({
-      record: {
-        ttl: "60",
-        recordType: "WR",
-        address: redirectTo,
-        hostName: "",
-        redirect_type: "301",
-        frame: "0",
-      },
-      domain: domainName,
-    });
+    if (redirectTo) {
+      const response = await DnsimpleService.addRecord({
+        record: {
+          ttl: "60",
+          recordType: "WR",
+          address: redirectTo,
+          hostName: "",
+          redirect_type: "301",
+          frame: "0",
+        },
+        domain: domainName,
+      });
+    }
 
     return { ok: true, message: null };
     console.log("Operation completed successfully");

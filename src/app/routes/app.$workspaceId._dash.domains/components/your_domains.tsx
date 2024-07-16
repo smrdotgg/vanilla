@@ -122,31 +122,40 @@ function PopoverWrapper({
             <input value={domainName} name="domainName" hidden />
             <div className="grid gap-4">
               <div className="space-y-2">
-                <div className="w-full flex justify-between">
-                  <h4 className="font-medium leading-none">Redirect</h4>
+                <div className="w-full flex justify-between  *:my-auto">
+                  <div className="flex flex-col">
+                    <h4 className="font-medium leading-none">Redirect</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Redirect{" "}
+                      <span className="font-mono text-muted-foreground ">
+                        domainName
+                      </span>{" "}
+                      to another URL.
+                    </p>
+                  </div>
                   <HoverCard>
                     <HoverCardTrigger>
-                      <Badge className="font-mono" variant={"secondary"}>
-                        ALPHA
+                      <Badge
+                        className="font-mono rounded-full px-2"
+                        variant={"secondary"}
+                      >
+                        <p className="text-xs">ALPHA</p>
                       </Badge>
                     </HoverCardTrigger>
                     <HoverCardContent>
-                      <p><span className="font-mono">ALPHA</span> features are a work in progress, and may behave unexpectedly. ALPHA features are an early preview.</p>
+                      <p>
+                        <span className="font-mono">ALPHA</span> features are a
+                        work in progress, and may behave unexpectedly. ALPHA
+                        features are an early preview.
+                      </p>
                     </HoverCardContent>
                   </HoverCard>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Redirect{" "}
-                  <span className="font-mono text-muted-foreground ">
-                    domainName
-                  </span>{" "}
-                  to another URL.
-                </p>
               </div>
               <div className="grid gap-2">
                 <div className="grid grid-cols-3 items-center gap-4">
                   <Input
-                    required
+                    
                     defaultValue={data ? String(data) : undefined}
                     id="targetUrl"
                     name="targetUrl"
