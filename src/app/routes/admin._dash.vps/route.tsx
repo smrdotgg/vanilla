@@ -4,6 +4,7 @@ import { prisma } from "~/utils/db";
 import { DataTable } from "./components/table";
 import { columns, ComputeData } from "./components/columns";
 import { useLoaderData } from "@remix-run/react";
+import { ContaboService } from "~/sdks/contabo";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   await adminGuard(args);
@@ -13,17 +14,29 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const computeData = await prisma.vps.findMany();
 
-  const parsedComputeDate: ComputeData[] = computeData.map((data) => {
-    return {
-      id: data.id.toString(),
-      domain: data.domain,
-      contaboId: data.compute_id_on_hosting_platform,
-      domainPointers: "not_set",
-      registrationDate: data.createdAt?.toISOString().split("T")[0] ?? "Unknown",
-    };
-  });
+  const computeDataWithIp: ComputeData[] = [];
 
-  return { users, computeData: parsedComputeDate };
+  for (const datum of computeData) {
+    const dataFromContabo = await ContaboService.getVPSInstanceData({
+      id: datum.compute_id_on_hosting_platform,
+    });
+    const ipv4 = dataFromContabo.data[0].ipConfig.v4.ip;
+
+    const ipv4PointsTo = (await prisma.reverseDnsEntry.findFirst({where: {from: ipv4}}))?.to;
+
+    computeDataWithIp.push({
+      id: datum.id.toString(),
+      domain: datum.domain,
+      contaboId: datum.compute_id_on_hosting_platform,
+      domainPointers: "not_set",
+      registrationDate:
+        datum.createdAt?.toISOString().split("T")[0] ?? "Unknown",
+      ipv4,
+      ipv4PointsTo: ipv4PointsTo ?? null,
+    });
+  }
+
+  return { users, computeData: computeDataWithIp };
 };
 
 const Page = () => {

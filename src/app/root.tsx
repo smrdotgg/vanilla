@@ -68,7 +68,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function LayoutCore({ children }: { children: React.ReactNode }) {
-  
   const data = useLoaderData<typeof loader>();
   const [theme] = useTheme();
   const backupTheme =

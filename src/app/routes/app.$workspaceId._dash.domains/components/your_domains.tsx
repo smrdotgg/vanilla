@@ -35,6 +35,7 @@ type RowData = {
   parsedExpiryDate?: string;
   domainType: DomainType;
 };
+
 type DomainType = "platform" | "dns";
 
 export function YourDomains() {
@@ -58,21 +59,15 @@ export function YourDomains() {
             <TableCell className={`font-medium ${domainRowWidth}`}>
               {row.name}
             </TableCell>
+            
             <PopoverWrapper
               domainRowWidth={domainRowWidth}
               data={row.rootCnameRecord ?? null}
               domainName={row.name}
             />
 
-            {/* <TableCell */}
-            {/*   className={`font-medium text-muted-foreground ${domainRowWidth}`} */}
-            {/* > */}
-            {/*   None */}
-            {/* </TableCell> */}
+            {/* TODO */}
             <TableCell>{row.mailboxCount}</TableCell>
-            {/* {row.parsedExpiryDate && ( */}
-            {/*   <TableCell>{row.parsedExpiryDate}</TableCell> */}
-            {/* )} */}
 
             {/* TODO */}
             <TableCell className="text-gray-500">N/A</TableCell>
@@ -105,7 +100,10 @@ function PopoverWrapper({
     <TableCell className={` ${domainRowWidth}`}>
       <Popover>
         <PopoverTrigger>
-          <DomainRedirectCell domainRowWidth={domainRowWidth} data={fetcher.state=== 'idle' ? data : "Loading..."} />
+          <DomainRedirectCell
+            domainRowWidth={domainRowWidth}
+            data={fetcher.state === "idle" ? data : "Loading..."}
+          />
         </PopoverTrigger>
         <PopoverContent className="w-80">
           <fetcher.Form method="post">

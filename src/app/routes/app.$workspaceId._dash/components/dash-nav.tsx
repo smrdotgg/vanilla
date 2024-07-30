@@ -21,12 +21,15 @@ import {
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { INTENTS } from "../types";
-import { flushSync } from "react-dom";
 import { Progress } from "~/components/ui/progress";
 
 type topDashRoutes = "domains" | "mailboxes";
 
-const topDashElements: { route: topDashRoutes; name: string; icon: IconType }[] = [
+const topDashElements: {
+  route: topDashRoutes;
+  name: string;
+  icon: IconType;
+}[] = [
   {
     route: "domains",
     name: "Domains",
@@ -41,15 +44,17 @@ const topDashElements: { route: topDashRoutes; name: string; icon: IconType }[] 
 
 type bottomDashRoutes = "settings";
 
-const bottomDashElements: { route: bottomDashRoutes; name: string; icon: IconType }[] = [
+const bottomDashElements: {
+  route: bottomDashRoutes;
+  name: string;
+  icon: IconType;
+}[] = [
   {
     route: "settings",
     name: "Settings",
     icon: LuSettings,
   },
 ];
-
-
 
 export function DashLayout({
   children,
@@ -79,9 +84,9 @@ export function DashLayout({
                   prefetch="intent"
                   className={({ isActive, isPending }) => {
                     if (isPending && loading !== e.route) {
-                      flushSync(() => setLoading(e.route));
+                      setLoading(e.route);
                     } else if (!isPending && loading === e.route) {
-                      flushSync(() => setLoading(""));
+                      setLoading("");
                     }
 
                     const baseClasses = "flex min-h-8 rounded m-1";
@@ -118,7 +123,7 @@ export function DashLayout({
                 </NavLink>
               ))}
             </div>
-          
+
             <div>
               {bottomDashElements.map((e, i) => (
                 <NavLink
@@ -126,9 +131,9 @@ export function DashLayout({
                   prefetch="intent"
                   className={({ isActive, isPending }) => {
                     if (isPending && loading !== e.route) {
-                      flushSync(() => setLoading(e.route));
+                      setLoading(e.route);
                     } else if (!isPending && loading === e.route) {
-                      flushSync(() => setLoading(""));
+                      setLoading("");
                     }
                     const baseClasses = "flex min-h-8 rounded m-1";
                     let stateClasses = "";
@@ -176,9 +181,9 @@ export function DashLayout({
     </div>
   );
 }
-function AccountTile(){
-return <></>;
-  return <>account tile</>
+function AccountTile() {
+  return <></>;
+  return <>account tile</>;
 }
 
 function WorkspaceSelect() {

@@ -9,6 +9,8 @@
     "app:dev": "remix vite:dev --port 3000 --host",
     "api:dev": "tsx watch src/backend/index.ts",
     "api:start": "tsx src/backend/index.ts",
+    "db:studio": "prisma studio",
+    "db:push": "prisma db push",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "typecheck": "tsc"
   },

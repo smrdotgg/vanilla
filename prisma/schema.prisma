@@ -294,8 +294,8 @@ enum MailBoxStatus {
 model mailbox {
   id Int @id @default(autoincrement())
 
-
-  domainName String
+  domainPrefix String @default("")
+  domainName   String
 
   firstName String
   lastName  String?
@@ -308,6 +308,9 @@ model mailbox {
 
   deletedAt   DateTime?
   workspaceId Int
+
+  imapPort Int @default(993)
+  smtpPort Int @default(465)
 }
 
 model vps {
@@ -333,6 +336,16 @@ model vps {
   @@map("splitbox")
 }
 
+// Table of reverse dns pointer
+// Meaning from ip to domain
+// example.com --> 123.123.123.123
+model reverseDnsEntry {
+  id Int @id @default(autoincrement())
+
+  from String @unique()
+  to   String
+}
+
 enum userType {
   USER
   ADMIN
@@ -350,8 +363,8 @@ model user {
   oauth_provider String
   password       String?
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
   deleted_at DateTime?
 
   workspace_user_join_list       workspace_user_join[]

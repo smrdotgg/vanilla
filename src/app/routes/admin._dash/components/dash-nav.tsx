@@ -1,14 +1,13 @@
 import { NavLink, useNavigation } from "@remix-run/react";
 import { GrInProgress } from "react-icons/gr";
-import { LuBuilding, LuServer, LuUsers } from "react-icons/lu";
+import { LuBuilding, LuMailbox, LuServer, LuUsers } from "react-icons/lu";
 
 import type { IconType } from "react-icons/lib";
 import { useEffect, useState } from "react";
 import { ModeToggle } from "~/components/ui/mode-toggle";
 import { Progress } from "~/components/ui/progress";
-import { flushSync } from "react-dom";
 
-type topDashRoutes = "users" | "workspaces" | "vps";
+type topDashRoutes = "users" | "workspaces" | "vps" | "mailboxes";
 
 const topDashElements: {
   route: topDashRoutes;
@@ -29,6 +28,11 @@ const topDashElements: {
     route: "vps",
     name: "Compute",
     icon: LuServer,
+  },
+  {
+    route: "mailboxes",
+    name: "Mailboxes",
+    icon: LuMailbox,
   },
 ];
 
@@ -51,9 +55,9 @@ export function AdminDashLayout({
   const [loading, setLoading] = useState("");
 
   return (
-    <div className="flex h-screen max-h-screen w-screen flex-col  overflow-hidden">
+    <div className="flex h-screen max-w-[100%] max-h-screen w-screen flex-col  overflow-hidden">
       <FakeLoading />
-      <div className="flex max-h-full flex-1 overflow-hidden">
+      <div className="flex w-screen max-w-[100%] max-h-full flex-1 overflow-hidden">
         <div className=" flex h-full max-h-full w-64 flex-col justify-between overflow-hidden  font-mono  ">
           <p className="text-center py-2 select-none font-mono text-3xl uppercase">
             splitbox admin
@@ -66,9 +70,9 @@ export function AdminDashLayout({
                   prefetch="intent"
                   className={({ isActive, isPending }) => {
                     if (isPending && loading !== e.route) {
-                      flushSync(() => setLoading(e.route));
+                      setLoading(e.route);
                     } else if (!isPending && loading === e.route) {
-                      flushSync(() => setLoading(""));
+                      setLoading("");
                     }
 
                     let baseClasses =
@@ -126,9 +130,9 @@ export function AdminDashLayout({
                   prefetch="intent"
                   className={({ isActive, isPending }) => {
                     if (isPending && loading !== e.route) {
-                      flushSync(() => setLoading(e.route));
+                      setLoading(e.route);
                     } else if (!isPending && loading === e.route) {
-                      flushSync(() => setLoading(""));
+                      setLoading("");
                     }
 
                     const baseClasses = "flex min-h-8";
@@ -168,11 +172,11 @@ export function AdminDashLayout({
           </div>
           <div className="pt-2"></div>
           <AccountTile />
-          <ModeToggle className="text-white" />
+          <ModeToggle className="dark:text-white" />
         </div>
         <div className="bg-muted-foreground mx-2 w-[1px] h-full"></div>
         {/* Main Content */}
-        <div className="flex max-h-full flex-1 overflow-y-auto ">
+        <div className="flex max-h-full w-full flex-grow overflow-y-auto ">
           {children}
         </div>
       </div>

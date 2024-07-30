@@ -16,16 +16,12 @@ import {
 } from "@/components/ui/table";
 import { Button } from "~/components/ui/button";
 
-// interface DataTableProps<TData, TValue> {
-//   columns: ColumnDef<TData, TValue>[];
-//   data: TData[];
-// }
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function MailboxTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -34,11 +30,12 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    enableGrouping: true,
   });
 
   return (
-    <div className="rounded-md ">
-      <div className="flex items-center justify-end space-x-2 py-4">
+    <div className=" flex w-full flex-col">
+      <div className="flex  items-center justify-end space-x-2 py-4 w-full ">
         <p>
           {table.getState().pagination.pageIndex + 1}/{table.getPageCount()}
         </p>
@@ -66,7 +63,11 @@ export function DataTable<TData, TValue>({
             <TableRow key={headerGroup.id} className="hover:bg-transparent">
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    colSpan={header.colSpan}
+                    key={header.id}
+                    className="text-center border"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(

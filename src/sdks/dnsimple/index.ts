@@ -88,30 +88,6 @@ const addRecord = ({ domain, record }: { domain: string; record: Host }) => {
     .then((r) => r.data as { id: number } | undefined);
 };
 
-// const addRecord = ({ domain, record }: { domain: string; record: Host }) => {
-//   const url = `${env.CLOUDNS_BASE_URL}/dns/add-record.json?auth-id=${
-//     env.CLOUDNS_ID
-//   }&auth-password=${env.CLOUDNS_PASS}&domain-name=${domain}&record-type=${
-//     record.recordType
-//   }&host=${record.hostName}&record=${record.address}&ttl=${
-//     record.ttl
-//   }&priority=10${
-//     record.recordType !== "WR"
-//       ? ""
-//       : `&frame=${record.frame}&redirect-type=${record.redirect_type}`
-//   }`;
-//
-//   console.log(`URL`);
-//   console.log(url);
-//   return fetch(url)
-//     .then((r) => r.json())
-//     .then((r) => {
-//       console.log(r);
-//       return r;
-//     })
-//     .then((r) => r.data as { id: number } | undefined);
-// };
-
 export const DnsimpleService = {
   getDomainRecords,
   addRecord,
