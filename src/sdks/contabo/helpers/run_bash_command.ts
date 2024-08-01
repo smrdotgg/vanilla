@@ -23,11 +23,13 @@ export async function runBashCommands(
       const ssh = new NodeSSH();
       consoleLog("Connecting via SSH");
       await ssh.connect(props);
+      consoleLog("Connected!");
       if (props.scriptMode) {
         await ssh.execCommand(`echo "#!/bin/bash" > script.sh `);
         for (const bc of bashCommands) {
           await ssh.execCommand(`echo "${bc}" >> script.sh `);
         }
+        consoleLog("Added all lines to script.sh (scriptmode)");
         const { code, signal, stderr, stdout } =
           await ssh.execCommand(`bash ./script.sh`);
         consoleLog(

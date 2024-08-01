@@ -84,16 +84,16 @@ export async function setupMailboxesCron() {
 
     if (!vpsDataFromDB.emailwizInitiated) {
       consoleLog(`Initializing Emailwiz for mailbox ${mailbox.id}`);
-      await tieVPSAndDomain({
-        mailbox: { ...mailbox, domainName: mailbox.domainName! },
-        contaboData,
-      });
+      // await tieVPSAndDomain({
+      //   mailbox: { ...mailbox, domainName: mailbox.domainName! },
+      //   contaboData,
+      // });
 
-      consoleLog(`Sleeping for 1 minutes...`);
-      await sleep(1 * 60 * 1000);
+      // consoleLog(`Sleeping for 1 minutes...`);
+      // await sleep(1 * 60 * 1000);
 
-      consoleLog(`Initializing Emailwiz for mailbox ${mailbox.id}`);
-      await initializeEmailwiz({ mailbox, contaboData });
+      // consoleLog(`Initializing Emailwiz for mailbox ${mailbox.id}`);
+      // await initializeEmailwiz({ mailbox, contaboData });
 
       consoleLog(`Posting Emailwiz pointers for mailbox ${mailbox.id}`);
       await postEmailwizPointers({
@@ -184,28 +184,28 @@ async function postEmailwizPointers({
   await setHosts({
     domain: mailbox.domainName,
     hosts: [
-      {
-        address: contaboData.data[0].ipConfig.v4.ip,
-        recordType: "A",
-        hostName: "www",
-        ttl: "60",
-      },
-      {
-        address: contaboData.data[0].ipConfig.v4.ip,
-        recordType: "A",
-        hostName: "",
-        ttl: "60",
-      },
+      // {
+      //   address: contaboData.data[0].ipConfig.v4.ip,
+      //   recordType: "A",
+      //   hostName: "www",
+      //   ttl: "60",
+      // },
+      // {
+      //   address: contaboData.data[0].ipConfig.v4.ip,
+      //   recordType: "A",
+      //   hostName: "",
+      //   ttl: "60",
+      // },
+      // {
+      //   address: contaboData.data[0].ipConfig.v6.ip,
+      //   recordType: "AAAA",
+      //   hostName: "",
+      //   ttl: "60",
+      // },
       {
         address: contaboData.data[0].ipConfig.v4.ip,
         recordType: "A",
         hostName: "mail",
-        ttl: "60",
-      },
-      {
-        address: contaboData.data[0].ipConfig.v6.ip,
-        recordType: "AAAA",
-        hostName: "",
         ttl: "60",
       },
       {
@@ -255,12 +255,13 @@ export async function initializeEmailwiz({
     `echo "postfix postfix/mailname string ${domain}" | sudo debconf-set-selections`,
     `echo "postfix postfix/main_mailer_type string 'Internet Site'" | sudo debconf-set-selections`,
     "sudo apt install git unzip -y",
-    "git clone https://github.com/LukeSmithxyz/emailwiz.git",
-    "cd emailwiz",
-    "sudo chmod +x ./*.sh",
-    "sudo ./emailwiz.sh",
-    "cd ..",
-    "cat dns_emailwizard",
+    "sudo ./x.sh",
+    // "git clone https://github.com/LukeSmithxyz/emailwiz.git",
+    // "cd emailwiz",
+    // "sudo chmod +x ./*.sh",
+    // "sudo ./emailwiz.sh",
+    // "cd ..",
+    // "cat dns_emailwizard",
   ];
   await runBashCommands({
     bashCommands: script({
@@ -312,30 +313,30 @@ export async function tieVPSAndDomain({
   await setHosts({
     domain: mailbox.domainName,
     hosts: [
-      {
-        address: contaboData.data[0].ipConfig.v4.ip,
-        recordType: "A",
-        hostName: "www",
-        ttl: "60",
-      },
-      {
-        address: contaboData.data[0].ipConfig.v4.ip,
-        recordType: "A",
-        hostName: "",
-        ttl: "60",
-      },
+      // {
+      //   address: contaboData.data[0].ipConfig.v4.ip,
+      //   recordType: "A",
+      //   hostName: "www",
+      //   ttl: "60",
+      // },
+      // {
+      //   address: contaboData.data[0].ipConfig.v4.ip,
+      //   recordType: "A",
+      //   hostName: "",
+      //   ttl: "60",
+      // },
       {
         address: contaboData.data[0].ipConfig.v4.ip,
         recordType: "A",
         hostName: "mail",
         ttl: "60",
       },
-      {
-        address: contaboData.data[0].ipConfig.v6.ip,
-        recordType: "AAAA",
-        hostName: "",
-        ttl: "60",
-      },
+      // {
+      //   address: contaboData.data[0].ipConfig.v6.ip,
+      //   recordType: "AAAA",
+      //   hostName: "",
+      //   ttl: "60",
+      // },
       {
         address: contaboData.data[0].ipConfig.v6.ip,
         recordType: "AAAA",

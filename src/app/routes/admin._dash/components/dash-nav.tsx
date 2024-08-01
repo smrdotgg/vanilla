@@ -1,13 +1,20 @@
 import { NavLink, useNavigation } from "@remix-run/react";
 import { GrInProgress } from "react-icons/gr";
-import { LuBuilding, LuMailbox, LuServer, LuUsers } from "react-icons/lu";
+import {
+  LuArrowUp01,
+  LuBuilding,
+  LuMailbox,
+  LuPointer,
+  LuServer,
+  LuUsers,
+} from "react-icons/lu";
 
 import type { IconType } from "react-icons/lib";
 import { useEffect, useState } from "react";
 import { ModeToggle } from "~/components/ui/mode-toggle";
 import { Progress } from "~/components/ui/progress";
 
-type topDashRoutes = "users" | "workspaces" | "vps" | "mailboxes";
+type topDashRoutes = "users" | "workspaces" | "vps" | "mailboxes" | "pointers";
 
 const topDashElements: {
   route: topDashRoutes;
@@ -34,6 +41,11 @@ const topDashElements: {
     name: "Mailboxes",
     icon: LuMailbox,
   },
+  {
+    route: "pointers",
+    name: "Pointers",
+    icon: LuArrowUp01,
+  },
 ];
 
 type bottomDashRoutes = "settings";
@@ -52,8 +64,6 @@ export function AdminDashLayout({
   children: React.ReactNode;
   selected?: topDashRoutes;
 }) {
-  const [loading, setLoading] = useState("");
-
   return (
     <div className="flex h-screen max-w-[100%] max-h-screen w-screen flex-col  overflow-hidden">
       <FakeLoading />
@@ -69,56 +79,34 @@ export function AdminDashLayout({
                   key={i}
                   prefetch="intent"
                   className={({ isActive, isPending }) => {
-                    if (isPending && loading !== e.route) {
-                      setLoading(e.route);
-                    } else if (!isPending && loading === e.route) {
-                      setLoading("");
-                    }
-
-                    let baseClasses =
-                      "flex min-h-8 rounded m-1 border border-gray-300 dark:border-gray-800 text-black";
+                    const baseClasses =
+                      "flex min-h-8 rounded m-1 border  hover:bg-muted  parent_class";
                     let stateClasses = "";
-
                     if (isActive) {
                       stateClasses =
-                        "bg-muted text-primary border-gray-800 dark:border-gray-500";
+                        "bg-muted  hide_loading font-semibold border-secondary-foreground";
                     } else if (isPending) {
-                      stateClasses =
-                        "bg-muted cursor-wait bg-text-600 text-muted dark:bg-muted-foreground ";
+                      stateClasses = "border-muted bg-muted hide_real_element";
                     } else {
                       stateClasses =
-                        "bg-card   text-muted-foreground dark:text-muted dark:bg-muted-foreground";
-                    }
-                    stateClasses = "";
-                    baseClasses =
-                      "flex min-h-8 rounded m-1 border-transparent  ";
-                    if (isActive) {
-                      stateClasses = "bg-muted border-none";
-                    } else if (isPending) {
-                      stateClasses = "border-muted ";
-                    } else {
-                      stateClasses =
-                        "text-muted-foreground hover:text-foreground border-none";
+                        "text-muted-foreground hover:text-foreground border-transparent hide_loading";
                     }
 
                     return `${baseClasses} ${stateClasses}`;
                   }}
                   to={e.route}
                 >
-                  {loading == e.route ? (
-                    <div className="flex h-full w-full items-center px-3">
-                      <GrInProgress className="h-8 min-w-4 " size={16} />
-                      <div className="pl-2"></div>
+                  <div className="loading flex h-full w-full items-center px-3">
+                    <GrInProgress className="h-8 min-w-4 " size={16} />
+                    <div className="pl-2"></div>
 
-                      <p>{e.name}</p>
-                    </div>
-                  ) : (
-                    <div className="flex h-full w-full items-center px-3">
-                      <e.icon className="h-8 min-w-4" size={16} />
-                      <div className="pl-2"></div>
-                      <p>{e.name}</p>
-                    </div>
-                  )}
+                    <p>{e.name}</p>
+                  </div>
+                  <div className="real_element flex h-full w-full items-center px-3 abc">
+                    <e.icon className="h-8 min-w-4" size={16} />
+                    <div className="pl-2"></div>
+                    <p>{e.name}</p>
+                  </div>
                 </NavLink>
               ))}
             </div>
@@ -129,43 +117,35 @@ export function AdminDashLayout({
                   key={i}
                   prefetch="intent"
                   className={({ isActive, isPending }) => {
-                    if (isPending && loading !== e.route) {
-                      setLoading(e.route);
-                    } else if (!isPending && loading === e.route) {
-                      setLoading("");
-                    }
-
                     const baseClasses = "flex min-h-8";
                     let stateClasses = "";
 
                     if (isActive) {
                       stateClasses =
-                        "text-3xl bg-primary text-primary-foreground";
+                        "text-3xl bg-primary text-primary-foreground hide_loading";
                     } else if (isPending) {
-                      stateClasses = "cursor-wait bg-gray-600 text-gray-500";
+                      stateClasses =
+                        "cursor-wait bg-gray-600 text-gray-500 hide_real_element";
                     } else {
                       stateClasses =
-                        "bg-gray-900 text-white transition duration-100 hover:bg-gray-900";
+                        "bg-gray-900 text-white transition duration-100 hover:bg-gray-900 hide_loading";
                     }
 
                     return `${baseClasses} ${stateClasses}`;
                   }}
                   to={e.route}
                 >
-                  {loading == e.route ? (
-                    <div className="flex h-full w-full items-center px-3">
-                      <GrInProgress className="h-8 min-w-4" size={16} />
-                      <div className="pl-2"></div>
+                  <div className="flex h-full w-full items-center px-3 real_element">
+                    <GrInProgress className="h-8 min-w-4" size={16} />
+                    <div className="pl-2"></div>
 
-                      <p>{e.name}</p>
-                    </div>
-                  ) : (
-                    <div className="flex h-full w-full items-center px-3">
-                      <e.icon className="h-8 min-w-4" size={16} />
-                      <div className="pl-2"></div>
-                      <p>{e.name}</p>
-                    </div>
-                  )}
+                    <p>{e.name}</p>
+                  </div>
+                  <div className="flex h-full w-full items-center px-3 loading">
+                    <e.icon className="h-8 min-w-4" size={16} />
+                    <div className="pl-2"></div>
+                    <p>{e.name}</p>
+                  </div>
                 </NavLink>
               ))}
             </div>

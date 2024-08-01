@@ -76,3 +76,11 @@
 }
 
 
+.hide_loading .loading{
+  display: none;
+}
+
+.hide_real_element .real_element{
+  display: none;
+}
+

@@ -318,6 +318,8 @@ model vps {
   name                           String
   compute_id_on_hosting_platform String @unique(map: "splitbox_compute_id_on_hosting_platform_unique")
 
+  status String?
+
   domain String?
 
   userId Int?

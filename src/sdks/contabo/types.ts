@@ -29,7 +29,20 @@ export interface Instance {
   diskMb: number;
   createdDate: Date;
   cancelDate?: Date;
-  status: string;
+  status:
+    | "provisioning"
+    | "uninstalled"
+    | "running"
+    | "stopped"
+    | "error"
+    | "installing"
+    | "unknown"
+    | "manual_provisioning"
+    | "product_not_available"
+    | "verification_required"
+    | "rescue"
+    | "pending_payment"
+    | "other";
   vHostId: number;
   vHostNumber: number;
   vHostName: string;
@@ -42,4 +55,3 @@ export interface Instance {
 export interface Links {
   self: string;
 }
-

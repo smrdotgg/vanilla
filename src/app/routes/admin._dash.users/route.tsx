@@ -5,6 +5,7 @@ import { UsersTable } from "./components/users_table";
 import { sleep } from "~/utils/sleep";
 import { INTENTS } from "./types";
 import { deleteUser } from "~/utils/firebase/auth.server";
+import { DefaultErrorBoundary } from "~/components/custom/my-error-boundary";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   await adminGuard(args);
@@ -64,3 +65,5 @@ export const action = async (args: ActionFunctionArgs) => {
   throw Error("not implemented");
   // const intent = args.request.headers.get("x-intent");
 };
+
+export { DefaultErrorBoundary as ErrorBoundary };

@@ -1,8 +1,9 @@
 import { MailboxTable } from "./components/mailbox_table";
 import { columns } from "./components/columns";
 import { prisma } from "~/utils/db";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useRevalidator, useRouteError } from "@remix-run/react";
 import { DnsimpleService } from "~/sdks/dnsimple";
+import { DefaultErrorBoundary } from "~/components/custom/my-error-boundary";
 
 const fullDomain = (subdomain: string, parent: string) =>
   `${subdomain.length ? subdomain + "." : ""}${parent}`;
@@ -61,4 +62,6 @@ export default function Page() {
   );
 }
 
-// FirstName,LastName,Username,Domain,Email,SMTP Server,SMTP Port,SMTP Security,IMAP Server,IMAP Port,IMAP Security,Password
+export { DefaultErrorBoundary as ErrorBoundary };
+
+// FirstName,LastName,Username,Domain,Email,SMTP Server,SMTP Port,SMTP Securityjkj,IMAP Server,IMAP Port,IMAP Security,Password

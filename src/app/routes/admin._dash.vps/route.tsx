@@ -3,7 +3,7 @@ import { adminGuard } from "~/app/middlewares/auth.server";
 import { prisma } from "~/utils/db";
 import { DataTable } from "./components/table";
 import { columns, ComputeData } from "./components/columns";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useRouteError } from "@remix-run/react";
 import { ContaboService } from "~/sdks/contabo";
 
 export const loader = async (args: LoaderFunctionArgs) => {
@@ -50,5 +50,15 @@ const Page = () => {
     </div>
   );
 };
+export function ErrorBoundary() {
+  const error = useRouteError();
+  // console.error(error);
+  return (
+    <div>
+      {JSON.stringify(error)}
+    </div>
+  );
+}
+
 
 export default Page;
