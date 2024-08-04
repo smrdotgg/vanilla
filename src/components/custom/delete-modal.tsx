@@ -28,7 +28,9 @@ export function DeleteDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {!!description && <DialogDescription>{description}</DialogDescription>}
+          {!!description && (
+            <DialogDescription>{description}</DialogDescription>
+          )}
         </DialogHeader>
         <DialogFooter className="sm:justify-end">
           <DialogClose asChild>

@@ -48,9 +48,9 @@ module.exports = {
           typescript: {},
         },
       },
-  rules: {
-    "prefer-const": "off", // Add this line to disable the "use const instead of let" rule
-  },
+      rules: {
+        "prefer-const": "off", // Add this line to disable the "use const instead of let" rule
+      },
     },
 
     // Typescript
@@ -74,9 +74,9 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
       ],
-  rules: {
-    "prefer-const": "off", // Add this line to disable the "use const instead of let" rule
-  },
+      rules: {
+        "prefer-const": "off", // Add this line to disable the "use const instead of let" rule
+      },
     },
 
     // Node

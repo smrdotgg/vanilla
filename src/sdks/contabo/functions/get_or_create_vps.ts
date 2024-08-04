@@ -21,7 +21,8 @@ export async function getOrCreateVPSAndGetId({
     }));
 
   let vpsContaboId: string;
-  if (existingVPS){// !== null) {
+  if (existingVPS) {
+    // !== null) {
     consoleLog(`Found existing VPS`);
     await prisma.vps.update({
       data: {

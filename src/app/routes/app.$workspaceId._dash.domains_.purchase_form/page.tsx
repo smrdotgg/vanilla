@@ -8,7 +8,6 @@ export function Page() {
   const { userPurchaseDetails, domainIsAvailable, domain } =
     useLoaderData<typeof loader>();
 
-
   return (
     <div className="flex h-full w-full flex-col overflow-hidden px-6">
       <div className="mx-auto flex w-full max-w-[81rem] flex-col justify-center  gap-2  py-4">

@@ -1,7 +1,4 @@
-import {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-} from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { Page } from "./page";
 import { INTENTS } from "./intent";

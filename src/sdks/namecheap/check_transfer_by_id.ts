@@ -18,7 +18,7 @@ export const checkTransferByID = async ({
   const responseBody = SXTJ.convertXML(
     await response.text()
   ) as NamecheapApiResponse<TransferResponse>;
-  console.log('[checkTransferByID] log call')
+  console.log("[checkTransferByID] log call");
   console.log(JSON.stringify(responseBody, null, 2));
 
   if (responseBody.ApiResponse.children[0].Errors.children)

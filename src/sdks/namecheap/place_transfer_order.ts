@@ -9,7 +9,9 @@ export const placeTransferOrder = async ({
   domain: string;
   eppCode: string;
 }) => {
-  const apiUrl = `${nameCheapBaseUrl}&Command=namecheap.domains.transfer.create&Years=1&DomainName=${domain}&EPPCode=base64:${btoa(eppCode)}`;
+  const apiUrl = `${nameCheapBaseUrl}&Command=namecheap.domains.transfer.create&Years=1&DomainName=${domain}&EPPCode=base64:${btoa(
+    eppCode
+  )}`;
   console.log(apiUrl);
   const response = await fetch(apiUrl);
 

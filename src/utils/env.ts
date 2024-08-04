@@ -102,7 +102,7 @@ export const env = createEnv({
     CLOUDNS_PASS: z.string(),
     CLOUDNS_BASE_URL: z.string().url(),
 
-    CONSOLE_LOGS: z.coerce.boolean().nullish(),
+    CONSOLE_LOGS: z.enum(["true", "false"]).default("false"),
 
     FIREBASE_USER_AMEND: z.coerce.boolean().nullish(),
   },

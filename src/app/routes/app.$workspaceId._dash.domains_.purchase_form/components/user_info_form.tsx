@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { INTENTS } from "../types";
-import { Link, useFetcher, useLoaderData , } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { countries } from "./countries";
 import { loader } from "../route";
 
@@ -44,8 +44,8 @@ export function DomainUserInfoForm({
 }: {
   initialData?: z.infer<typeof domainUserInfoZodSchema> | undefined;
 }) {
-  const {workspaceId, } = useLoaderData<typeof loader>();
-  const { state, submit,  } = useFetcher();
+  const { workspaceId } = useLoaderData<typeof loader>();
+  const { state, submit } = useFetcher();
   const loading = state !== "idle";
   const form = useForm<z.infer<typeof domainUserInfoZodSchema>>({
     resolver: zodResolver(domainUserInfoZodSchema),
@@ -69,82 +69,82 @@ export function DomainUserInfoForm({
           onSubmit={form.handleSubmit(onSubmit)}
           className=" mx-auto  flex w-full max-w-[80rem] flex-col gap-2 px-6"
         >
-            <div className="pt-4"></div>
-            <div>
-              <h3 className="text-lg font-medium">Domain Owner Information</h3>
-              {/* <p className="text-sm text-muted-foreground"> */}
-              {/*   This is how others will see you on the site. */}
-              {/* </p> */}
-            </div>
-            <FormField
-              control={form.control}
-              name="first_name"
-              render={({ field }) => (
-                <FormItem className={formItemClass}>
-                  <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="last_name"
-              render={({ field }) => (
-                <FormItem className={formItemClass}>
-                  <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email_address"
-              render={({ field }) => (
-                <FormItem className={formItemClass}>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <div className="pt-4"></div>
+          <div>
+            <h3 className="text-lg font-medium">Domain Owner Information</h3>
+            {/* <p className="text-sm text-muted-foreground"> */}
+            {/*   This is how others will see you on the site. */}
+            {/* </p> */}
+          </div>
+          <FormField
+            control={form.control}
+            name="first_name"
+            render={({ field }) => (
+              <FormItem className={formItemClass}>
+                <FormLabel>First Name</FormLabel>
+                <FormControl>
+                  <Input disabled={loading} placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="last_name"
+            render={({ field }) => (
+              <FormItem className={formItemClass}>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email_address"
+            render={({ field }) => (
+              <FormItem className={formItemClass}>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <>
-                  <FormItem className={formItemClass}>
-                    <FormLabel>Address Line 1</FormLabel>
-                    <FormControl>
-                      <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                </>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="state_province"
-              render={({ field }) => (
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <>
                 <FormItem className={formItemClass}>
-                  <FormLabel>State/Province</FormLabel>
+                  <FormLabel>Address Line 1</FormLabel>
                   <FormControl>
                     <Input placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
-            <div className="flex gap-2 *:w-full">
+              </>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="state_province"
+            render={({ field }) => (
+              <FormItem className={formItemClass}>
+                <FormLabel>State/Province</FormLabel>
+                <FormControl>
+                  <Input placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex gap-2 *:w-full">
             <FormField
               control={form.control}
               name="city"
@@ -162,7 +162,7 @@ export function DomainUserInfoForm({
               control={form.control}
               name="country"
               render={({ field }) => (
-                <FormItem className={'w-full'}>
+                <FormItem className={"w-full"}>
                   <FormLabel>Country</FormLabel>
                   <FormControl>
                     <Select {...field} onValueChange={field.onChange}>
@@ -182,13 +182,52 @@ export function DomainUserInfoForm({
                 </FormItem>
               )}
             />
-            </div>
+          </div>
+          <FormField
+            control={form.control}
+            name="postal_code"
+            render={({ field }) => (
+              <FormItem className={formItemClass}>
+                <FormLabel>Postal Code</FormLabel>
+                <FormControl>
+                  <Input placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex gap-2 *:w-full">
             <FormField
               control={form.control}
-              name="postal_code"
+              name="phone_code"
               render={({ field }) => (
                 <FormItem className={formItemClass}>
-                  <FormLabel>Postal Code</FormLabel>
+                  <FormLabel>Country Code</FormLabel>
+                  <FormControl>
+                    <Select {...field} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Country Code" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {phoneCountryCodes.countries.map((data, index) => (
+                          <SelectItem value={data.code} key={index}>
+                            {data.name} ({data.code})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone_number"
+              render={({ field }) => (
+                <FormItem className={formItemClass}>
+                  <FormLabel>Phone Number (Excluding Country Code)</FormLabel>
                   <FormControl>
                     <Input placeholder="" {...field} />
                   </FormControl>
@@ -196,54 +235,15 @@ export function DomainUserInfoForm({
                 </FormItem>
               )}
             />
-
-            <div className="flex gap-2 *:w-full">
-              <FormField
-                control={form.control}
-                name="phone_code"
-                render={({ field }) => (
-                  <FormItem className={formItemClass}>
-                    <FormLabel>Country Code</FormLabel>
-                    <FormControl>
-                      <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Country Code" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {phoneCountryCodes.countries.map((data, index) => (
-                            <SelectItem value={data.code} key={index}>
-                              {data.name} ({data.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone_number"
-                render={({ field }) => (
-                  <FormItem className={formItemClass}>
-                    <FormLabel>Phone Number (Excluding Country Code)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="pt-4"></div>
-          
+          </div>
+          <div className="pt-4"></div>
 
           <div className="flex justify-end gap-2">
-
-            {!loading && <Button asChild variant={"secondary"}  >
-              <Link to={`/app/${workspaceId}/domains`} >Cancel</Link>
-            </Button>}
+            {!loading && (
+              <Button asChild variant={"secondary"}>
+                <Link to={`/app/${workspaceId}/domains`}>Cancel</Link>
+              </Button>
+            )}
             {/* <Button onClick={() => navigate("")} variant="secondary"> */}
             {/*   Cancel */}
             {/* </Button> */}

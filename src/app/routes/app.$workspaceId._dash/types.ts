@@ -1,3 +1,3 @@
 export const INTENTS = {
-    changeSelectedWorksapce: "changeSelectedWorkspace",
+  changeSelectedWorksapce: "changeSelectedWorkspace",
 } as const;

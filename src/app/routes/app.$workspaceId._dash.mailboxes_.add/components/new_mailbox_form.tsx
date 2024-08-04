@@ -15,7 +15,7 @@ import { Form, FormControl, FormLabel } from "@/components/ui/form";
 
 export const TinyFormSchema = z.object({
   firstName: z.string().min(2).max(50),
-  lastName: z.string().nullish(),//.min(2).max(50).nullish(),
+  lastName: z.string().nullish(), //.min(2).max(50).nullish(),
   username: z.string().min(2).max(50),
   domain: z.string().min(1),
 });
@@ -47,12 +47,14 @@ export function NewMailboxTinyForm({
     <div className="flex max-w-[52rem] flex-col dark:border-white dark:bg-gray-950 bg-gray-50 p-5 *:mx-auto">
       <div className="mb-2 ml-0 flex w-[50rem] justify-between">
         <p className="text-xl font-bold">Mailbox #{index + 1}</p>
-        {forms.length > 1 && <Button
-          variant={"ghost"}
-          onClick={() => setForms(forms.filter((f, i) => i !== index))}
-        >
-          <LuX className="text-red-500" />
-        </Button>}
+        {forms.length > 1 && (
+          <Button
+            variant={"ghost"}
+            onClick={() => setForms(forms.filter((f, i) => i !== index))}
+          >
+            <LuX className="text-red-500" />
+          </Button>
+        )}
       </div>
       <div className="pt-2"></div>
       <Form {...form}>
@@ -141,7 +143,9 @@ function ErrorDisplay({ errors }: { errors: string[] | undefined }) {
   const parsedError =
     errors !== undefined && errors.length > 0 ? errors![0] : undefined; // Boolean(errors?.length) ? errors![0] : "";
 
-  return <>
-    <p className="text-red-500 text-xs ">{parsedError ?? <>&nbsp;</>}</p>
-  </>;
+  return (
+    <>
+      <p className="text-red-500 text-xs ">{parsedError ?? <>&nbsp;</>}</p>
+    </>
+  );
 }

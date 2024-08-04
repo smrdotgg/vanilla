@@ -59,7 +59,7 @@ export function YourDomains() {
             <TableCell className={`font-medium ${domainRowWidth}`}>
               {row.name}
             </TableCell>
-            
+
             <PopoverWrapper
               domainRowWidth={domainRowWidth}
               data={row.rootCnameRecord ?? null}

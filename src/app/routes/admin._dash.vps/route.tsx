@@ -22,7 +22,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
     });
     const ipv4 = dataFromContabo.data[0].ipConfig.v4.ip;
 
-    const ipv4PointsTo = (await prisma.reverseDnsEntry.findFirst({where: {from: ipv4}}))?.to;
+    const ipv4PointsTo = (
+      await prisma.reverseDnsEntry.findFirst({ where: { from: ipv4 } })
+    )?.to;
 
     computeDataWithIp.push({
       id: datum.id.toString(),
@@ -53,12 +55,7 @@ const Page = () => {
 export function ErrorBoundary() {
   const error = useRouteError();
   // console.error(error);
-  return (
-    <div>
-      {JSON.stringify(error)}
-    </div>
-  );
+  return <div>{JSON.stringify(error)}</div>;
 }
-
 
 export default Page;

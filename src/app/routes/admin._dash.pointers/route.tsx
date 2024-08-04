@@ -1,4 +1,4 @@
-import { useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { ContaboService } from "~/sdks/contabo";
 import { DnsimpleService } from "~/sdks/dnsimple";
@@ -12,6 +12,12 @@ import {
   checkReversePointersWithDNS,
   getPrefixAndCore,
 } from "./helpers";
+import { ActionFunctionArgs } from "@remix-run/node";
+import { adminGuard } from "~/app/middlewares/auth.server";
+import { formDataToObj } from "~/utils/forms";
+import { INTENTS } from "./types";
+import { runBashCommands } from "~/sdks/contabo/helpers/run_bash_command";
+import { sendTestEmail } from "./mail.helper";
 
 const fullDomain = (subdomain: string, parent: string) =>
   `${subdomain.length ? subdomain + "." : ""}${parent}`;
@@ -20,17 +26,19 @@ export const loader = async () => {
   const domains = await prisma.domain_dns_transfer.findMany({
     where: { canceledAt: null },
   });
-  const domainsWithMailboxCount = await Promise.all(domains.map(async (d) => {
-    const { core, prefix } = getPrefixAndCore({ domain: d.name });
+  const domainsWithMailboxCount = await Promise.all(
+    domains.map(async (d) => {
+      const { core, prefix } = getPrefixAndCore({ domain: d.name });
 
-    const mailboxCount = await prisma.mailbox.count({
-      where: {
-        domainPrefix: prefix,
-        domainName: core,
-      },
-    });
-    return {...d, mailboxCount}
-  }));
+      const mailboxCount = await prisma.mailbox.count({
+        where: {
+          domainPrefix: prefix,
+          domainName: core,
+        },
+      });
+      return { ...d, mailboxCount };
+    })
+  );
 
   const data = await Promise.all(
     domainsWithMailboxCount.map(async (domain) => {
@@ -110,8 +118,38 @@ export default function Page() {
       {!!val && <pre>{JSON.stringify(data, null, 2)}</pre>}
       {!val && <PointerTable />}
       Pointers
+      <Form method="post">
+        <Button type="submit">test</Button>
+      </Form>
     </div>
   );
 }
 
+export const action = async ({ request }: ActionFunctionArgs) => {
+  await adminGuard({ request });
+  const body = formDataToObj(await request.formData());
+  if (body.intent === INTENTS.sendTestEmail.name) {
+    const parsedBody = INTENTS.sendTestEmail.schema.parse(body);
+
+    const vpsData = await prisma.vps.findFirst({
+      where: { domain: parsedBody.domain },
+    });
+    if (!vpsData) return { ok: false, error: "Compute not found" };
+    const contaboId = vpsData.compute_id_on_hosting_platform;
+    const defaultUser = await ContaboService.getVPSInstanceData({
+      id: contaboId,
+    }).then((r) => r.data.at(0)!.defaultUser);
+
+    await sendTestEmail({
+      targetEmail: parsedBody.email,
+      domain: parsedBody.domain,
+      vpsUser: defaultUser,
+    });
+
+    return { ok: true, error: null };
+  }
+  throw Error("Unhandled Intent");
+};
+
+export const shouldRevalidate = () => false;
 export { DefaultErrorBoundary as ErrorBoundary };

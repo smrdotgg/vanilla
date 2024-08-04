@@ -29,9 +29,9 @@ export const updateDomainTransfer = async ({
       responseBody.ApiResponse.children[0].Errors.children[0].Error.content
     );
 
-  return responseBody.ApiResponse.children[3].CommandResponse.children[0].DomainTransferCreateResult;
+  return responseBody.ApiResponse.children[3].CommandResponse.children[0]
+    .DomainTransferCreateResult;
 };
-
 
 // export const placeTransferOrder = async ({
 //   domain,
@@ -41,17 +41,19 @@ export const updateDomainTransfer = async ({
 //   eppCode: string;
 // }) => {
 // };
-type TransferResponse = [{
-  DomainTransferCreateResult: {
-    DomainName: string;
-    Transfer: `${boolean}`;
-    TransferID: string;
-    StatusID: string;
-    OrderID: string;
-    TransactionID: string;
-    ChargedAmount: string;
-    StatusCode: string;
-  };
-}];
+type TransferResponse = [
+  {
+    DomainTransferCreateResult: {
+      DomainName: string;
+      Transfer: `${boolean}`;
+      TransferID: string;
+      StatusID: string;
+      OrderID: string;
+      TransactionID: string;
+      ChargedAmount: string;
+      StatusCode: string;
+    };
+  }
+];
 
 // await placeTransferOrder({ domain: "steliade.com", eppCode: "abc" });

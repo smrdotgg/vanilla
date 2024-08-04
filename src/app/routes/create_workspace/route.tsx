@@ -33,7 +33,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export async function action({ request }: ActionFunctionArgs) {
   let { user, firebaseData } = await getUserData({ request });
 
-
   if (!user) {
     return redirect("/auth/sign-in");
   }

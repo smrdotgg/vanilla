@@ -154,7 +154,6 @@ const sessionLogin = async ({
     // getAuth().verifyIdToken(idToken);
     await admin.auth().verifyIdToken(idToken, true);
 
-
     return admin
       .auth()
       .createSessionCookie(idToken, {
@@ -221,9 +220,9 @@ const sessionLogout = async (request: Request) => {
 const getFirebaseUser = async (idToken: string) =>
   admin.auth().getUser(idToken);
 
-const deleteUser = async ({userId}:{userId: string}) => {
+const deleteUser = async ({ userId }: { userId: string }) => {
   return await admin.auth().deleteUser(userId);
-}
+};
 
 export {
   deleteUser,

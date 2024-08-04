@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -49,17 +48,7 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
   }
-
-
-
 }
-
-
-
-
-
-
-
 
 @layer base {
   * {
@@ -68,19 +57,15 @@
   body {
     @apply bg-background text-foreground;
   }
-
-
 }
 .ck-editor__editable_inline {
   @apply max-h-full min-h-96 min-w-0 flex-grow;
 }
 
-
-.hide_loading .loading{
+.hide_loading .loading {
   display: none;
 }
 
-.hide_real_element .real_element{
+.hide_real_element .real_element {
   display: none;
 }
-

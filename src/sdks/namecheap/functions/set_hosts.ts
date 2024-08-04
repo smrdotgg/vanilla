@@ -37,9 +37,9 @@ export const setHosts = async ({
   }
 
   consoleLog(`Fetching DNS records for ${domain}`);
-  const records = (
-    await DnsimpleService.getDomainRecords({ domain })
-  ).filter((r) => r.type !== "NS");
+  const records = (await DnsimpleService.getDomainRecords({ domain })).filter(
+    (r) => r.type !== "NS"
+  );
 
   consoleLog(`Deleting existing records for ${domain}`);
   const recordList = Object.entries(records).map(([, v]) => v);

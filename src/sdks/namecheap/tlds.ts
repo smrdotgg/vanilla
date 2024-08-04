@@ -8,7 +8,7 @@ export const topDomains: string[] = [
   ".xyz",
   ".club",
   ".online",
-  ".site"
+  ".site",
 ];
 
 export const hardDomains = [
@@ -81,5 +81,3 @@ export const hardDomains = [
 //   ".de",
 //   ".fr",
 // ];
-
-

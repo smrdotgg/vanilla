@@ -6,15 +6,14 @@ export async function runBashCommands(
   props: NodeSSHConfig & {
     bashCommands: string[];
     scriptMode?: boolean;
-  },
+  }
 ) {
   let retryCount = 0;
   const maxRetries = 6;
   const retryDelay = 20 * 1000; // 20 seconds
   const responses: string[] = [];
 
-  const bashCommands = props.bashCommands as string[];//.map(c => `sudo ${c}`);
-
+  const bashCommands = props.bashCommands as string[]; //.map(c => `sudo ${c}`);
 
   consoleLog("Starting to run bash commands");
   bashCommands.map((bc) => consoleLog(bc));
@@ -30,10 +29,11 @@ export async function runBashCommands(
           await ssh.execCommand(`echo "${bc}" >> script.sh `);
         }
         consoleLog("Added all lines to script.sh (scriptmode)");
-        const { code, signal, stderr, stdout } =
-          await ssh.execCommand(`bash ./script.sh`);
+        const { code, signal, stderr, stdout } = await ssh.execCommand(
+          `bash ./script.sh`
+        );
         consoleLog(
-          `Command result - stdout: ${stdout}, stderr: ${stderr}, code: ${code}, signal: ${signal}`,
+          `Command result - stdout: ${stdout}, stderr: ${stderr}, code: ${code}, signal: ${signal}`
         );
         responses.push(stdout);
       } else {
@@ -41,7 +41,7 @@ export async function runBashCommands(
           consoleLog(`Executing command: ${bc}`);
           const { code, signal, stderr, stdout } = await ssh.execCommand(bc);
           consoleLog(
-            `Command result - stdout: ${stdout}, stderr: ${stderr}, code: ${code}, signal: ${signal}`,
+            `Command result - stdout: ${stdout}, stderr: ${stderr}, code: ${code}, signal: ${signal}`
           );
           responses.push(stdout);
         }
@@ -55,7 +55,7 @@ export async function runBashCommands(
 
       if (retryCount <= maxRetries) {
         consoleLog(
-          `Retry ${retryCount} of ${maxRetries} in ${retryDelay}ms...`,
+          `Retry ${retryCount} of ${maxRetries} in ${retryDelay}ms...`
         );
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
       } else {
@@ -66,4 +66,3 @@ export async function runBashCommands(
   }
   return [];
 }
-

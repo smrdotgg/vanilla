@@ -8,7 +8,11 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 
-export function DNSTransferDialog_InitialPage({ onClick }: { onClick: () => void }) {
+export function DNSTransferDialog_InitialPage({
+  onClick,
+}: {
+  onClick: () => void;
+}) {
   return (
     <>
       <DialogHeader>

@@ -1,6 +1,7 @@
 import { prisma } from "~/utils/db";
 import { promises } from "dns";
 import { DnsimpleService } from "~/sdks/dnsimple";
+import { generateRandomString } from "~/utils/others";
 
 export const checkReversePointers = ({
   reversePointers,
@@ -118,3 +119,9 @@ export const getPrefixAndCore = ({ domain }: { domain: string }) => {
     domainSegments.length === 2 ? "" : domain.split(`.${coreDomain}`).at(0);
   return { prefix: prefixSegment, core: coreDomain };
 };
+
+const createTempUser = async () => {
+  const name = `{generateRandomString(20)}`;
+};
+
+const sendEmailThroughTestuser = () => {};

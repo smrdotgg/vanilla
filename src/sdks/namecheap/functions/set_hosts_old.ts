@@ -24,7 +24,9 @@ export const setHosts = async ({
   const hostsDataUrlBit = hosts
     .map(
       (h, i) =>
-        `HostName${i + 1}=${h.hostName}&RecordType${i + 1}=${h.recordType}&Address${i + 1}=${h.address}&TTL${i + 1}=${h.ttl}`,
+        `HostName${i + 1}=${h.hostName}&RecordType${i + 1}=${
+          h.recordType
+        }&Address${i + 1}=${h.address}&TTL${i + 1}=${h.ttl}`
     )
     .join("&");
   const apiUrl = `${nameCheapBaseUrl}&Command=namecheap.domains.dns.setHosts&sld=${sld}&tld=${tld}&${hostsDataUrlBit}`;
@@ -42,5 +44,3 @@ type Host = {
   ttl: string;
   [key: string]: string;
 };
-
-

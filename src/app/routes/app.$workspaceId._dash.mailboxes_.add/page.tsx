@@ -12,7 +12,7 @@ import { INTENTS } from "./types";
 
 export function Page() {
   const { domains } = useLoaderData<typeof loader>();
-  const { submit, state, } = useFetcher();
+  const { submit, state } = useFetcher();
 
   const [hasBeenSubmitted, setHasBeenSubmitted] = useState(false);
 

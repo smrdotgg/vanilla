@@ -79,21 +79,20 @@ export async function setupMailboxesCron() {
       consoleLog(
         `Updated VPS data in database: ${JSON.stringify(vpsDataFromDB)}`
       );
-
     }
 
     if (!vpsDataFromDB.emailwizInitiated) {
       consoleLog(`Initializing Emailwiz for mailbox ${mailbox.id}`);
-      // await tieVPSAndDomain({
-      //   mailbox: { ...mailbox, domainName: mailbox.domainName! },
-      //   contaboData,
-      // });
+      await tieVPSAndDomain({
+        mailbox: { ...mailbox, domainName: mailbox.domainName! },
+        contaboData,
+      });
 
-      // consoleLog(`Sleeping for 1 minutes...`);
-      // await sleep(1 * 60 * 1000);
+      consoleLog(`Sleeping for 1 minutes...`);
+      await sleep(1 * 60 * 1000);
 
-      // consoleLog(`Initializing Emailwiz for mailbox ${mailbox.id}`);
-      // await initializeEmailwiz({ mailbox, contaboData });
+      consoleLog(`Initializing Emailwiz for mailbox ${mailbox.id}`);
+      await initializeEmailwiz({ mailbox, contaboData });
 
       consoleLog(`Posting Emailwiz pointers for mailbox ${mailbox.id}`);
       await postEmailwizPointers({
@@ -108,7 +107,6 @@ export async function setupMailboxesCron() {
         where: { id: vpsDataFromDB.id },
         data: { emailwizInitiated: true },
       });
-
     }
 
     if (mailbox.status === "PENDING") {

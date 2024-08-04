@@ -1,3 +1,3 @@
-import {Page} from "./page";
+import { Page } from "./page";
 
-export {Page as default}
+export { Page as default };

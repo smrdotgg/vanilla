@@ -419,3 +419,18 @@ model tld_yearly_price_info {
 
   @@unique([tld_price_id, year])
 }
+
+enum JobEventState {
+  PENDING
+  DONE
+}
+
+model send_test_email_job_event {
+  id    Int           @id @default(autoincrement())
+  state JobEventState @default(PENDING)
+
+  targetEmail String
+
+  created_at DateTime  @default(now())
+  handled_at DateTime?
+}

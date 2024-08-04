@@ -54,7 +54,7 @@ function DNSTransferCopy({
   dnsList,
 }: {
   dnsList: string[];
-  domainName:string;
+  domainName: string;
 }) {
   return (
     <div className="max-w-full  flex flex-col gap-4">
@@ -82,7 +82,8 @@ function DNSTransferCopy({
       </div>
       <p>
         Once you have set your DNS servers, you will be able to use{" "}
-        <span className="bg-secondary font-mono ">{domainName}</span> in SplitBox.
+        <span className="bg-secondary font-mono ">{domainName}</span> in
+        SplitBox.
       </p>
       <p>
         Please note that it might take up to 48 hours for the effect to take

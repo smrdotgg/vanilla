@@ -8,8 +8,8 @@ export type ComputeData = {
   registrationDate: string;
   domain: string | null;
   domainPointers: "not_set" | "error" | "success";
-  ipv4:string,
-  ipv4PointsTo:string | null,
+  ipv4: string;
+  ipv4PointsTo: string | null;
 };
 
 export const columns: ColumnDef<ComputeData>[] = [

@@ -5,7 +5,7 @@ import whois from "whois-json";
 // import * as whois from "whois-json";
 //
 export const loader = async (args: LoaderFunctionArgs) => {
-  const domains = ['steliade.com' ]
+  const domains = ["steliade.com"];
   const data = await Promise.all(domains.map((d) => whois(d)));
   return { data };
 };

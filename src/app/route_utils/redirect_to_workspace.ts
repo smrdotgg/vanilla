@@ -28,8 +28,7 @@ export const redirectUserToWorkspace = async ({
       },
     });
   } else if (user.workspace_user_join_list.length) {
-    selectedWorkspaceId =
-      user.workspace_user_join_list[0].workspace_id;
+    selectedWorkspaceId = user.workspace_user_join_list[0].workspace_id;
     return redirect(`/app/${selectedWorkspaceId}`, {
       headers: {
         "Set-Cookie": await selectedWorkspaceCookie.serialize(

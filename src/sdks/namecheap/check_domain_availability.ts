@@ -22,35 +22,33 @@ export const checkDomainNameAvailability = async ({
     await response.text()
   ) as NamecheapApiResponse<{ DomainCheckResult: DomainCheckResult }[]>;
   console.log(JSON.stringify(responseParsed, null, 2));
-  
+
   const domainCheckResults =
     responseParsed.ApiResponse.children[3].CommandResponse.children.map(
       (c) => c.DomainCheckResult
     );
 
-  domainCheckResults.sort(
-    (first, second) => {
-      const firstTld = "." + first.Domain.split(".")[1];
-      const secondTld = "." + second.Domain.split(".")[1];
-      if (!topDomains.includes(firstTld)) {
-        return 1;
-      }
-      if (!topDomains.includes(secondTld)) {
-        return 1;
-      }
-
-      const firstIndex = topDomains.indexOf(firstTld);
-      const secondIndex = topDomains.indexOf(secondTld);
-
-      if (firstIndex > secondIndex) {
-        return 1;
-      } else if (firstIndex < secondIndex) {
-        return -1;
-      } else {
-        return 0;
-      }
+  domainCheckResults.sort((first, second) => {
+    const firstTld = "." + first.Domain.split(".")[1];
+    const secondTld = "." + second.Domain.split(".")[1];
+    if (!topDomains.includes(firstTld)) {
+      return 1;
     }
-  );
+    if (!topDomains.includes(secondTld)) {
+      return 1;
+    }
+
+    const firstIndex = topDomains.indexOf(firstTld);
+    const secondIndex = topDomains.indexOf(secondTld);
+
+    if (firstIndex > secondIndex) {
+      return 1;
+    } else if (firstIndex < secondIndex) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
   return domainCheckResults;
 };
 

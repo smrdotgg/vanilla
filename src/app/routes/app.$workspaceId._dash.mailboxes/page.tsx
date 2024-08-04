@@ -8,8 +8,7 @@ import { YourMailboxes } from "./components/your_mailboxes";
 import { loader } from "./route";
 
 export const Page = () => {
-  const { workspaceId, domains, mailboxes } =
-    useLoaderData<typeof loader>();
+  const { workspaceId, domains, mailboxes } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex w-full flex-col p-6 ">
@@ -46,7 +45,10 @@ export const Page = () => {
         <YourMailboxes
           rows={mailboxes.map((m) => ({
             fullName: m.firstName + " " + (m.lastName ?? ""),
-            address: (m.username && m.domainName) ? m.username + "@" + m.domainName : "N/A",
+            address:
+              m.username && m.domainName
+                ? m.username + "@" + m.domainName
+                : "N/A",
             domainId: String(m.id),
             status: m.status,
           }))}

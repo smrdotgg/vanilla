@@ -26,7 +26,6 @@ const Page = () => {
 
 export default Page;
 
-
 export const action = async (args: ActionFunctionArgs) => {
   const session = await adminGuard(args);
   const formData = await args.request.formData();

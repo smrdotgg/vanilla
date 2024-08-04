@@ -50,4 +50,3 @@ export async function getAccessToken() {
     });
   return response.access_token;
 }
-

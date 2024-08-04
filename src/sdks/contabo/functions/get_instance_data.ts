@@ -19,4 +19,3 @@ export async function getVPSInstanceData({ id }: { id: string }): Promise<{
     headers: headers,
   }).then((r) => r.json());
 }
-

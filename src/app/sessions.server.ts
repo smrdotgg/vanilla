@@ -19,4 +19,3 @@ const sessionStorage = createCookieSessionStorage({
 });
 
 export const themeSessionResolver = createThemeSessionResolver(sessionStorage);
-

@@ -66,7 +66,7 @@ export function TransferDomainDialog() {
             <Input
               name="code"
               placeholder="Authorization Code"
-            autoComplete="off"
+              autoComplete="off"
               className="w-full"
               required
             />

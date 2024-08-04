@@ -5,14 +5,12 @@ import { prisma } from "~/utils/db";
 export const loader: LoaderFunction = async (params: LoaderFunctionArgs) => {
   const session = await workspaceGuard(params);
 
-
-  const mailboxes = await prisma.mailbox
-    .findMany({
-      where: {
-        workspaceId: Number(session.workspaceMembership.workspace_id),
-        status: "ADDED",
-      },
-    });
+  const mailboxes = await prisma.mailbox.findMany({
+    where: {
+      workspaceId: Number(session.workspaceMembership.workspace_id),
+      status: "ADDED",
+    },
+  });
 
   const csvTopLine = `FirstName,LastName,Username,Domain,Email,SMTP Server,SMTP Port,SMTP Security,IMAP Server,IMAP Port,IMAP Security,Password`;
   const csvBody = mailboxes

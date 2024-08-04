@@ -1,4 +1,3 @@
 export const INTENTS = {
-    createMailboxes: "createMailboxes",
+  createMailboxes: "createMailboxes",
 } as const;
-

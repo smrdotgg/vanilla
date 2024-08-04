@@ -9,8 +9,6 @@ export const ContaboService = {
   getOrCreateVPSAndGetId,
   getVPSInstanceData,
   enableIpv6,
-
 };
 
 // enableIpv6
-

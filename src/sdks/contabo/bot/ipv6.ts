@@ -118,7 +118,7 @@ export async function setIpv6ReverseDNS({
       targetPage.locator("::-p-aria(Reverse DNS Management)"),
       targetPage.locator("li:nth-of-type(19) > a"),
       targetPage.locator(
-        '::-p-xpath(//*[@id=\\"mainmenu\\"]/div[2]/ul/li[19]/a)',
+        '::-p-xpath(//*[@id=\\"mainmenu\\"]/div[2]/ul/li[19]/a)'
       ),
       targetPage.locator(":scope >>> li:nth-of-type(19) > a"),
       targetPage.locator("::-p-text(Reverse DNS Management)"),
@@ -144,7 +144,7 @@ export async function setIpv6ReverseDNS({
             const cellText = cell.textContent ?? "";
             console.log(`Checking cell with content: ${cellText}`);
             return cellText.includes(ipv6);
-          }),
+          })
         );
         if (targetRow) {
           console.log("Target row found, processing...");
@@ -164,7 +164,7 @@ export async function setIpv6ReverseDNS({
           console.log(`No matching row found for IPV6: ${ipv6}`);
         }
       },
-      ipv6,
+      ipv6
     );
   }
 
@@ -172,7 +172,7 @@ export async function setIpv6ReverseDNS({
     const targetPage = page;
     await Locator.race([
       targetPage.locator(
-        '::-p-aria(Update PTR record information) >>>> ::-p-aria([role=\\"textbox\\"])',
+        '::-p-aria(Update PTR record information) >>>> ::-p-aria([role=\\"textbox\\"])'
       ),
       targetPage.locator("#ptr"),
       targetPage.locator('::-p-xpath(//*[@id=\\"ptr\\"])'),
@@ -207,7 +207,7 @@ export async function setIpv6ReverseDNS({
     const targetPage = page;
     await Locator.race([
       targetPage.locator(
-        '::-p-aria(Update PTR record information) >>>> ::-p-aria([role=\\"textbox\\"])',
+        '::-p-aria(Update PTR record information) >>>> ::-p-aria([role=\\"textbox\\"])'
       ),
       targetPage.locator("#ptr"),
       targetPage.locator('::-p-xpath(//*[@id=\\"ptr\\"])'),
@@ -220,11 +220,11 @@ export async function setIpv6ReverseDNS({
     const targetPage = page;
     await Locator.race([
       targetPage.locator(
-        '::-p-aria(Save) >>>> ::-p-aria([role=\\"generic\\"])',
+        '::-p-aria(Save) >>>> ::-p-aria([role=\\"generic\\"])'
       ),
       targetPage.locator("button.ui-state-hover > span"),
       targetPage.locator(
-        "::-p-xpath(/html/body/div[6]/div[3]/div/button[1]/span)",
+        "::-p-xpath(/html/body/div[6]/div[3]/div/button[1]/span)"
       ),
       targetPage.locator(":scope >>> button.ui-state-hover > span"),
       targetPage.locator("::-p-text(Save)"),
@@ -242,4 +242,3 @@ export async function setIpv6ReverseDNS({
 }
 
 export {};
-

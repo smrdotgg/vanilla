@@ -30,7 +30,12 @@ export const parseWhoisResponse = ({
     const containsServerTransferProhibited = domainStatusValues.includes(
       "serverTransferProhibited"
     );
-    return {creationDate, containsOk, containsClientTransferProhibited, containsServerTransferProhibited};
+    return {
+      creationDate,
+      containsOk,
+      containsClientTransferProhibited,
+      containsServerTransferProhibited,
+    };
   }
 
   throw Error("Unsupported TLD");

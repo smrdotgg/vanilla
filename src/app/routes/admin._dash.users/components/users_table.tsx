@@ -172,9 +172,10 @@ function RestoreDomainDialog({
           <DialogTitle>
             Are you absolutely sure you want to restore this user?
           </DialogTitle>
-          <DialogDescription >
-            This user currently cannot access their account.<br />This will enable
-            them to access their account once again.
+          <DialogDescription>
+            This user currently cannot access their account.
+            <br />
+            This will enable them to access their account once again.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-end">

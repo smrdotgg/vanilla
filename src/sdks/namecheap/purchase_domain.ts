@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import SXTJ from "simple-xml-to-json";
 import { env } from "~/utils/env";
-import { nameCheapBaseUrl, } from ".";
+import { nameCheapBaseUrl } from ".";
 import { prisma } from "~/utils/db";
 
 export const purchaseDomain = async ({

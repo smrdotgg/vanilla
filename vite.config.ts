@@ -1,5 +1,5 @@
 import { vitePlugin as remix } from "@remix-run/dev";
-import path from "path"
+import path from "path";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -16,7 +16,7 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   optimizeDeps: {
-    exclude: [ "firebase-admin", "node-ssh"],
+    exclude: ["firebase-admin", "node-ssh"],
   },
   resolve: {
     alias: {

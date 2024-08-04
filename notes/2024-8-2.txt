@@ -1,0 +1,30 @@
+---
+
+1. User wants to purchase domain
+ - domain is instantly added to database
+ - domain zone is instantly added to DNS
+ - domain status is checked from DB (cron synched)
+
+2. User wants to add mailbox
+ - mailbox is instantly added to database
+ - mailbox status is checked form DB
+
+3. Admin wants to view the status of all domains
+ - domain status is fetched from database
+
+
+--
+CRONS
+1. Mailbox Status Sync
+ - Not deleted
+ - VPS Assigned 
+ - VPS Status
+ - IPV6 Enabled
+ - mail.$DOMAIN points to machine IP (on dns service record)
+ - mail.$DOMAIN points to machine IP (according to real dns record)
+ - Emailwiz installed and set up (check for artifacts)
+ - PostEmailwiz records set (on dns service record)
+ - PostEmailwiz records set (according to real dns record)
+
+2. Mailbox Update/Setup
+ - Fix any mailboxes that aren't working well.

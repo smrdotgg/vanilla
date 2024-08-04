@@ -18,7 +18,10 @@ export function Page() {
     return (
       <>
         <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gray-100 py-12 dark:bg-gray-900 sm:px-6 lg:px-8">
-          <p>Domain not available. <Link to="../domains"> Shop for more domains.</Link></p>
+          <p>
+            Domain not available.{" "}
+            <Link to="../domains"> Shop for more domains.</Link>
+          </p>
         </div>
       </>
     );
@@ -36,8 +39,9 @@ export function Page() {
             <span className="text-2xl font-bold">${price - 1}.99</span>
           </div>
           <p className="text-gray-500 dark:text-gray-400">
-            You&apos;re purchasing a 1 year registration for the domain
-            {" "}<span className="font-mono">{name}</span>.<br/>This will renew automatically each year.
+            You&apos;re purchasing a 1 year registration for the domain{" "}
+            <span className="font-mono">{name}</span>.<br />
+            This will renew automatically each year.
           </p>
         </CardContent>
         <CardFooter className="flex justify-end gap-1">

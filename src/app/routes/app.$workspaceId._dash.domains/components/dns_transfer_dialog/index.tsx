@@ -30,14 +30,14 @@ export function DNSTransferDialog() {
           (DNS) Transfer In Domain
         </Button>
       </DialogTrigger>
-      <DialogContent className='p-10 max-h-screen overflow-y-auto' >
+      <DialogContent className="p-10 max-h-screen overflow-y-auto">
         {page === "initial" && (
           <DNSTransferDialog_InitialPage
             onClick={() => setPage("transferForm")}
           />
         )}
         {page === "transferForm" && (
-          <DNSTransferDialog_FormPage setOpen={setOpen} open={open}/>
+          <DNSTransferDialog_FormPage setOpen={setOpen} open={open} />
         )}
       </DialogContent>
     </Dialog>

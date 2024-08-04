@@ -10,6 +10,9 @@ import {
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "../route";
 import { MyCheckMark, MyXMark } from "~/components/custom/checkmark";
+import { Button } from "~/components/ui/button";
+import { LucideEllipsisVertical } from "lucide-react";
+import { RowMenu } from "./row_menu";
 
 export const PointerTable = () => {
   const { rows } = useLoaderData<typeof loader>();
@@ -31,6 +34,7 @@ export const PointerTable = () => {
           <TableHead>Emailwiz set up</TableHead>
           <TableHead>Email Pointers Set up</TableHead>
           <TableHead>Ready for emails</TableHead>
+          <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -43,9 +47,7 @@ export const PointerTable = () => {
             {/* <TableHead>Domain</TableHead> */}
             <TableCell className="text-center">{row.name}</TableCell>
             {/* <TableHead>Host Machine Assigned</TableHead> */}
-            <TableCell >
-              {row.vps ? <MyCheckMark /> : "N/A"}
-            </TableCell>
+            <TableCell>{row.vps ? <MyCheckMark /> : "N/A"}</TableCell>
             {/* <TableHead>Host Machine Status</TableHead> */}
             <TableCell>
               {(() => {
@@ -101,6 +103,17 @@ export const PointerTable = () => {
                 if (row.vps.readyForEmail) return <MyCheckMark />;
                 return <MyXMark />;
               })()}
+            </TableCell>
+            {/* <TableHead>Actions</TableHead> */}
+            <TableCell>
+              <RowMenu
+                domain={row.name}
+                trigger={
+                  <Button variant={"ghost"}>
+                    <LucideEllipsisVertical className="text-primary h-4" />
+                  </Button>
+                }
+              />
             </TableCell>
           </TableRow>
         ))}
