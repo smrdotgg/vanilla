@@ -23,7 +23,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   const workingDnsDomainsWithMailboxCount = await Promise.all(
     workingDnsDomains.map(async (d) => {
-      const mailboxCount = await prisma.mailbox.count({
+      const mailboxCount = await prisma.mailbox_config.count({
         where: { domainName: d.name },
       });
       let rootCnameRecord: string | undefined;
@@ -40,7 +40,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       return { ...d, mailboxCount, rootCnameRecord };
     })
   );
-  const mailboxes = await prisma.mailbox.findMany({
+  const mailboxes = await prisma.mailbox_config.findMany({
     where: { workspaceId: workspaceMembership.workspace_id, deletedAt: null },
   });
 

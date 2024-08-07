@@ -6,7 +6,7 @@ import { prisma } from "~/utils/db";
 export async function loader(args: LoaderFunctionArgs) {
   const session = await workspaceGuard(args);
 
-  const mailboxes = await prisma.mailbox.findMany({
+  const mailboxes = await prisma.mailbox_config.findMany({
     where: {
       workspaceId: session.workspaceMembership.workspace_id,
       deletedAt: null,
@@ -23,7 +23,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const domains = await Promise.all(
     workingDnsDomains.map(async (d) => {
-      const mailboxCount = await prisma.mailbox.count({
+      const mailboxCount = await prisma.mailbox_config.count({
         where: { domainName: d.name },
       });
       return { ...d, mailboxCount };

@@ -15,7 +15,7 @@ import { LucideEllipsisVertical } from "lucide-react";
 import { RowMenu } from "./row_menu";
 
 export const PointerTable = () => {
-  const { rows } = useLoaderData<typeof loader>();
+  const { statuses: rows } = useLoaderData<typeof loader>();
   return (
     <Table>
       <TableCaption>A list of domains.</TableCaption>

@@ -8,7 +8,7 @@ import { DefaultErrorBoundary } from "~/components/custom/my-error-boundary";
 const fullDomain = (subdomain: string, parent: string) =>
   `${subdomain.length ? subdomain + "." : ""}${parent}`;
 export const loader = async () => {
-  const mailboxes = (await prisma.mailbox.findMany()).map((m) => ({
+  const mailboxes = (await prisma.mailbox_config.findMany()).map((m) => ({
     id: m.id,
     firstName: m.firstName,
     lastName: m.lastName,

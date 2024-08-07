@@ -5,9 +5,11 @@ import { env } from "~/utils/env";
 export const setHosts = async ({
   hosts,
   domain,
+  removeExistingRecords = true,
 }: {
   domain: string;
   hosts: Host[];
+  removeExistingRecords?: boolean;
 }) => {
   hosts = hosts.map((host) => {
     return {
@@ -20,10 +22,6 @@ export const setHosts = async ({
 
   consoleLog(`Setting hosts for domain ${domain} with ${hosts.length} hosts`);
   consoleLog(hosts);
-
-  // const val: {[key: string]:number} = Object.entries(hosts).map(([k,v]) => [k,v])
-
-  // consoleLog(`Setting hosts for domain ${domain}`);
 
   let zone = await getZone({ domain });
   if (!zone) {
@@ -41,19 +39,20 @@ export const setHosts = async ({
     (r) => r.type !== "NS"
   );
 
-  consoleLog(`Deleting existing records for ${domain}`);
-  const recordList = Object.entries(records).map(([, v]) => v);
-  consoleLog(`Records: ${JSON.stringify(recordList, null, 2)}`);
-
-  for (const record of recordList) {
-    const result = await deleteRecord({ recordId: record.id, domain });
-    if (!result) {
-      consoleError(
-        `Failed to add record for ${JSON.stringify(record, null, 2)}`
-      );
-      throw new Error("Failed to add record");
-    } else {
-      console.log(await result.text());
+  if (removeExistingRecords) {
+    consoleLog(`Deleting existing records for ${domain}`);
+    const recordList = Object.entries(records).map(([, v]) => v);
+    consoleLog(`Records: ${JSON.stringify(recordList, null, 2)}`);
+    for (const record of recordList) {
+      const result = await deleteRecord({ recordId: record.id, domain });
+      if (!result) {
+        consoleError(
+          `Failed to add record for ${JSON.stringify(record, null, 2)}`
+        );
+        throw new Error("Failed to add record");
+      } else {
+        console.log(await result.text());
+      }
     }
   }
 

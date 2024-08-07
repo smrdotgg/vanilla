@@ -1,8 +1,12 @@
 node_modules
 x.ts
+x.backup.ts
 
 /.cache
 /build
 .env
 
 *.sh
+
+
+ign

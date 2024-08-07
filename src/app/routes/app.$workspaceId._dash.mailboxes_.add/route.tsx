@@ -36,7 +36,7 @@ export async function action(args: ActionFunctionArgs) {
       return { ok: false, success: false, error: result.error };
     }
 
-    await prisma.mailbox.createMany({
+    await prisma.mailbox_config.createMany({
       data: result.data.map((d) => ({
         workspaceId: session.workspaceMembership.workspace_id,
         firstName: d.firstName,

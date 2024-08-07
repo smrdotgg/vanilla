@@ -150,8 +150,9 @@ model domain_dns_transfer {
   workspace workspace @relation(fields: [workspaceId], references: [id])
   user      user      @relation(fields: [userId], references: [id])
 
-  userId      Int
-  workspaceId Int
+  userId         Int
+  workspaceId    Int
+  mailbox_config mailbox_config[]
 }
 
 model domain_transfer {
@@ -291,11 +292,10 @@ enum MailBoxStatus {
   ADDED
 }
 
-model mailbox {
+model mailbox_config {
   id Int @id @default(autoincrement())
 
   domainPrefix String @default("")
-  domainName   String
 
   firstName String
   lastName  String?
@@ -309,8 +309,35 @@ model mailbox {
   deletedAt   DateTime?
   workspaceId Int
 
-  imapPort Int @default(993)
-  smtpPort Int @default(465)
+  imapPort              Int                 @default(993)
+  smtpPort              Int                 @default(465)
+  domain                domain_dns_transfer @relation(fields: [domain_dns_transferId], references: [id])
+  domain_dns_transferId Int
+
+  @@map("mailbox")
+}
+
+enum MailboxStatusVpsStatus {
+  UP
+  DOWN
+}
+
+model domain_email_status {
+  id Int @id @default(autoincrement())
+
+  domainPrefix String @default("")
+  coreDomain String @map("fullDomain")
+
+  vpsAssigned                             Boolean
+  vpsStatus                               MailboxStatusVpsStatus
+  ipv6Enabled                             Boolean
+  mailDotDomainSetToPointToMachineIp      Boolean
+  mailDotDomainActuallyPointsToMachineIp  Boolean
+  emailSoftwareSetUp                      Boolean
+  emailAuthPointersSetToPointCorrectly    Boolean
+  emailAuthPointersActuallyPointCorrectly Boolean
+	@@map("mailbox_status")
+  @@unique([domainPrefix, coreDomain])
 }
 
 model vps {
@@ -388,7 +415,7 @@ model workspace {
   domain              domain[]
   splitbox            vps[]
   campaign            campaign[]
-  mailbox             mailbox[]
+  mailbox             mailbox_config[]
   domainTransfers     domain_transfer[]
   domain_dns_transfer domain_dns_transfer[]
 }

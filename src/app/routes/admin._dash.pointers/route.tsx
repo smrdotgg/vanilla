@@ -24,89 +24,18 @@ const fullDomain = (subdomain: string, parent: string) =>
 
 export const loader = async () => {
   const domains = await prisma.domain_dns_transfer.findMany({
-    where: { canceledAt: null },
+    include: {
+      mailbox_config: {
+        
+      },
+    },
   });
-  const domainsWithMailboxCount = await Promise.all(
-    domains.map(async (d) => {
-      const { core, prefix } = getPrefixAndCore({ domain: d.name });
-
-      const mailboxCount = await prisma.mailbox.count({
-        where: {
-          domainPrefix: prefix,
-          domainName: core,
-        },
-      });
-      return { ...d, mailboxCount };
-    })
-  );
-
-  const data = await Promise.all(
-    domainsWithMailboxCount.map(async (domain) => {
-      const vps = await prisma.vps.findFirst({
-        where: { domain: domain.name },
-      });
-      if (!vps) return { ...domain, vps: null };
-
-      const recordList = await DnsimpleService.getDomainRecords({
-        domain: domain.name,
-      }).then((iplist) => iplist.filter((i) => i.type.toUpperCase() === "A"));
-      let ip: string | null = null;
-
-      for (const record of recordList) {
-        const recordDomain = fullDomain(record.host, domain.name);
-        if (record.type.toUpperCase() === "A" && recordDomain === domain.name) {
-          ip = record.record;
-        }
-      }
-
-      const contaboData = await ContaboService.getVPSInstanceData({
-        id: vps!.compute_id_on_hosting_platform,
-      }).then((c) => c.data.at(0)!);
-
-      const ipv4 = contaboData.ipConfig.v4.ip;
-      const ipv6 = contaboData.ipConfig.v6.ip;
-      const ipv6Starter = ipv6.slice(0, 19);
-
-      const reversePointers = await prisma.reverseDnsEntry.findMany({
-        where: {
-          OR: [{ from: ipv4 }, { from: { startsWith: ipv6Starter } }],
-        },
-      });
-      const ipReversePointersAreValid = checkReversePointers({
-        domain: domain.name,
-        reversePointers,
-        ipv4,
-        ipv6,
-      });
-      const ipreversPointersValidation = await checkReversePointersWithDNS({
-        domain: domain.name,
-        ipv4,
-        ipv6,
-      });
-
-      const pointersSet = await authDomainPointersSet({ domain: domain.name });
-
-      return {
-        ...domain,
-        vps: {
-          ...vps!,
-          status: contaboData.status,
-          ip: { ipv4, ipv6 },
-          ipReversePointersAreValid,
-          ipreversPointersValidation,
-          pointersSet: {
-            allSet: pointersSet.allSet,
-          },
-          readyForEmail:
-            ipreversPointersValidation &&
-            vps.emailwizInitiated &&
-            pointersSet.allSet,
-        },
-      };
-    })
-  );
-
-  return { rows: data };
+  const mailboxes = await prisma.mailbox_config.findMany({
+    where: { deletedAt: null },
+    include: { mailbox_status: true },
+  });
+  const data = await prisma.mailbox_status.findMany();
+  return { statuses: data };
 };
 
 export default function Page() {

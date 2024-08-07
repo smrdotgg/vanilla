@@ -5,7 +5,7 @@ import { prisma } from "~/utils/db";
 export const loader: LoaderFunction = async (params: LoaderFunctionArgs) => {
   const session = await workspaceGuard(params);
 
-  const mailboxes = await prisma.mailbox.findMany({
+  const mailboxes = await prisma.mailbox_config.findMany({
     where: {
       workspaceId: Number(session.workspaceMembership.workspace_id),
       status: "ADDED",

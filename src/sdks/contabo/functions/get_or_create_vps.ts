@@ -3,18 +3,18 @@ import { Instance, Links } from "../types";
 import { env } from "~/utils/env";
 import { getAccessToken } from "../helpers/get_access_token";
 import { consoleLog } from "~/utils/console_log";
+import { prefixPlusDomain } from "~/backend/helpers/prefix_plus_domain";
 
 export async function getOrCreateVPSAndGetId({
-  mailboxId,
+  mailboxDomain,
 }: {
-  mailboxId: number;
+  mailboxDomain: string,
 }) {
-  const mailbox = (await prisma.mailbox.findFirst({
-    where: { id: mailboxId },
-  }))!;
   const existingVPS =
     (await prisma.vps.findFirst({
-      where: { domain: mailbox.domainName },
+      where: {
+        domain: mailboxDomain,
+      },
     })) ??
     (await prisma.vps.findFirst({
       where: { OR: [{ domain: { equals: null } }, { domain: { equals: "" } }] },
@@ -26,7 +26,7 @@ export async function getOrCreateVPSAndGetId({
     consoleLog(`Found existing VPS`);
     await prisma.vps.update({
       data: {
-        domain: mailbox.domainName,
+        domain: mailboxDomain,
       },
       where: {
         id: existingVPS.id,
@@ -38,7 +38,7 @@ export async function getOrCreateVPSAndGetId({
     vpsContaboId = await createVPSInstance().then((d) => d.id);
     await prisma.vps.create({
       data: {
-        domain: mailbox.domainName,
+        domain: mailboxDomain,
         compute_id_on_hosting_platform: vpsContaboId,
         name: crypto.randomUUID(),
       },
