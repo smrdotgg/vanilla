@@ -25,17 +25,29 @@ const fullDomain = (subdomain: string, parent: string) =>
 export const loader = async () => {
   const domains = await prisma.domain_dns_transfer.findMany({
     include: {
-      mailbox_config: {
-        
-      },
+      mailbox_config: {},
     },
   });
+  const data = await prisma.domain_email_status.findMany();
   const mailboxes = await prisma.mailbox_config.findMany({
-    where: { deletedAt: null },
-    include: { mailbox_status: true },
+    where: {
+      deletedAt: null,
+      domain: { name: { in: data.map((d) => d.coreDomain) } },
+      domainPrefix: { in: data.map((d) => d.domainPrefix) },
+    },
+    include: { domain: true },
   });
-  const data = await prisma.mailbox_status.findMany();
-  return { statuses: data };
+
+  return {
+    statuses: data.map((row) => {
+      const count = mailboxes.filter(
+        (m) =>
+          m.domainPrefix === row.domainPrefix &&
+          m.domain.name === row.coreDomain
+      ).length;
+      return { ...row, mailboxCount: count };
+    }),
+  };
 };
 
 export default function Page() {
