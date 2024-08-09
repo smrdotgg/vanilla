@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { INTENTS } from "../types";
 import { Progress } from "~/components/ui/progress";
+import { AccountTile } from "./account-dash";
 
 type topDashRoutes = "domains" | "mailboxes";
 
@@ -135,7 +136,7 @@ export function DashLayout({
                     } else if (!isPending && loading === e.route) {
                       setLoading("");
                     }
-                    const baseClasses = "flex min-h-8 rounded m-1";
+                    const baseClasses = "flex min-h-8 rounded mx-1";
                     let stateClasses = "";
 
                     if (isActive) {
@@ -170,7 +171,6 @@ export function DashLayout({
               ))}
             </div>
           </div>
-          <div className="pt-2"></div>
           <AccountTile />
         </div>
         {/* Main Content */}
@@ -180,10 +180,6 @@ export function DashLayout({
       </div>
     </div>
   );
-}
-function AccountTile() {
-  return <></>;
-  return <>account tile</>;
 }
 
 function WorkspaceSelect() {

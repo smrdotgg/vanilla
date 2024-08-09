@@ -1,4 +1,5 @@
 import { useFetcher, Link } from "@remix-run/react";
+import { FaGoogle } from "react-icons/fa";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -95,11 +96,9 @@ function ContinueWithGoogleButton() {
   const fetcher = useFetcher();
 
   const signInWithGoogle = async () => {
-    console.log("Signing out before Google sign-in...");
     await signOut(auth);
-    console.log("Sign-out successful. Initiating Google sign-in...");
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
+    await signInWithPopup(auth, provider)
       .then(async (res) => {
         console.log("Google sign-in successful. Getting ID token...");
         const idToken = await res.user.getIdToken();
@@ -115,10 +114,13 @@ function ContinueWithGoogleButton() {
   };
 
   return (
-    <button className="ui button" type="button" onClick={signInWithGoogle}>
-      <i className="icon google"></i>
+    <Button className="ui button flex bg-white text-black gap-2" type="button" onClick={signInWithGoogle}>
+    <FaGoogle />
+    <p>
       Login with Google
-    </button>
+    </p>
+
+    </Button>
   );
 }
 
