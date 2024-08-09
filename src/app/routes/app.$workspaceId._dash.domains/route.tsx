@@ -8,7 +8,6 @@ import { ErrorBoundary } from "./error";
 import { checkDomainTransferability } from "./helpers/whois/index.server";
 import { z } from "zod";
 import { DnsimpleService } from "~/sdks/dnsimple";
-// import { env } from "~/utils/env";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { workspaceMembership } = await workspaceGuard({
@@ -24,7 +23,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const workingDnsDomainsWithMailboxCount = await Promise.all(
     workingDnsDomains.map(async (d) => {
       const mailboxCount = await prisma.mailbox_config.count({
-        where: { domainName: d.name },
+        where: { domain: { name: d.name } },
       });
       let rootCnameRecord: string | undefined;
       const x = await DnsimpleService.getZone({ domain: d.name });

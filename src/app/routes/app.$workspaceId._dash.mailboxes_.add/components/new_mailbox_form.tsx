@@ -17,7 +17,8 @@ export const TinyFormSchema = z.object({
   firstName: z.string().min(2).max(50),
   lastName: z.string().nullish(), //.min(2).max(50).nullish(),
   username: z.string().min(2).max(50),
-  domain: z.string().min(1),
+  domainTransferId: z.string(),
+  domainPrefix: z.string(),
 });
 
 export type TinyFormType = z.infer<typeof TinyFormSchema>;
@@ -30,7 +31,7 @@ export function NewMailboxTinyForm({
   error,
 }: {
   index: number;
-  domains: string[];
+  domains: {name:string, id:number}[];
   setForms: (forms: TinyFormType[]) => void;
   forms: TinyFormType[];
   error: ZodError<TinyFormType> | undefined;
@@ -116,7 +117,7 @@ export function NewMailboxTinyForm({
                     forms.map((f, i) => (i === index ? { ...f, domain: e } : f))
                   );
                 }}
-                value={data.domain}
+                value={data.domainTransferId}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -125,13 +126,13 @@ export function NewMailboxTinyForm({
                 </FormControl>
                 <SelectContent>
                   {domains.map((domain, index) => (
-                    <SelectItem key={index} value={domain}>
-                      {domain}
+                    <SelectItem key={index} value={domain.id.toString()}>
+                      {domain.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <ErrorDisplay errors={error?.formErrors.fieldErrors.domain} />
+              <ErrorDisplay errors={error?.formErrors.fieldErrors.domainTransferId} />
             </div>
           </div>
         </form>

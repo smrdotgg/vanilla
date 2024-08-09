@@ -32,5 +32,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return null;
 };
 export default function Page() {
-  return <Outlet />;
+  return <Outlet />
+  
 }

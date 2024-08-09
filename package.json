@@ -77,6 +77,7 @@
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
+    "whois": "^2.14.2",
     "whois-json": "^2.0.4",
     "whoiser": "^1.17.3",
     "zod": "^3.23.8"

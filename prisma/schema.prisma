@@ -311,6 +311,8 @@ model mailbox_config {
 
   imapPort              Int                 @default(993)
   smtpPort              Int                 @default(465)
+  
+
   domain                domain_dns_transfer @relation(fields: [domain_dns_transferId], references: [id])
   domain_dns_transferId Int
 

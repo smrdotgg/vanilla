@@ -1,5 +1,9 @@
 import { ContaboService } from "~/sdks/contabo";
-import {prefixPlusDomain, dnsLookup, ipv6AreEqual, } from "./mailbox_check.helpers";
+import {
+  prefixPlusDomain,
+  dnsLookup,
+  ipv6AreEqual,
+} from "./mailbox_check.helpers";
 import { DnsimpleService } from "~/sdks/dnsimple";
 import { prisma } from "~/utils/db";
 import dns from "dns";
@@ -20,10 +24,13 @@ export const MailboxCheckCron = async () => {
   for (const mailboxConfig of mailboxConfigs) {
     console.log(`mailboxConfig = ${JSON.stringify(mailboxConfig)}`);
     console.log(`mailDomains = ${JSON.stringify(mailDomains)}`);
+
     const prefix = mailboxConfig.domainPrefix.length
       ? `${mailboxConfig.domainPrefix}.`
       : "";
+
     const fullDomain = `${prefix}${mailboxConfig.domain.name}`;
+
     if (mailDomains.findIndex((val) => val.fullDomain === fullDomain) === -1) {
       mailDomains.push({
         fullDomain,

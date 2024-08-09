@@ -42,8 +42,8 @@ export async function action(args: ActionFunctionArgs) {
         firstName: d.firstName,
         lastName: d.lastName,
         username: d.username,
-        domainName: d.domain,
         password: crypto.randomUUID(),
+        domain_dns_transferId: Number(d.domainTransferId),
       })),
     });
 
@@ -54,3 +54,4 @@ export async function action(args: ActionFunctionArgs) {
 
   return null;
 }
+

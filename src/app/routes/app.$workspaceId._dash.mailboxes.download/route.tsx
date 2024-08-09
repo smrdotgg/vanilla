@@ -10,13 +10,14 @@ export const loader: LoaderFunction = async (params: LoaderFunctionArgs) => {
       workspaceId: Number(session.workspaceMembership.workspace_id),
       status: "ADDED",
     },
+    include: { domain: true },
   });
 
   const csvTopLine = `FirstName,LastName,Username,Domain,Email,SMTP Server,SMTP Port,SMTP Security,IMAP Server,IMAP Port,IMAP Security,Password`;
   const csvBody = mailboxes
     .map(
       (m) =>
-        `${m.firstName},${m.lastName},${m.username},${m.domainName},${m.username}@${m.domainName},mail.${m.domainName},465,SSL/TLS,mail.${m.domainName},993,SSL/TLS,${m.password}`
+        `${m.firstName},${m.lastName},${m.username},${m.domain.name},${m.username}@${m.domain.name},mail.${m.domain.name},465,SSL/TLS,mail.${m.domain.name},993,SSL/TLS,${m.password}`
     )
     .join("\n");
   const csvString = csvTopLine + "\n" + csvBody;

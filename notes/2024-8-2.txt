@@ -1,4 +1,21 @@
 ---
+## 2024-8-8
+1. [~] Online version up
+      - 
+      - 
+2. [ ] Test dashboard working, showing actual status of domains
+3. [ ] Test dashboard shows when last update happened
+4. [ ] All features tested and working
+5. [ ] User allow list management
+6. [ ] User last login
+7. [ ] Website set
+8. [ ] User session replay
+9. [ ] Payments
+
+
+---
+
+## 2024-8-2
 
 1. User wants to purchase domain
  - domain is instantly added to database
@@ -28,3 +45,4 @@ CRONS
 
 2. Mailbox Update/Setup
  - Fix any mailboxes that aren't working well.
+---

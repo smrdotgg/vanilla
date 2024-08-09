@@ -17,7 +17,7 @@ export function Page() {
   const [hasBeenSubmitted, setHasBeenSubmitted] = useState(false);
 
   const [forms, setForms] = useState<TinyFormType[]>([
-    { domain: "", username: "", lastName: undefined, firstName: "" },
+    { domainPrefix: "", domainTransferId: "", username: "", lastName: undefined, firstName: "" },
   ]);
 
   const errors = forms.map((form) =>
@@ -57,7 +57,7 @@ export function Page() {
             onClick={() =>
               setForms([
                 ...forms,
-                { domain: "", username: "", lastName: "", firstName: "" },
+                { domainPrefix: "", domainTransferId: "", username: "", lastName: undefined, firstName: "" },
               ])
             }
           >
@@ -73,7 +73,7 @@ export function Page() {
             forms={forms}
             error={errors[index]}
             // data={formData}
-            domains={domains.map((d) => d.name)}
+            domains={domains}
           />
         ))}
       </div>

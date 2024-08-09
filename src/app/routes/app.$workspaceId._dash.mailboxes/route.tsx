@@ -11,6 +11,7 @@ export async function loader(args: LoaderFunctionArgs) {
       workspaceId: session.workspaceMembership.workspace_id,
       deletedAt: null,
     },
+    include: {domain: true}
   });
 
   const dnsDomains = await prisma.domain_dns_transfer.findMany({
@@ -24,7 +25,7 @@ export async function loader(args: LoaderFunctionArgs) {
   const domains = await Promise.all(
     workingDnsDomains.map(async (d) => {
       const mailboxCount = await prisma.mailbox_config.count({
-        where: { domainName: d.name },
+        where: { domain:{name: d.name} },
       });
       return { ...d, mailboxCount };
     })

@@ -8,22 +8,22 @@ import { DefaultErrorBoundary } from "~/components/custom/my-error-boundary";
 const fullDomain = (subdomain: string, parent: string) =>
   `${subdomain.length ? subdomain + "." : ""}${parent}`;
 export const loader = async () => {
-  const mailboxes = (await prisma.mailbox_config.findMany()).map((m) => ({
+  const mailboxes = (await prisma.mailbox_config.findMany({include: {domain: true}})).map((m) => ({
     id: m.id,
     firstName: m.firstName,
     lastName: m.lastName,
     username: m.username,
     subdomain: m.domainPrefix,
-    parentDomain: m.domainName,
-    fullDomain: fullDomain(m.domainPrefix, m.domainName),
-    email: `${m.username}@${fullDomain(m.domainPrefix, m.domainName)}`,
+    parentDomain: m.domain.name,
+    fullDomain: fullDomain(m.domainPrefix, m.domain.name),
+    email: `${m.username}@${fullDomain(m.domainPrefix, m.domain.name)}`,
     smtp: {
-      server: fullDomain(m.domainPrefix, m.domainName),
+      server: fullDomain(m.domainPrefix, m.domain.name),
       port: m.smtpPort,
       security: "SSL/TLS",
     },
     imap: {
-      server: fullDomain(m.domainPrefix, m.domainName),
+      server: fullDomain(m.domainPrefix, m.domain.name),
       port: m.imapPort,
       security: "SSL/TLS",
     },
